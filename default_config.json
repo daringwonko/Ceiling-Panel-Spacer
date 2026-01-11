@@ -1,0 +1,15 @@
+{
+  "ceiling_length_mm": 5000,
+  "ceiling_width_mm": 4000,
+  "perimeter_gap_mm": 200,
+  "panel_gap_mm": 200,
+  "material_name": "led_panel_white",
+  "waste_factor": 0.15,
+  "labor_multiplier": 0.25,
+  "export_dxf": true,
+  "export_svg": true,
+  "export_json": true,
+  "export_report": true,
+  "output_dir": ".",
+  "optimization_strategy": "balanced"
+}

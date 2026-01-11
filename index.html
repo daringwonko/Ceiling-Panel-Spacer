@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ceiling Panel Calculator - Professional 3D GUI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 380px 1fr 350px;
+            height: 100vh;
+            gap: 0;
+        }
+
+        /* Left Panel - Controls */
+        .control-panel {
+            background: white;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .panel-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            font-size: 18px;
+            font-weight: 600;
+            border-bottom: 3px solid #764ba2;
+        }
+
+        .form-section {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .form-section h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        input[type="number"],
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        input[type="number"]:focus,
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        .value-display {
+            display: inline-block;
+            background: #f5f5f5;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #667eea;
+            margin-left: 10px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-export {
+            background: #4CAF50;
+            color: white;
+            font-size: 11px;
+            padding: 8px;
+        }
+
+        .btn-export:hover {
+            background: #45a049;
+        }
+
+        /* Center - 3D Viewport */
+        .viewport {
+            background: #f8f9fa;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .viewport-info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 12px;
+            z-index: 50;
+            max-width: 300px;
+        }
+
+        .viewport-info h4 {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #4CAF50;
+        }
+
+        .viewport-info p {
+            margin: 4px 0;
+            line-height: 1.6;
+        }
+
+        /* Right Panel - Properties */
+        .properties-panel {
+            background: white;
+            overflow-y: auto;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .properties-panel h2 {
+            font-size: 16px;
+            font-weight: 600;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom: 3px solid #764ba2;
+        }
+
+        .iot-dashboard {
+            display: none;
+        }
+
+        .ceiling-properties {
+            display: block;
+        }
+
+        .property-group {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .property-group h3 {
+            font-size: 12px;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .property-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .property-label {
+            font-weight: 500;
+            color: #555;
+        }
+
+        .property-value {
+            font-weight: 600;
+            color: #667eea;
+            text-align: right;
+        }
+
+        .cost-display {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        .cost-display .cost-label {
+            font-size: 11px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .cost-display .cost-value {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .status-message {
+            padding: 12px;
+            margin: 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            display: none;
+        }
+
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .status-message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            display: block;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: #667eea;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+            margin-left: 8px;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #764ba2;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            .control-panel, .properties-panel {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left Control Panel -->
+        <div class="control-panel">
+            <div class="panel-header">
+                🏢 Smart Building Hub
+            </div>
+
+            <!-- Mode Toggle -->
+            <div class="form-section">
+                <div class="button-group">
+                    <button class="btn-primary" id="mode-ceiling" onclick="setMode('ceiling')">Ceiling Design</button>
+                    <button class="btn-secondary" id="mode-iot" onclick="setMode('iot')">IoT Monitoring</button>
+                </div>
+            </div>
+
+            <div id="status-message" class="status-message"></div>
+
+            <!-- Ceiling Dimensions -->
+            <div class="form-section" id="ceiling-dimensions-section">
+                <h3>Ceiling Dimensions</h3>
+                <div class="form-group">
+                    <label>Length (mm)</label>
+                    <input type="number" id="ceiling_length" value="5000" min="100" max="50000" step="100">
+                </div>
+                <div class="form-group">
+                    <label>Width (mm)</label>
+                    <input type="number" id="ceiling_width" value="4000" min="100" max="50000" step="100">
+                </div>
+            </div>
+
+            <!-- Spacing -->
+            <div class="form-section" id="ceiling-spacing-section">
+                <h3>Spacing</h3>
+                <div class="form-group">
+                    <label>Perimeter Gap (mm)</label>
+                    <input type="number" id="perimeter_gap" value="200" min="0" max="2000" step="50">
+                </div>
+                <div class="form-group">
+                    <label>Panel Gap (mm)</label>
+                    <input type="number" id="panel_gap" value="200" min="0" max="1000" step="50">
+                </div>
+            </div>
+
+            <!-- Material -->
+            <div class="form-section" id="ceiling-material-section">
+                <h3>Material</h3>
+                <div class="form-group">
+                    <label>Select Material</label>
+                    <select id="material_name">
+                        <option value="led_panel_white">LED Panel White</option>
+                        <option value="led_panel_black">LED Panel Black</option>
+                        <option value="acoustic_white">Acoustic White</option>
+                        <option value="drywall_white">Drywall White</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Algorithm -->
+            <div class="form-section" id="ceiling-algorithm-section">
+                <h3>Optimization</h3>
+                <div class="form-group">
+                    <label>Strategy</label>
+                    <select id="optimization_strategy">
+                        <option value="balanced">Balanced</option>
+                        <option value="minimize_seams">Minimize Seams</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Costs -->
+            <div class="form-section" id="ceiling-costs-section">
+                <h3>Cost Parameters</h3>
+                <div class="form-group">
+                    <label>Waste Factor (%)</label>
+                    <input type="number" id="waste_factor" value="15" min="0" max="100" step="5">
+                    <small style="color: #999; font-size: 11px;">Account for cutting/breakage</small>
+                </div>
+                <div class="form-group">
+                    <label>Labor Multiplier (%) - Optional</label>
+                    <input type="number" id="labor_multiplier" value="25" min="0" max="200" step="5">
+                    <small style="color: #999; font-size: 11px;">As % of material cost</small>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="form-section" id="ceiling-actions-section">
+                <h3>Actions</h3>
+                <div class="button-group">
+                    <button class="btn-primary" onclick="calculateLayout()">
+                        ↻ Calculate
+                    </button>
+                    <button class="btn-secondary" onclick="resetForm()">
+                        Reset
+                    </button>
+                </div>
+                <div style="margin-top: 10px;">
+                    <button class="btn-primary" id="vr-button" onclick="enterVR()" style="width: 100%; display: none;">
+                        🥽 Enter VR
+                    </button>
+                </div>
+            </div>
+
+            <!-- Export -->
+            <div class="form-section" id="ceiling-export-section">
+                <h3>Export</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <button class="btn-export" onclick="exportProject('json')">📄 JSON</button>
+                    <button class="btn-export" onclick="exportProject('dxf')">📐 DXF</button>
+                    <button class="btn-export" onclick="exportProject('svg')">🖼️ SVG</button>
+                    <button class="btn-export" onclick="exportProject('report')">📋 Report</button>
+                </div>
+            </div>
+
+            <!-- IoT Network Status -->
+            <div class="form-section iot-section" id="iot-network-section" style="display: none;">
+                <h3>🛰️ IoT Network</h3>
+                <div class="property-item">
+                    <span class="property-label">Status</span>
+                    <span class="property-value" id="network-status">Checking...</span>
+                </div>
+                <div class="property-item">
+                    <span class="property-label">Nodes Online</span>
+                    <span class="property-value" id="nodes-online">-</span>
+                </div>
+                <div class="property-item">
+                    <span class="property-label">MQTT Connected</span>
+                    <span class="property-value" id="mqtt-status">-</span>
+                </div>
+                <button class="btn-secondary" onclick="refreshNetworkStatus()" style="width: 100%; margin-top: 10px;">
+                    🔄 Refresh Status
+                </button>
+            </div>
+
+            <!-- Sensor Monitoring -->
+            <div class="form-section iot-section" id="iot-sensors-section" style="display: none;">
+                <h3>📊 Sensor Data</h3>
+                <div class="form-group">
+                    <label>Select Sensor</label>
+                    <select id="sensor-select">
+                        <option value="">Choose sensor...</option>
+                    </select>
+                </div>
+                <div id="sensor-data-display" style="margin-top: 10px;">
+                    <div class="property-item">
+                        <span class="property-label">Current Value</span>
+                        <span class="property-value" id="sensor-value">-</span>
+                    </div>
+                    <div class="property-item">
+                        <span class="property-label">Health Score</span>
+                        <span class="property-value" id="sensor-health">-</span>
+                    </div>
+                </div>
+                <button class="btn-secondary" onclick="refreshSensorData()" style="width: 100%; margin-top: 10px;">
+                    📈 Refresh Data
+                </button>
+            </div>
+
+            <!-- Maintenance Dashboard -->
+            <div class="form-section iot-section" id="iot-maintenance-section" style="display: none;">
+                <h3>🔧 Maintenance</h3>
+                <div class="property-item">
+                    <span class="property-label">System Health</span>
+                    <span class="property-value" id="system-health">-</span>
+                </div>
+                <div class="property-item">
+                    <span class="property-label">Critical Alerts</span>
+                    <span class="property-value" id="critical-alerts">-</span>
+                </div>
+                <button class="btn-primary" onclick="viewMaintenancePredictions()" style="width: 100%; margin-top: 10px;">
+                    📋 View Predictions
+                </button>
+            </div>
+
+            <!-- Energy Dashboard -->
+            <div class="form-section iot-section" id="iot-energy-section" style="display: none;">
+                <h3>⚡ Energy</h3>
+                <div class="property-item">
+                    <span class="property-label">Efficiency Score</span>
+                    <span class="property-value" id="energy-efficiency">-</span>
+                </div>
+                <div class="property-item">
+                    <span class="property-label">Savings Potential</span>
+                    <span class="property-value" id="energy-savings">$0.00</span>
+                </div>
+                <button class="btn-primary" onclick="viewEnergyOptimizations()" style="width: 100%; margin-top: 10px;">
+                    💡 View Optimizations
+                </button>
+            </div>
+
+            <!-- Autonomous Control -->
+            <div class="form-section iot-section" id="iot-autonomous-section" style="display: none;">
+                <h3>🤖 Autonomous Mode</h3>
+                <div class="property-item">
+                    <span class="property-label">Status</span>
+                    <span class="property-value" id="autonomous-status">Disabled</span>
+                </div>
+                <div class="property-item">
+                    <span class="property-label">Active Rules</span>
+                    <span class="property-value" id="active-rules">-</span>
+                </div>
+                <div class="button-group" style="margin-top: 10px;">
+                    <button class="btn-primary" id="autonomous-toggle" onclick="toggleAutonomousMode()">
+                        Enable Autonomous
+                    </button>
+                </div>
+            </div>
+
+            <!-- IoT Dashboard -->
+            <div class="iot-dashboard" id="iot-dashboard">
+                <h2>IoT Smart Building Dashboard</h2>
+
+                <!-- Real-time Sensor Charts -->
+                <div class="property-group">
+                    <h3>📊 Real-time Monitoring</h3>
+                    <canvas id="sensor-chart" width="300" height="200" style="width: 100%; margin-top: 10px;"></canvas>
+                </div>
+
+                <!-- System Status -->
+                <div class="property-group">
+                    <h3>🏥 System Health</h3>
+                    <div class="property-item">
+                        <span class="property-label">Overall Health</span>
+                        <span class="property-value" id="dashboard-health">-</span>
+                    </div>
+                    <div class="property-item">
+                        <span class="property-label">Active Alerts</span>
+                        <span class="property-value" id="dashboard-alerts">-</span>
+                    </div>
+                </div>
+
+                <!-- Energy Summary -->
+                <div class="property-group">
+                    <h3>⚡ Energy Overview</h3>
+                    <div class="cost-display">
+                        <div class="cost-label">CURRENT CONSUMPTION</div>
+                        <div class="cost-value" id="dashboard-consumption">0.0 kWh</div>
+                        <hr style="margin: 10px 0; opacity: 0.3;">
+                        <div style="font-size: 11px;">
+                            <div id="energy-breakdown">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Events -->
+                <div class="property-group">
+                    <h3>📋 Recent Events</h3>
+                    <div id="recent-events" style="max-height: 150px; overflow-y: auto; font-size: 11px;">
+                        <div style="color: #999; text-align: center; padding: 20px;">Loading events...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center - 3D Viewport -->
+        <div class="viewport">
+            <canvas id="canvas"></canvas>
+            <div class="viewport-info" id="viewport-info" style="display: none;">
+                <h4>3D Preview</h4>
+                <p><strong>Rotate:</strong> Drag with mouse</p>
+                <p><strong>Zoom:</strong> Scroll wheel</p>
+                <p><strong>Pan:</strong> Right-click drag</p>
+            </div>
+        </div>
+
+        <!-- Right Properties Panel -->
+        <div class="properties-panel ceiling-properties">
+            <h2>Project Properties</h2>
+
+            <div class="property-group">
+                <h3>Ceiling</h3>
+                <div class="property-item">
+                    <span class="property-label">Length</span>
+                    <span class="property-value" id="prop-length">-</span>
+                </div>
+                <div class="property-item">
+                    <span class="property-label">Width</span>
+                    <span class="property-value" id="prop-width">-</span>
+                </div>
+                <div class="property-item">
+                    <span class="property-label">Area</span>
+                    <span class="property-value" id="prop-area">-</span>
+                </div>
+            </div>
+
+            <div class="property-group">
+                <h3>Layout</h3>
+                <div class="property-item">
+                    <span class="property-label">Total Panels</span>
+                    <span class="property-value" id="prop-panels">-</span>
+                </div>
+                <div class="property-item">
+                    <span class="property-label">Panel Size</span>
+                    <span class="property-value" id="prop-size">-</span>
+                </div>
+                <div class="property-item">
+                    <span class="property-label">Coverage</span>
+                    <span class="property-value" id="prop-coverage">-</span>
+                </div>
+                <div class="property-item">
+                    <span class="property-label">Grid</span>
+                    <span class="property-value" id="prop-grid">-</span>
+                </div>
+            </div>
+
+            <div class="property-group">
+                <h3>Material</h3>
+                <div class="property-item">
+                    <span class="property-label">Type</span>
+                    <span class="property-value" id="prop-material">-</span>
+                </div>
+                <div class="property-item">
+                    <span class="property-label">Cost/m²</span>
+                    <span class="property-value" id="prop-cost-per-sqm">-</span>
+                </div>
+            </div>
+
+            <div class="property-group">
+                <div class="cost-display">
+                    <div class="cost-label">MATERIAL COST</div>
+                    <div class="cost-value" id="prop-material-cost">$0.00</div>
+                    <hr style="margin: 10px 0; opacity: 0.3;">
+                    <div style="font-size: 11px; margin-bottom: 8px;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Material:</span>
+                            <span id="cost-material">$0.00</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Waste (15%):</span>
+                            <span id="cost-waste">$0.00</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Labor:</span>
+                            <span id="cost-labor">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Three.js for 3D rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/webxr-polyfill@latest/build/webxr-polyfill.js"></script>
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Global variables
+        let scene, camera, renderer, ceiling, panels = [];
+        let currentLayout = null;
+        let controls, vrSession = null;
+        let currentMode = 'ceiling'; // 'ceiling' or 'iot'
+        let sensorChart = null;
+        let iotUpdateInterval = null;
+
+        // Initialize Three.js
+        function initThreeJS() {
+            const canvas = document.getElementById('canvas');
+            
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xf8f9fa);
+            
+            // Camera
+            const width = canvas.clientWidth;
+            const height = canvas.clientHeight;
+            camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 10000);
+            camera.position.set(3000, 2500, 3000);
+            camera.lookAt(2500, 0, 2000);
+            
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+            renderer.setSize(width, height);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFShadowShadowMap;
+            renderer.xr.enabled = true;
+            
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(3000, 4000, 2000);
+            directionalLight.castShadow = true;
+            directionalLight.shadow.mapSize.width = 2048;
+            directionalLight.shadow.mapSize.height = 2048;
+            directionalLight.shadow.camera.left = -5000;
+            directionalLight.shadow.camera.right = 5000;
+            directionalLight.shadow.camera.top = 5000;
+            directionalLight.shadow.camera.bottom = -5000;
+            scene.add(directionalLight);
+            
+            // Grid
+            const gridHelper = new THREE.GridHelper(10000, 10, 0xcccccc, 0xeeeeee);
+            gridHelper.position.y = -10;
+            scene.add(gridHelper);
+
+            // Controls
+            controls = new THREE.OrbitControls(camera, canvas);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.enableZoom = true;
+            controls.enablePan = true;
+
+            // Check VR support
+            if (navigator.xr) {
+                navigator.xr.isSessionSupported('immersive-vr').then(supported => {
+                    if (supported) {
+                        document.getElementById('vr-button').style.display = 'block';
+                    }
+                });
+            }
+            
+            // Mouse controls disabled - using OrbitControls
+            
+            // Resize handler
+            window.addEventListener('resize', () => {
+                const newWidth = canvas.clientWidth;
+                const newHeight = canvas.clientHeight;
+                camera.aspect = newWidth / newHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(newWidth, newHeight);
+            });
+            
+            // Animation loop
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update();
+                renderer.render(scene, camera);
+            }
+            animate();
+            
+            showStatus('GUI initialized successfully!', 'info');
+        }
+
+        // Draw ceiling layout
+        function drawCeiling(ceilingData, layoutData) {
+            // Clear previous
+            if (ceiling) scene.remove(ceiling);
+            panels.forEach(p => scene.remove(p));
+            panels = [];
+            
+            const length = ceilingData.length;
+            const width = ceilingData.width;
+            const panelWidth = layoutData.panel_width;
+            const panelLength = layoutData.panel_length;
+            const panelsPerRow = layoutData.panels_per_row;
+            const panelsPerColumn = layoutData.panels_per_column;
+            
+            // Ceiling base
+            const ceilingGeom = new THREE.BoxGeometry(length, 10, width);
+            const ceilingMat = new THREE.MeshPhongMaterial({ color: 0xf0f0f0 });
+            ceiling = new THREE.Mesh(ceilingGeom, ceilingMat);
+            ceiling.receiveShadow = true;
+            scene.add(ceiling);
+            
+            // Draw panels
+            const panelMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0x667eea,
+                shininess: 100
+            });
+            const edgesMaterial = new THREE.LineBasicMaterial({ color: 0x333333, linewidth: 2 });
+            
+            for (let row = 0; row < panelsPerRow; row++) {
+                for (let col = 0; col < panelsPerColumn; col++) {
+                    const x = (row * panelWidth) - (length / 2) + (panelWidth / 2);
+                    const z = (col * panelLength) - (width / 2) + (panelLength / 2);
+                    
+                    const panelGeom = new THREE.BoxGeometry(panelWidth, 2, panelLength);
+                    const panel = new THREE.Mesh(panelGeom, panelMaterial);
+                    panel.position.set(x, 5, z);
+                    panel.castShadow = true;
+                    panel.receiveShadow = true;
+                    
+                    // Add edges
+                    const edges = new THREE.EdgesGeometry(panelGeom);
+                    const wireframe = new THREE.LineSegments(edges, edgesMaterial);
+                    panel.add(wireframe);
+                    
+                    scene.add(panel);
+                    panels.push(panel);
+                }
+            }
+            
+            // Center view
+            const centerX = length / 2;
+            const centerZ = width / 2;
+            const distance = Math.max(length, width) * 1.5;
+            camera.position.set(centerX, distance * 0.8, centerZ + distance);
+            camera.lookAt(centerX, 0, centerZ);
+        }
+
+        // API Calls
+        function calculateLayout() {
+            const data = {
+                ceiling_length: parseFloat(document.getElementById('ceiling_length').value),
+                ceiling_width: parseFloat(document.getElementById('ceiling_width').value),
+                perimeter_gap: parseFloat(document.getElementById('perimeter_gap').value),
+                panel_gap: parseFloat(document.getElementById('panel_gap').value),
+                material_name: document.getElementById('material_name').value,
+                waste_factor: parseFloat(document.getElementById('waste_factor').value) / 100,
+                labor_multiplier: parseFloat(document.getElementById('labor_multiplier').value) / 100,
+                optimization_strategy: document.getElementById('optimization_strategy').value,
+            };
+            
+            showStatus('Calculating layout...', 'info');
+            
+            fetch('/api/calculate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(r => r.json())
+            .then(result => {
+                if (result.success) {
+                    currentLayout = result;
+                    drawCeiling(result.ceiling, result.layout);
+                    updateProperties(result);
+                    showStatus('Layout calculated successfully!', 'success');
+                } else {
+                    showStatus(`Error: ${result.error}`, 'error');
+                }
+            })
+            .catch(e => showStatus(`Error: ${e.message}`, 'error'));
+        }
+
+        function updateProperties(result) {
+            const layout = result.layout;
+            const ceiling = result.ceiling;
+            const costs = result.costs;
+            const material = result.material;
+            
+            document.getElementById('prop-length').textContent = `${ceiling.length.toFixed(0)} mm`;
+            document.getElementById('prop-width').textContent = `${ceiling.width.toFixed(0)} mm`;
+            document.getElementById('prop-area').textContent = `${ceiling.area.toFixed(1)} m²`;
+            document.getElementById('prop-panels').textContent = layout.total_panels;
+            document.getElementById('prop-size').textContent = `${layout.panel_width.toFixed(0)}×${layout.panel_length.toFixed(0)}mm`;
+            document.getElementById('prop-coverage').textContent = `${layout.coverage.toFixed(1)} m²`;
+            document.getElementById('prop-grid').textContent = `${layout.panels_per_row}×${layout.panels_per_column}`;
+            document.getElementById('prop-material').textContent = material.name;
+            document.getElementById('prop-cost-per-sqm').textContent = `$${material.cost_per_sqm.toFixed(2)}`;
+            
+            document.getElementById('prop-material-cost').textContent = `$${costs.total_cost.toFixed(2)}`;
+            document.getElementById('cost-material').textContent = `$${costs.material_cost.toFixed(2)}`;
+            document.getElementById('cost-waste').textContent = `$${costs.waste_cost.toFixed(2)}`;
+            document.getElementById('cost-labor').textContent = `$${costs.labor_cost.toFixed(2)}`;
+        }
+
+        function exportProject(format) {
+            if (!currentLayout) {
+                showStatus('Please calculate a layout first', 'error');
+                return;
+            }
+            
+            const data = {
+                waste_factor: parseFloat(document.getElementById('waste_factor').value) / 100,
+                labor_multiplier: parseFloat(document.getElementById('labor_multiplier').value) / 100,
+                output_dir: '.'
+            };
+            
+            fetch(`/api/export/${format}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(r => r.json())
+            .then(result => {
+                if (result.success) {
+                    showStatus(`Exported to ${result.filename}`, 'success');
+                } else {
+                    showStatus(`Error: ${result.error}`, 'error');
+                }
+            })
+            .catch(e => showStatus(`Error: ${e.message}`, 'error'));
+        }
+
+        function resetForm() {
+            document.getElementById('ceiling_length').value = 5000;
+            document.getElementById('ceiling_width').value = 4000;
+            document.getElementById('perimeter_gap').value = 200;
+            document.getElementById('panel_gap').value = 200;
+            document.getElementById('material_name').value = 'led_panel_white';
+            document.getElementById('waste_factor').value = 15;
+            document.getElementById('labor_multiplier').value = 25;
+            document.getElementById('optimization_strategy').value = 'balanced';
+            showStatus('Form reset', 'info');
+        }
+
+        function showStatus(message, type) {
+            const elem = document.getElementById('status-message');
+            elem.textContent = message;
+            elem.className = `status-message ${type}`;
+            if (type !== 'error') {
+                setTimeout(() => {
+                    elem.style.display = 'none';
+                }, 4000);
+            }
+        }
+
+        // VR Functions
+        async function enterVR() {
+            try {
+                vrSession = await navigator.xr.requestSession('immersive-vr');
+                await renderer.xr.setSession(vrSession);
+                showStatus('VR mode activated!', 'success');
+            } catch (error) {
+                showStatus(`VR not available: ${error.message}`, 'error');
+            }
+        }
+
+        // ============================================================================
+        // IoT MODE FUNCTIONS
+        // ============================================================================
+
+        function setMode(mode) {
+            currentMode = mode;
+
+            // Update button styles
+            document.getElementById('mode-ceiling').className = mode === 'ceiling' ? 'btn-primary' : 'btn-secondary';
+            document.getElementById('mode-iot').className = mode === 'iot' ? 'btn-primary' : 'btn-secondary';
+
+            // Show/hide sections
+            const ceilingSections = ['ceiling-dimensions-section', 'ceiling-spacing-section', 'ceiling-material-section',
+                                   'ceiling-algorithm-section', 'ceiling-costs-section', 'ceiling-actions-section', 'ceiling-export-section'];
+            const iotSections = ['iot-network-section', 'iot-sensors-section', 'iot-maintenance-section',
+                               'iot-energy-section', 'iot-autonomous-section'];
+
+            ceilingSections.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.style.display = mode === 'ceiling' ? 'block' : 'none';
+            });
+
+            iotSections.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.style.display = mode === 'iot' ? 'block' : 'none';
+            });
+
+            // Show/hide properties panels
+            document.querySelector('.ceiling-properties').style.display = mode === 'ceiling' ? 'block' : 'none';
+            document.getElementById('iot-dashboard').style.display = mode === 'iot' ? 'block' : 'none';
+
+            if (mode === 'iot') {
+                initIoTMode();
+            } else {
+                if (iotUpdateInterval) {
+                    clearInterval(iotUpdateInterval);
+                    iotUpdateInterval = null;
+                }
+            }
+        }
+
+        function initIoTMode() {
+            refreshNetworkStatus();
+            loadSensorList();
+            updateIoTDashboard();
+
+            // Start periodic updates
+            if (!iotUpdateInterval) {
+                iotUpdateInterval = setInterval(updateIoTDashboard, 30000); // Update every 30 seconds
+            }
+        }
+
+        function refreshNetworkStatus() {
+            fetch('/api/iot/network/status')
+                .then(r => r.json())
+                .then(result => {
+                    if (result.success) {
+                        document.getElementById('network-status').textContent =
+                            result.network_status.network_health > 80 ? 'Healthy' :
+                            result.network_status.network_health > 50 ? 'Warning' : 'Critical';
+                        document.getElementById('nodes-online').textContent =
+                            `${result.network_status.online_nodes}/${result.network_status.total_nodes}`;
+                        document.getElementById('mqtt-status').textContent =
+                            result.mqtt_connected ? 'Connected' : 'Disconnected';
+                    }
+                })
+                .catch(e => console.error('Network status error:', e));
+        }
+
+        function loadSensorList() {
+            fetch('/api/iot/network/status')
+                .then(r => r.json())
+                .then(result => {
+                    if (result.success) {
+                        const select = document.getElementById('sensor-select');
+                        select.innerHTML = '<option value="">Choose sensor...</option>';
+
+                        result.nodes.forEach(node => {
+                            node.sensors.forEach(sensorType => {
+                                const sensorId = `${node.node_id}_${sensorType}`;
+                                const option = document.createElement('option');
+                                option.value = sensorId;
+                                option.textContent = `${node.node_id} - ${sensorType.replace('_', ' ')}`;
+                                select.appendChild(option);
+                            });
+                        });
+                    }
+                })
+                .catch(e => console.error('Load sensors error:', e));
+        }
+
+        function refreshSensorData() {
+            const sensorId = document.getElementById('sensor-select').value;
+            if (!sensorId) {
+                showStatus('Please select a sensor', 'error');
+                return;
+            }
+
+            // Get sensor data
+            fetch(`/api/iot/sensors/${sensorId}/data`)
+                .then(r => r.json())
+                .then(result => {
+                    if (result.success && result.data.length > 0) {
+                        const latest = result.data[result.data.length - 1];
+                        document.getElementById('sensor-value').textContent =
+                            `${latest.value} ${latest.unit}`;
+                    }
+                })
+                .catch(e => console.error('Sensor data error:', e));
+
+            // Get sensor health
+            fetch(`/api/iot/sensors/${sensorId}/health`)
+                .then(r => r.json())
+                .then(result => {
+                    if (result.success) {
+                        const health = result.health.health_score;
+                        document.getElementById('sensor-health').textContent =
+                            `${health.toFixed(1)}%`;
+                        document.getElementById('sensor-health').style.color =
+                            health > 80 ? '#4CAF50' : health > 60 ? '#FF9800' : '#F44336';
+                    }
+                })
+                .catch(e => console.error('Sensor health error:', e));
+        }
+
+        function viewMaintenancePredictions() {
+            fetch('/api/maintenance/predictions')
+                .then(r => r.json())
+                .then(result => {
+                    if (result.success) {
+                        const predictions = result.predictions.slice(0, 5); // Show top 5
+                        let message = `Found ${result.total_predictions} maintenance predictions:\n\n`;
+                        predictions.forEach(p => {
+                            message += `• ${p.component_id}: ${p.maintenance_type} (${p.priority}) - ${p.time_to_failure_days} days\n`;
+                        });
+                        alert(message);
+                    }
+                })
+                .catch(e => console.error('Maintenance predictions error:', e));
+        }
+
+        function viewEnergyOptimizations() {
+            fetch('/api/energy/optimizations')
+                .then(r => r.json())
+                .then(result => {
+                    if (result.success) {
+                        const optimizations = result.optimizations.slice(0, 3); // Show top 3
+                        let message = `Found ${result.total_optimizations} energy optimizations:\n\n`;
+                        optimizations.forEach(opt => {
+                            message += `• ${opt.optimization_type.replace('_', ' ')}: $${opt.projected_savings.toFixed(2)}/year savings\n`;
+                        });
+                        alert(message);
+                    }
+                })
+                .catch(e => console.error('Energy optimizations error:', e));
+        }
+
+        function toggleAutonomousMode() {
+            const button = document.getElementById('autonomous-toggle');
+            const currentStatus = document.getElementById('autonomous-status').textContent;
+
+            if (currentStatus === 'Disabled') {
+                // Enable autonomous mode (would need backend endpoint)
+                document.getElementById('autonomous-status').textContent = 'Enabled';
+                button.textContent = 'Disable Autonomous';
+                button.className = 'btn-secondary';
+                showStatus('Autonomous mode enabled', 'success');
+            } else {
+                // Disable autonomous mode
+                document.getElementById('autonomous-status').textContent = 'Disabled';
+                button.textContent = 'Enable Autonomous';
+                button.className = 'btn-primary';
+                showStatus('Autonomous mode disabled', 'info');
+            }
+        }
+
+        function updateIoTDashboard() {
+            // Update system health
+            fetch('/api/maintenance/system/health')
+                .then(r => r.json())
+                .then(result => {
+                    if (result.success) {
+                        const health = result.system_health.overall_health_score;
+                        document.getElementById('dashboard-health').textContent = `${health.toFixed(1)}%`;
+                        document.getElementById('dashboard-health').style.color =
+                            health > 80 ? '#4CAF50' : health > 60 ? '#FF9800' : '#F44336';
+
+                        document.getElementById('system-health').textContent = `${health.toFixed(1)}%`;
+                        document.getElementById('critical-alerts').textContent =
+                            result.system_health.critical_maintenance_count;
+                    }
+                })
+                .catch(e => console.error('System health error:', e));
+
+            // Update energy data
+            fetch('/api/energy/dashboard')
+                .then(r => r.json())
+                .then(result => {
+                    if (result.success) {
+                        const dashboard = result.dashboard;
+                        document.getElementById('energy-efficiency').textContent =
+                            `${dashboard.efficiency_score.toFixed(1)}%`;
+                        document.getElementById('energy-savings').textContent =
+                            `$${dashboard.savings_potential.toFixed(2)}`;
+                        document.getElementById('dashboard-consumption').textContent =
+                            `${dashboard.current_consumption.toFixed(1)} kWh`;
+                        document.getElementById('dashboard-alerts').textContent =
+                            dashboard.alerts.length;
+                    }
+                })
+                .catch(e => console.error('Energy dashboard error:', e));
+
+            // Update sensor chart (simplified)
+            updateSensorChart();
+        }
+
+        function updateSensorChart() {
+            // This would create a real-time chart of sensor data
+            // For now, just initialize Chart.js
+            if (!sensorChart) {
+                const ctx = document.getElementById('sensor-chart').getContext('2d');
+                sensorChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            label: 'Sensor Values',
+                            data: [],
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            }
+
+            // In a real implementation, this would fetch and update chart data
+            // For demo purposes, we'll add some sample data
+            const now = new Date();
+            const timeLabels = [];
+            const dataPoints = [];
+
+            for (let i = 9; i >= 0; i--) {
+                const time = new Date(now.getTime() - i * 60000); // Every minute for 10 minutes
+                timeLabels.push(time.toLocaleTimeString());
+                dataPoints.push(Math.random() * 100); // Sample data
+            }
+
+            sensorChart.data.labels = timeLabels;
+            sensorChart.data.datasets[0].data = dataPoints;
+            sensorChart.update();
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            initThreeJS();
+            document.getElementById('viewport-info').style.display = 'block';
+            setMode('ceiling'); // Start with ceiling mode
+        });
+
+        // Auto-calculate on input change (debounced)
+        let calculateTimeout;
+        ['ceiling_length', 'ceiling_width', 'perimeter_gap', 'panel_gap', 'material_name', 'optimization_strategy'].forEach(id => {
+            document.getElementById(id).addEventListener('change', () => {
+                if (currentMode === 'ceiling') {
+                    clearTimeout(calculateTimeout);
+                    calculateTimeout = setTimeout(calculateLayout, 500);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

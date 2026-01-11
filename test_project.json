@@ -1,0 +1,45 @@
+{
+  "metadata": {
+    "generated": "2026-01-10T13:52:00.776690",
+    "application": "Ceiling Panel Calculator",
+    "version": "2.0"
+  },
+  "ceiling": {
+    "length_mm": 8000,
+    "width_mm": 6000,
+    "area_m2": 48.0
+  },
+  "spacing": {
+    "perimeter_gap_mm": 200,
+    "panel_gap_mm": 200
+  },
+  "layout": {
+    "panel_width_mm": 1250.0,
+    "panel_length_mm": 1750.0,
+    "panels_per_row": 4,
+    "panels_per_column": 4,
+    "total_panels": 16,
+    "total_coverage_sqm": 35.0,
+    "gap_area_sqm": 13.0
+  },
+  "material": {
+    "name": "LED Panel",
+    "category": "lighting",
+    "color": "White",
+    "reflectivity": 0.85,
+    "cost_per_sqm": 450.0,
+    "notes": "Integrated LED lighting, 4000K"
+  },
+  "costs": {
+    "material_coverage_sqm": 35.0,
+    "waste_factor": 0.15,
+    "waste_coverage_sqm": 5.25,
+    "total_coverage_sqm": 40.25,
+    "material_cost": 15750.0,
+    "waste_cost": 2362.5,
+    "total_material_cost": 18112.5,
+    "labor_multiplier": null,
+    "labor_cost": 0,
+    "total_cost": 18112.5
+  }
+}

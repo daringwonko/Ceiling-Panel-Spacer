@@ -1,0 +1,54 @@
+======================================================================
+CEILING PANEL LAYOUT REPORT
+Generated: 2026-01-10 17:39:01
+======================================================================
+
+CEILING DIMENSIONS
+----------------------------------------------------------------------
+Length:      4800.0 mm  (  4.80 m)
+Width:       3600.0 mm  (  3.60 m)
+Area:         17.28 m²
+
+SPACING SPECIFICATIONS
+----------------------------------------------------------------------
+Perimeter Gap:   200.0 mm (all edges)
+Panel Gap:       200.0 mm (between panels)
+
+PANEL LAYOUT (OPTIMIZED)
+----------------------------------------------------------------------
+Panel Dimensions:  1500.0 mm × 2100.0 mm
+Panel Area:        3.1500 m²
+Panels Per Row:    2
+Panels Per Column: 2
+Total Panels:      4
+
+COVERAGE ANALYSIS
+----------------------------------------------------------------------
+Panel Coverage:     12.60 m²
+Gap/Service Area:    4.68 m²
+Coverage %:          72.9%
+
+MATERIAL SPECIFICATION
+----------------------------------------------------------------------
+Product:       LED Panel
+Category:      lighting
+Color:         White
+Reflectivity:  85%
+Cost/m²:       $450.00
+Notes:         Integrated LED lighting, 4000K
+
+MATERIAL REQUIREMENTS & COST BREAKDOWN
+----------------------------------------------------------------------
+Panels Required:     4 units
+
+COST CALCULATION:
+  Panel Coverage:         12.60 m² @ $450.00/m² = $  5,670.00
+  Material Waste:          1.89 m² (15%) @ $450.00/m² = $    850.50
+  Subtotal (Material):                                          $  6,520.50
+  Labor Cost:          25.0% overhead on materials          $  1,630.12
+  TOTAL PROJECT COST:                                           $  8,150.62
+
+CUTTING LIST
+----------------------------------------------------------------------
+Panel Size: 1500.0 mm × 2100.0 mm
+Quantity: 4 pieces

@@ -1,0 +1,46 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Virtual environments
+venv/
+env/
+.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Test output
+test_output/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Generated files
+*.dxf
+*.svg
+*.stl
+*.obj
+*.mtl
+*.gltf
+*.bin
+*.json.bak
+
+# Logs
+logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
