@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ceiling-calculator
+  labels:
+    app: ceiling-calculator
+    environment: production
