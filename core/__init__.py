@@ -14,7 +14,7 @@ from .ceiling_panel_calc import (
     SVGGenerator,
     DXFGenerator,
     ProjectExporter,
-    MATERIALS,
+    MaterialLibrary,
 )
 
 from .config_manager import (
@@ -24,7 +24,7 @@ from .config_manager import (
 
 from .logging_config import (
     get_logger,
-    setup_logging,
+    configure_logging,
     CeilingCalculatorError,
     ValidationError,
     ConfigurationError,
@@ -32,24 +32,24 @@ from .logging_config import (
 
 __all__ = [
     # Core calculation
-    'CeilingDimensions',
-    'PanelSpacing',
-    'Material',
-    'PanelLayout',
-    'CeilingPanelCalculator',
+    "CeilingDimensions",
+    "PanelSpacing",
+    "Material",
+    "PanelLayout",
+    "CeilingPanelCalculator",
     # Generators
-    'SVGGenerator',
-    'DXFGenerator',
-    'ProjectExporter',
+    "SVGGenerator",
+    "DXFGenerator",
+    "ProjectExporter",
     # Materials
-    'MATERIALS',
+    "MaterialLibrary",
     # Configuration
-    'ConfigManager',
-    'CalculatorConfig',
+    "ConfigManager",
+    "CalculatorConfig",
     # Logging
-    'get_logger',
-    'setup_logging',
-    'CeilingCalculatorError',
-    'ValidationError',
-    'ConfigurationError',
+    "get_logger",
+    "configure_logging",
+    "CeilingCalculatorError",
+    "ValidationError",
+    "ConfigurationError",
 ]

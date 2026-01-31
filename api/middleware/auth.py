@@ -10,15 +10,13 @@ from typing import Optional, Dict, Any, Callable
 from functools import wraps
 from dataclasses import dataclass
 
-# Default secret (should be overridden in production)
-JWT_SECRET = os.getenv("JWT_SECRET", "ceiling-panel-calculator-secret-key-change-in-production")
-JWT_ALGORITHM = "HS256"
-JWT_EXPIRATION_HOURS = 24
+from core.config import settings
 
 
 @dataclass
 class User:
     """User data structure."""
+
     id: str
     email: str
     name: str
@@ -44,25 +42,21 @@ class User:
             "name": self.name,
             "organization_id": self.organization_id,
             "role": self.role,
-            "permissions": self.permissions
+            "permissions": self.permissions,
         }
 
 
 class JWTManager:
     """JWT token management."""
 
-    def __init__(self, secret: str = None, algorithm: str = JWT_ALGORITHM):
-        self.secret = secret or JWT_SECRET
-        self.algorithm = algorithm
+    def __init__(self, secret: str = None, algorithm: str = None):
+        self.secret = secret or settings.jwt_secret.get_secret_value()
+        self.algorithm = algorithm or settings.jwt_algorithm
 
-    def create_token(
-        self,
-        user: User,
-        expires_delta: timedelta = None
-    ) -> str:
+    def create_token(self, user: User, expires_delta: timedelta = None) -> str:
         """Create a JWT token for a user."""
         if expires_delta is None:
-            expires_delta = timedelta(hours=JWT_EXPIRATION_HOURS)
+            expires_delta = timedelta(hours=settings.jwt_expiration_hours)
 
         expire = datetime.utcnow() + expires_delta
         payload = {
@@ -72,7 +66,7 @@ class JWTManager:
             "org": user.organization_id,
             "role": user.role,
             "exp": expire,
-            "iat": datetime.utcnow()
+            "iat": datetime.utcnow(),
         }
 
         return jwt.encode(payload, self.secret, algorithm=self.algorithm)
@@ -98,7 +92,7 @@ class JWTManager:
             email=payload["email"],
             name=payload["name"],
             organization_id=payload.get("org"),
-            role=payload.get("role", "user")
+            role=payload.get("role", "user"),
         )
 
         return self.create_token(user)
@@ -128,19 +122,19 @@ def get_current_user(request) -> Optional[User]:
     auth_header = None
 
     # Flask-style
-    if hasattr(request, 'headers'):
-        auth_header = request.headers.get('Authorization')
+    if hasattr(request, "headers"):
+        auth_header = request.headers.get("Authorization")
 
     # FastAPI-style
-    if auth_header is None and hasattr(request, 'headers'):
-        auth_header = request.headers.get('authorization')
+    if auth_header is None and hasattr(request, "headers"):
+        auth_header = request.headers.get("authorization")
 
     if not auth_header:
         return None
 
     # Parse Bearer token
     parts = auth_header.split()
-    if len(parts) != 2 or parts[0].lower() != 'bearer':
+    if len(parts) != 2 or parts[0].lower() != "bearer":
         return None
 
     token = parts[1]
@@ -154,7 +148,7 @@ def get_current_user(request) -> Optional[User]:
         email=payload["email"],
         name=payload["name"],
         organization_id=payload.get("org"),
-        role=payload.get("role", "user")
+        role=payload.get("role", "user"),
     )
 
 
@@ -187,26 +181,30 @@ def require_auth(permissions: list = None):
             user = get_current_user(request)
 
             if user is None:
-                return jsonify({
-                    "success": False,
-                    "data": None,
-                    "error": {
-                        "code": "UNAUTHORIZED",
-                        "message": "Authentication required"
+                return jsonify(
+                    {
+                        "success": False,
+                        "data": None,
+                        "error": {
+                            "code": "UNAUTHORIZED",
+                            "message": "Authentication required",
+                        },
                     }
-                }), 401
+                ), 401
 
             # Check permissions
             for perm in permissions:
                 if not user.has_permission(perm):
-                    return jsonify({
-                        "success": False,
-                        "data": None,
-                        "error": {
-                            "code": "FORBIDDEN",
-                            "message": f"Missing permission: {perm}"
+                    return jsonify(
+                        {
+                            "success": False,
+                            "data": None,
+                            "error": {
+                                "code": "FORBIDDEN",
+                                "message": f"Missing permission: {perm}",
+                            },
                         }
-                    }), 403
+                    ), 403
 
             # Store user in request context
             g.current_user = user
@@ -214,6 +212,7 @@ def require_auth(permissions: list = None):
             return func(*args, **kwargs)
 
         return wrapper
+
     return decorator
 
 
@@ -223,10 +222,7 @@ def hash_password(password: str, salt: str = None) -> tuple:
         salt = os.urandom(32).hex()
 
     hashed = hashlib.pbkdf2_hmac(
-        'sha256',
-        password.encode('utf-8'),
-        salt.encode('utf-8'),
-        100000
+        "sha256", password.encode("utf-8"), salt.encode("utf-8"), 100000
     ).hex()
 
     return hashed, salt
@@ -247,6 +243,7 @@ class APIKeyManager:
     def create_key(self, name: str, permissions: list = None) -> str:
         """Create a new API key."""
         import secrets
+
         key = f"cpk_{secrets.token_urlsafe(32)}"
         key_hash = hashlib.sha256(key.encode()).hexdigest()
 
@@ -254,7 +251,7 @@ class APIKeyManager:
             "name": name,
             "permissions": permissions or [],
             "created_at": datetime.utcnow(),
-            "last_used": None
+            "last_used": None,
         }
 
         return key
