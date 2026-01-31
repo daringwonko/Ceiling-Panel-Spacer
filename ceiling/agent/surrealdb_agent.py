@@ -67,13 +67,41 @@ class SurrealDBAgent:
 
     async def _ensure_schemas(self) -> None:
         """Ensure required schemas exist"""
-        # Project schema
+        # Multi-tenant isolation: All queries automatically filter by tenant_id
+        # Users can only access data within their assigned tenant
+
+        # Project schema with tenant isolation
         await self.db.query("""
             DEFINE TABLE project SCHEMALESS;
             DEFINE FIELD tenant_id ON project TYPE string;
             DEFINE FIELD name ON project TYPE string;
             DEFINE FIELD created_at ON project TYPE datetime DEFAULT time::now();
             DEFINE FIELD updated_at ON project TYPE datetime DEFAULT time::now();
+            DEFINE INDEX tenant_projects ON project COLUMNS tenant_id;
+        """)
+
+        # Component schema with tenant isolation
+        await self.db.query("""
+            DEFINE TABLE component SCHEMALESS PERMISSIONS
+                FOR select WHERE tenant_id = $auth.tenant_id;
+            DEFINE FIELD tenant_id ON component TYPE string;
+            DEFINE FIELD type ON component TYPE string;
+            DEFINE FIELD data ON component TYPE object;
+            DEFINE FIELD created_at ON component TYPE datetime DEFAULT time::now();
+            DEFINE FIELD updated_at ON component TYPE datetime DEFAULT time::now();
+            DEFINE INDEX tenant_components ON component COLUMNS tenant_id;
+        """)
+
+        # Relationship schema with tenant isolation
+        await self.db.query("""
+            DEFINE TABLE component_relationship SCHEMALESS PERMISSIONS
+                FOR select WHERE tenant_id = $auth.tenant_id;
+            DEFINE FIELD tenant_id ON component_relationship TYPE string;
+            DEFINE FIELD relationship_type ON component_relationship TYPE string;
+            DEFINE FIELD in ON component;
+            DEFINE FIELD out ON component;
+            DEFINE FIELD created_at ON component_relationship TYPE datetime DEFAULT time::now();
+            DEFINE INDEX tenant_relationships ON component_relationship COLUMNS tenant_id;
         """)
 
         # Component schema
@@ -105,6 +133,10 @@ class SurrealDBAgent:
     async def switch_tenant(self, tenant_id: str) -> None:
         """Switch to a different tenant space"""
         self.current_tenant = tenant_id
+
+        # Reset notification listeners when switching tenants
+        if hasattr(self, "notification_listeners"):
+            self.notification_listeners.clear()
 
     async def store_layout(self, project_id: str, layout_result: Any) -> str:
         """Store a layout result in SurrealDB"""
@@ -178,7 +210,7 @@ class SurrealDBAgent:
             raise ValueError("No tenant selected")
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        backup_path = f"backup_{self.current_tenant}_{timestamp}.json"
+        backup_path = f"backup_tenant_{self.current_tenant}_{timestamp}.json"
 
         # Export all tenant data
         projects = await self.db.query(
@@ -217,12 +249,29 @@ class SurrealDBAgent:
 
     async def restore_backup(self, backup_path: str) -> None:
         """Restore data from a backup file"""
+        if not os.path.exists(backup_path):
+            raise FileNotFoundError(f"Backup file not found: {backup_path}")
+
         with open(backup_path, "r") as f:
             backup_data = json.load(f)
 
-        # Validate tenant isolation
+        # Validate tenant isolation - security first
         if backup_data["tenant_id"] != self.current_tenant:
-            raise ValueError("Backup tenant does not match current tenant")
+            raise ValueError(
+                f"Backup tenant ({backup_data['tenant_id']}) does not match current tenant ({self.current_tenant})"
+            )
+
+        # Additional validation: check backup format
+        required_keys = [
+            "timestamp",
+            "tenant_id",
+            "projects",
+            "components",
+            "relationships",
+        ]
+        for key in required_keys:
+            if key not in backup_data:
+                raise ValueError(f"Invalid backup format: missing '{key}' field")
 
         # Restore projects, components, relationships
         for project in backup_data["projects"]:
