@@ -37,6 +37,19 @@ export default {
           800: '#1e40af',
           900: '#1e3a8a',
         },
+        // Savage Cabinetry Brand Colors
+        savage: {
+          primary: '#1E40AF',      // Royal blue - primary brand color
+          'primary-hover': '#1E3A8A', // Darker blue for hover states
+          accent: '#F59E0B',       // Amber - accent/highlight
+          dark: '#0F172A',         // Slate 900 - main background
+          surface: '#1E293B',      // Slate 800 - card/panel backgrounds
+          text: '#F8FAFC',         // Slate 50 - primary text
+          'text-muted': '#94A3B8', // Slate 400 - secondary text
+          success: '#10B981',      // Emerald - success states
+          danger: '#EF4444',       // Red - error/danger states
+          warning: '#F59E0B',      // Amber - warning states (same as accent)
+        },
       },
       fontFamily: {
         // Professional typography for BIM tools
