@@ -13,7 +13,7 @@ See: .planning/PROJECT.md (updated 2026-01-31)
 ## Project Status
 
 **Phase:** 1 of 4 (Foundation Repair)  
-**Overall Progress:** ██░░░░░░░░░░░░░░░░░░░░░░░░ 10%  
+**Overall Progress:** ███░░░░░░░░░░░░░░░░░░░░░░░ 30%  
 **Last Updated:** 2026-01-31
 
 ---
@@ -36,12 +36,16 @@ See: .planning/PROJECT.md (updated 2026-01-31)
   - Secure configuration with pydantic-settings
   - Hardcoded secrets removed from auth middleware
   - .env.example created
+- ✓ Plan 01-03: Export generators fixed (3/3 tasks)
+  - DXFGenerator requires ezdxf, removed broken fallback
+  - SVGConfig with screen/print/high-res presets
+  - export_json() returns project data dictionary
 
 **Completion Criteria:**
 - [x] No hardcoded secrets (Plan 01-02)
 - [ ] Panel calculator generates practical layouts
 - [ ] API input validation working (Plan 01-02 complete, needs integration)
-- [ ] DXF/SVG exports functional
+- [x] DXF/SVG exports functional (Plan 01-03)
 - [ ] Examples executable
 - [ ] Tests with assertions
 
@@ -98,7 +102,7 @@ None. Ready to continue Phase 1.
 **Progress:**
 - Phases planned: 4
 - Requirements defined: 42
-- Plans completed: 2/8 (01-01, 01-02)
+- Plans completed: 3/8 (01-01, 01-02, 01-03)
 - Ready to execute: Yes
 
 ---
@@ -106,7 +110,7 @@ None. Ready to continue Phase 1.
 ## Session Continuity
 
 **Last session:** 2026-01-31
-**Stopped at:** Completed Plan 01-02 (Validation & configuration)
+**Stopped at:** Completed Plan 01-03 (Export generators)
 **Resume file:** None
 
 ---
