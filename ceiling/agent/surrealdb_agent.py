@@ -11,9 +11,11 @@ Provides enterprise-grade database functionality:
 import asyncio
 import json
 import os
+import shutil
+import tempfile
 from typing import Any, Dict, List, Optional
 from dataclasses import dataclass, asdict
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 @dataclass
@@ -46,6 +48,7 @@ class SurrealDBAgent:
         self.namespace = namespace
         self.db = None
         self.current_tenant: Optional[str] = None
+        self.backup_retention_days = 30  # Auto-cleanup old backups
 
     async def connect(self) -> None:
         """Establish connection to SurrealDB"""
@@ -210,9 +213,12 @@ class SurrealDBAgent:
             raise ValueError("No tenant selected")
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        backup_path = f"backup_tenant_{self.current_tenant}_{timestamp}.json"
+        backup_dir = f"backups/tenant_{self.current_tenant}"
+        os.makedirs(backup_dir, exist_ok=True)
 
-        # Export all tenant data
+        backup_path = f"{backup_dir}/backup_{timestamp}.json"
+
+        # Export all tenant data with relationships
         projects = await self.db.query(
             """
             SELECT * FROM project WHERE tenant_id = $tenant_id
@@ -234,18 +240,60 @@ class SurrealDBAgent:
             {"tenant_id": self.current_tenant},
         )
 
+        # Include metadata for integrity checking
         backup_data = {
-            "timestamp": timestamp,
-            "tenant_id": self.current_tenant,
-            "projects": projects[0]["result"] if projects else [],
-            "components": components[0]["result"] if components else [],
-            "relationships": relationships[0]["result"] if relationships else [],
+            "metadata": {
+                "version": "1.0",
+                "created_at": datetime.now().isoformat(),
+                "tenant_id": self.current_tenant,
+                "record_counts": {
+                    "projects": len(projects[0]["result"]) if projects else 0,
+                    "components": len(components[0]["result"]) if components else 0,
+                    "relationships": len(relationships[0]["result"])
+                    if relationships
+                    else 0,
+                },
+            },
+            "data": {
+                "projects": projects[0]["result"] if projects else [],
+                "components": components[0]["result"] if components else [],
+                "relationships": relationships[0]["result"] if relationships else [],
+            },
         }
 
-        with open(backup_path, "w") as f:
-            json.dump(backup_data, f, indent=2, default=str)
+        # Write to temporary file first, then move for atomicity
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".json", delete=False, dir=backup_dir
+        ) as temp_file:
+            json.dump(backup_data, temp_file, indent=2, default=str)
+            temp_path = temp_file.name
+
+        # Atomic move
+        shutil.move(temp_path, backup_path)
+
+        # Cleanup old backups
+        await self._cleanup_old_backups(backup_dir)
 
         return backup_path
+
+    async def _cleanup_old_backups(self, backup_dir: str) -> None:
+        """Remove backups older than retention period"""
+        if not os.path.exists(backup_dir):
+            return
+
+        cutoff_date = datetime.now() - timedelta(days=self.backup_retention_days)
+
+        for filename in os.listdir(backup_dir):
+            if filename.startswith("backup_") and filename.endswith(".json"):
+                filepath = os.path.join(backup_dir, filename)
+                try:
+                    # Check file modification time
+                    mtime = datetime.fromtimestamp(os.path.getmtime(filepath))
+                    if mtime < cutoff_date:
+                        os.remove(filepath)
+                except (OSError, ValueError):
+                    # Skip files that can't be processed
+                    continue
 
     async def restore_backup(self, backup_path: str) -> None:
         """Restore data from a backup file"""
@@ -255,33 +303,69 @@ class SurrealDBAgent:
         with open(backup_path, "r") as f:
             backup_data = json.load(f)
 
+        # Handle both old and new backup formats
+        if "metadata" in backup_data:
+            # New format
+            tenant_id = backup_data["metadata"]["tenant_id"]
+            data = backup_data["data"]
+            metadata = backup_data["metadata"]
+        else:
+            # Backward compatibility with old format
+            tenant_id = backup_data["tenant_id"]
+            data = backup_data
+            metadata = None
+
         # Validate tenant isolation - security first
-        if backup_data["tenant_id"] != self.current_tenant:
+        if tenant_id != self.current_tenant:
             raise ValueError(
-                f"Backup tenant ({backup_data['tenant_id']}) does not match current tenant ({self.current_tenant})"
+                f"Backup tenant ({tenant_id}) does not match current tenant ({self.current_tenant})"
             )
 
-        # Additional validation: check backup format
-        required_keys = [
-            "timestamp",
-            "tenant_id",
-            "projects",
-            "components",
-            "relationships",
-        ]
+        # Validate backup format and integrity
+        required_keys = ["projects", "components", "relationships"]
         for key in required_keys:
-            if key not in backup_data:
+            if key not in data:
                 raise ValueError(f"Invalid backup format: missing '{key}' field")
 
-        # Restore projects, components, relationships
-        for project in backup_data["projects"]:
-            await self.db.create("project", project)
+        # Additional validation if we have metadata
+        if metadata:
+            expected_counts = metadata["record_counts"]
+            actual_counts = {
+                "projects": len(data["projects"]),
+                "components": len(data["components"]),
+                "relationships": len(data["relationships"]),
+            }
 
-        for component in backup_data["components"]:
-            await self.db.create("component", component)
+            if expected_counts != actual_counts:
+                raise ValueError(
+                    "Backup integrity check failed: record counts don't match metadata"
+                )
 
-        for relationship in backup_data["relationships"]:
-            await self.db.create("component_relationship", relationship)
+        # Create a transaction for atomic restore
+        # Note: In a real implementation, this would use SurrealDB transactions
+        restored_count = 0
+
+        try:
+            # Restore projects first (dependencies)
+            for project in data["projects"]:
+                await self.db.create("project", project)
+                restored_count += 1
+
+            # Restore components
+            for component in data["components"]:
+                await self.db.create("component", component)
+                restored_count += 1
+
+            # Restore relationships last
+            for relationship in data["relationships"]:
+                await self.db.create("component_relationship", relationship)
+                restored_count += 1
+
+        except Exception as e:
+            # Log restoration failure - in production, would rollback transaction
+            raise RuntimeError(
+                f"Backup restoration failed after {restored_count} records: {e}"
+            ) from e
 
     async def publish_event(self, event: CollaborationEvent) -> None:
         """Publish a collaboration event (placeholder for notifications)"""
