@@ -34,6 +34,20 @@
 - Clean, tested foundation layer
 - Executable documentation
 
+**Plans:** 4 plans in 2 waves
+
+Plans:
+- [ ] 01-01-PLAN.md — Core algorithm fix (CRIT-01: max 2400mm panels)
+- [ ] 01-02-PLAN.md — Validation & config (CRIT-02, CRIT-07: validation + secrets)
+- [ ] 01-03-PLAN.md — Export generators (CRIT-03, CRIT-04, CRIT-05: DXF/SVG/JSON)
+- [ ] 01-04-PLAN.md — Examples & tests (CRIT-06, TEST-01: executable docs + tests)
+
+**Wave Structure:**
+| Wave | Plans | Parallel |
+|------|-------|----------|
+| 1 | 01-01, 01-02, 01-03 | Yes (independent) |
+| 2 | 01-04 | Depends on 01-01, 01-02, 01-03 |
+
 ---
 
 ## Phase 2: Architecture & 3D Foundation (Weeks 4-6)
