@@ -1,0 +1,8 @@
+export { default as PencilIcon } from './PencilIcon'
+export { default as CubeIcon } from './CubeIcon'
+export { default as BuildingIcon } from './BuildingIcon'
+export { default as DoorIcon } from './DoorIcon'
+export { default as TextIcon } from './TextIcon'
+export { default as EditIcon } from './EditIcon'
+export { default as SettingsIcon } from './SettingsIcon'
+export { default as DownloadIcon } from './DownloadIcon'
