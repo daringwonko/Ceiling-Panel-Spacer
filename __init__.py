@@ -27,15 +27,15 @@ from core import (
     PanelSpacing,
     Material,
     PanelLayout,
-    MATERIALS,
+    MaterialLibrary,
 )
 
 __all__ = [
-    '__version__',
-    'CeilingPanelCalculator',
-    'CeilingDimensions',
-    'PanelSpacing',
-    'Material',
-    'PanelLayout',
-    'MATERIALS',
+    "__version__",
+    "CeilingPanelCalculator",
+    "CeilingDimensions",
+    "PanelSpacing",
+    "Material",
+    "PanelLayout",
+    "MaterialLibrary",
 ]
