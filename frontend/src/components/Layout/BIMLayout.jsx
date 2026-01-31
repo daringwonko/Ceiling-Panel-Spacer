@@ -232,7 +232,7 @@ export default function BIMLayout() {
                           ? 'bg-savage-primary text-white hover:bg-savage-primary-hover'
                           : 'text-savage-text-muted hover:bg-savage-surface hover:text-savage-primary'
                       }`
-                  >
+                    }>
                     <tool.icon className="w-5 h-5 flex-shrink-0" />
                     {sidebarOpen && (
                       <span className="truncate text-sm">{tool.name}</span>

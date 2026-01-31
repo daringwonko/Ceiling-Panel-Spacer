@@ -14,6 +14,7 @@ import Arch3DEditor from './components/Arch3DEditor'
 
 // BIM Workbench components (new - Phase 6)
 import BIMLayout from './components/Layout/BIMLayout'
+import TestComponents from './components/bim/TestComponents'
 
 // Placeholder routes (will be implemented in subsequent plans)
 // const DraftingCanvas = () => <div className="p-4 card">2D Drafting Canvas - Coming Soon</div>
@@ -32,6 +33,7 @@ function App() {
       <Routes>
         {/* BIM Workbench Routes */}
         <Route path="/bim" element={<BIMLayout />} />
+        <Route path="/bim/test-components" element={<TestComponents />} />
         
         {/* Original routes (keep for backward compatibility) */}
         <Route path="/" element={<Layout />}>
