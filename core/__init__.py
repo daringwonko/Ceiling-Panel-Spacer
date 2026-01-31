@@ -17,6 +17,10 @@ from .ceiling_panel_calc import (
     MaterialLibrary,
 )
 
+from .algorithm_config import (
+    AlgorithmConfig,
+)
+
 from .config_manager import (
     ConfigManager,
     CalculatorConfig,
@@ -44,6 +48,7 @@ __all__ = [
     # Materials
     "MaterialLibrary",
     # Configuration
+    "AlgorithmConfig",
     "ConfigManager",
     "CalculatorConfig",
     # Logging
