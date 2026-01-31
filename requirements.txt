@@ -41,3 +41,7 @@ mypy>=0.900
 # scikit-learn>=0.24.0  # For ML optimization
 # matplotlib>=3.4.0  # For visualization
 # plotly>=5.0.0  # For interactive charts
+sqlalchemy
+fastapi
+uvicorn
+alembic

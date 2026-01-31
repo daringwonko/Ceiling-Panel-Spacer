@@ -1,0 +1,18 @@
+I've pushed the missing commits to a new branch. Here's what happened:
+
+New branch pushed: claude/add-setup-guide-7LZ9n
+
+Contains 2 commits:
+
+    feat: Add simple all-in-one app for easy testing (run_app.py)
+    docs: Add comprehensive setup guide for beginners (SETUP_GUIDE.md)
+
+To merge these into main, create a PR here:
+
+https://github.com/daringwonko/Ceiling-Panel-Spacer/pull/new/claude/add-setup-guide-7LZ9n
+
+Or you can view the branch directly:
+
+https://github.com/daringwonko/Ceiling-Panel-Spacer/tree/claude/add-setup-guide-7LZ9n
+
+The files you need (run_app.py and SETUP_GUIDE.md) are on that branch ready to be merged!
