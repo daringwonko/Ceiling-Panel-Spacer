@@ -7,7 +7,7 @@
 
 ---
 
-## Phase 1: Foundation Repair (Weeks 1-3)
+## Phase 0: Foundation Repair (Weeks 1-2)
 
 **Goal:** Fix critical issues in existing codebase to create a solid foundation
 
@@ -36,21 +36,23 @@
 
 **Plans:** 4 plans in 2 waves
 
- Plans:
- - [x] 01-01-PLAN.md — Core algorithm fix (CRIT-01: max 2400mm panels)
- - [x] 01-02-PLAN.md — Validation & config (CRIT-02, CRIT-07: validation + secrets)
- - [x] 01-03-PLAN.md — Export generators (CRIT-03, CRIT-04, CRIT-05: DXF/SVG/JSON)
- - [x] 01-04-PLAN.md — Examples & tests (CRIT-06, TEST-01: executable docs + tests)
+Plans:
+- [x] 00-01-PLAN.md — Core algorithm fix (CRIT-01: max 2400mm panels)
+- [x] 00-02-PLAN.md — Validation & config (CRIT-02, CRIT-07: validation + secrets)
+- [x] 00-03-PLAN.md — Export generators (CRIT-03, CRIT-04, CRIT-05: DXF/SVG/JSON)
+- [x] 00-04-PLAN.md — Examples & tests (CRIT-06, TEST-01: executable docs + tests)
 
 **Wave Structure:**
 | Wave | Plans | Parallel |
 |------|-------|----------|
-| 1 | 01-01, 01-02, 01-03 | Yes (independent) |
-| 2 | 01-04 | Depends on 01-01, 01-02, 01-03 |
+| 1 | 00-01, 00-02, 00-03 | Yes (independent) |
+| 2 | 00-04 | Depends on 00-01, 00-02, 00-03 |
 
 ---
 
-## Phase 2: Architecture & 3D Foundation (Weeks 4-6)
+
+
+## Phase 1: Architecture & 3D Foundation (Weeks 3-4)
 
 **Goal:** Build unified orchestration system and basic 3D interface
 
@@ -79,7 +81,7 @@
 
 ---
 
-## Phase 3: Design Tools & Code Compliance (Weeks 7-9)
+## Phase 2: Design Tools & Code Compliance (Weeks 5-7)
 
 **Goal:** Complete 3D design interface and add building code validation
 
@@ -110,7 +112,7 @@
 
 ---
 
-## Phase 4: Manufacturing & Supplier Portal (Weeks 10-12)
+## Phase 3: Manufacturing & Supplier Portal (Weeks 8-10)
 
 **Goal:** Manufacturing export, supplier portal, and multi-language support
 
@@ -145,11 +147,12 @@
 ## Phase Summary
 
 | # | Phase | Duration | Key Deliverable |
-|---|-------|----------|-----------------|
-| 1 | Foundation Repair | Weeks 1-3 | Working calculation engine |
-| 2 | Architecture & 3D | Weeks 4-6 | Unified system with basic 3D |
-| 3 | Design & Compliance | Weeks 7-9 | SketchUp-like design + code validation |
-| 4 | Manufacturing | Weeks 10-12 | Supplier portal + exports |
+|---|---|----------|-----------------|
+| 0 | Foundation Repair | Weeks 1-2 | Working calculation engine |
+| 1 | Architecture & 3D | Weeks 3-4 | Unified system with basic 3D |
+| 2 | Design & Compliance | Weeks 5-7 | SketchUp-like design + code validation |
+| 3 | Manufacturing | Weeks 8-10 | Supplier portal + exports |
+| 4 | Platform Integration | Weeks 11-12 | Operational Savage Cabinetry platform |
 
 **Total:** 12 weeks to working beta
 
@@ -158,15 +161,17 @@
 ## Dependencies & Critical Path
 
 **Critical Path:**
-1. Phase 1 (Foundation) → Must complete before any integration
-2. Phase 2 (Orchestration) → Required for 3D and compliance coordination
-3. Phase 3 (Design) → Compliance needs orchestration to validate designs
-4. Phase 4 (Manufacturing) → Portal needs working exports and designs
+1. Phase 0 (Foundation) → Must complete before any integration
+2. Phase 1 (Orchestration) → Required for 3D and compliance coordination
+3. Phase 2 (Design) → Compliance needs orchestration to validate designs
+4. Phase 3 (Manufacturing) → Portal needs working exports and designs
+5. Phase 4 (Platform Integration) → Final assembly of all components
 
 **Risk Mitigation:**
-- If Phase 1 takes longer, compress Phase 2 features
+- If Phase 0 takes longer, compress Phase 1 features
 - Building codes can start with basic checks, expand in iterations
 - Supplier portal MVP can start with 1-2 languages
+- Platform integration can begin earlier with basic versions
 
 ---
 

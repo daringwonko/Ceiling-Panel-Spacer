@@ -1,0 +1,108 @@
+{
+  "name": "Ceiling Panel Calculator Pro",
+  "short_name": "Ceiling Calc",
+  "description": "Professional ceiling panel calculation tool for architects, contractors, and construction designers",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#1e293b",
+  "background_color": "#ffffff",
+  "orientation": "any",
+  "categories": ["productivity", "business", "utilities"],
+  "screenshots": [
+    {
+      "src": "/screenshots/calculator.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/screenshots/layout.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "icons": [
+    {
+      "src": "/icons/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "Shortcuts": [
+    {
+      "name": "New Project",
+      "short_name": "New",
+      "description": "Start a new ceiling calculation project",
+      "url": "/#new",
+      "icons": [
+        {
+          "src": "/icons/new-icon-96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Recent Projects",
+      "short_name": "Recent",
+      "description": "View recently worked on projects",
+      "url": "/#recent",
+      "icons": [
+        {
+          "src": "/icons/recent-icon-96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "lang": "en",
+  "dir": "ltr",
+  "scope": "/"
+}
