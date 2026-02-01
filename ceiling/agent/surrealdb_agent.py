@@ -14,7 +14,7 @@ import os
 import shutil
 import tempfile
 from typing import Any, Dict, List, Optional
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 
 
@@ -48,22 +48,26 @@ class SurrealDBAgent:
         self.namespace = namespace
         self.db = None
         self.current_tenant: Optional[str] = None
-        self.backup_retention_days = 30  # Auto-cleanup old backups
+        self.backup_retention_days = 30
+        self.notification_listeners: Dict[str, asyncio.Task] = {}
 
-    async def connect(self) -> None:
+    async def connect(self, database: str = "ceiling_db") -> None:
         """Establish connection to SurrealDB"""
         try:
-            # Import here to handle missing dependency gracefully
             from surrealdb import Surreal
 
             self.db = Surreal(self.url)
             await self.db.connect()
-            await self.db.use(namespace=self.namespace)
+            await self.db.use(namespace=self.namespace, database=database)
 
         except ImportError as e:
             raise NotImplementedError(
                 "SurrealDB Python library not installed. "
                 "Install with: pip install surrealdb"
+            ) from e
+        except Exception as e:
+            raise ConnectionError(
+                f"Failed to connect to SurrealDB at {self.url}: {e}"
             ) from e
 
         await self._ensure_schemas()
@@ -101,31 +105,11 @@ class SurrealDBAgent:
                 FOR select WHERE tenant_id = $auth.tenant_id;
             DEFINE FIELD tenant_id ON component_relationship TYPE string;
             DEFINE FIELD relationship_type ON component_relationship TYPE string;
+            DEFINE FIELD source_type ON component_relationship TYPE string;
             DEFINE FIELD in ON component;
             DEFINE FIELD out ON component;
             DEFINE FIELD created_at ON component_relationship TYPE datetime DEFAULT time::now();
             DEFINE INDEX tenant_relationships ON component_relationship COLUMNS tenant_id;
-        """)
-
-        # Component schema
-        await self.db.query("""
-            DEFINE TABLE component SCHEMALESS;
-            DEFINE FIELD tenant_id ON component TYPE string;
-            DEFINE FIELD type ON component TYPE string;
-            DEFINE FIELD data ON component TYPE object;
-            DEFINE FIELD created_at ON component TYPE datetime DEFAULT time::now();
-            DEFINE FIELD updated_at ON component TYPE datetime DEFAULT time::now();
-        """)
-
-        # Relationship schema
-        await self.db.query("""
-            DEFINE TABLE component_relationship SCHEMALESS;
-            DEFINE FIELD tenant_id ON component_relationship TYPE string;
-            DEFINE FIELD source_type ON component_relationship TYPE string;
-            DEFINE FIELD relationship_type ON component_relationship TYPE string;
-            DEFINE FIELD in ON component;
-            DEFINE FIELD out ON component;
-            DEFINE FIELD created_at ON component_relationship TYPE datetime DEFAULT time::now();
         """)
 
     async def disconnect(self) -> None:
@@ -141,52 +125,38 @@ class SurrealDBAgent:
         if hasattr(self, "notification_listeners"):
             self.notification_listeners.clear()
 
-    async def store_layout(self, project_id: str, layout_result: Any) -> str:
-        """Store a layout result in SurrealDB"""
-        if not self.current_tenant:
-            raise ValueError("No tenant selected")
+    async def store_layout(self, project_id: str, layout: dict) -> bool:
+        """Store a ceiling layout in SurrealDB"""
+        try:
+            if not self.current_tenant:
+                raise ValueError("No tenant selected")
 
-        component_data = {
-            "tenant_id": self.current_tenant,
-            "type": "layout",
-            "data": asdict(layout_result),
-            "project_rel": project_id,
-        }
+            layout_data = {
+                "tenant_id": self.current_tenant,
+                "type": "layout",
+                "data": layout,
+                "project_id": project_id,
+                "created_at": datetime.utcnow().isoformat(),
+            }
 
-        result = await self.db.create("component", component_data)
-        return result[0]["id"]
+            await self.db.create("layouts", layout_data)
+            return True
+        except Exception as e:
+            raise ValueError(f"Failed to store layout: {e}")
 
-    async def query_related_components(
-        self, component_id: str
-    ) -> List[ComponentRelationship]:
-        """Query components related to a given component"""
-        if not self.current_tenant:
-            raise ValueError("No tenant selected")
+    async def query_related_components(self, project_id: str) -> dict:
+        """Query all components related to a project"""
+        try:
+            if not self.current_tenant:
+                raise ValueError("No tenant selected")
 
-        # Query related components via relationships
-        query_result = await self.db.query(
-            """
-            SELECT ->component_relationship->component.* as related,
-                   ->component_relationship.relationship_type as rel_type
-            FROM $component_id
-            WHERE tenant_id = $tenant_id
-        """,
-            {"component_id": component_id, "tenant_id": self.current_tenant},
-        )
-
-        relationships = []
-        for row in query_result[0]["result"]:
-            if row["related"]:
-                relationships.append(
-                    ComponentRelationship(
-                        source_component=component_id,
-                        target_component=row["related"]["id"],
-                        relationship_type=row["rel_type"],
-                        metadata=row["related"]["data"],
-                    )
-                )
-
-        return relationships
+            result = await self.db.query(
+                "SELECT * FROM component WHERE project_id = $project_id AND tenant_id = $tenant_id",
+                {"project_id": project_id, "tenant_id": self.current_tenant},
+            )
+            return result[0]["result"] if result else []
+        except Exception as e:
+            raise ValueError(f"Failed to query components: {e}")
 
     async def execute_query(
         self, query: str, params: Dict[str, Any]
@@ -203,9 +173,33 @@ class SurrealDBAgent:
 
     async def setup_notifications(self) -> None:
         """Setup real-time notifications for collaborative changes"""
-        # This would typically use SurrealDB live queries
-        # For now, placeholder implementation
-        pass
+        if not self.current_tenant:
+            raise ValueError("No tenant selected")
+
+        self.notification_listeners: Dict[str, asyncio.Task] = {}
+
+        async def listen_for_changes(table: str) -> None:
+            """Background task to listen for changes on a table"""
+            try:
+                async for change in await self.db.listen(table):
+                    if change.get("tenant_id") == self.current_tenant:
+                        event = CollaborationEvent(
+                            event_type=change.get("action", "unknown"),
+                            component_id=change.get("id", ""),
+                            user_id=change.get("user_id", ""),
+                            tenant_id=self.current_tenant,
+                            timestamp=datetime.utcnow(),
+                            data=change.get("data", {}),
+                        )
+                        await self.publish_event(event)
+            except Exception:
+                pass
+
+        tables_to_monitor = ["component", "project", "component_relationship"]
+        for table in tables_to_monitor:
+            self.notification_listeners[table] = asyncio.create_task(
+                listen_for_changes(table)
+            )
 
     async def create_backup(self) -> str:
         """Create a backup of current tenant data"""
@@ -368,6 +362,21 @@ class SurrealDBAgent:
             ) from e
 
     async def publish_event(self, event: CollaborationEvent) -> None:
-        """Publish a collaboration event (placeholder for notifications)"""
-        # This would integrate with real-time notification system
-        pass
+        """Publish a collaboration event to all registered listeners"""
+        if not self.current_tenant:
+            raise ValueError("No tenant selected")
+
+        if event.tenant_id != self.current_tenant:
+            raise ValueError("Event tenant does not match current tenant")
+
+        event_data = {
+            "event_type": event.event_type,
+            "component_id": event.component_id,
+            "user_id": event.user_id,
+            "tenant_id": event.tenant_id,
+            "timestamp": event.timestamp.isoformat(),
+            "data": event.data,
+        }
+
+        for listener_id, listener_queue in self.notification_listeners.items():
+            await listener_queue.put(event_data)

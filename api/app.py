@@ -63,6 +63,7 @@ def create_app(config: dict = None) -> Flask:
     from .routes.health import health_bp
     from .routes.bim import bim_bp
     from .routes.kitchen import kitchen_bp
+    from .routes.llm import llm_bp
 
     app.register_blueprint(calculations_bp)
     app.register_blueprint(projects_bp)
@@ -71,6 +72,7 @@ def create_app(config: dict = None) -> Flask:
     app.register_blueprint(health_bp)
     app.register_blueprint(bim_bp)
     app.register_blueprint(kitchen_bp)
+    app.register_blueprint(llm_bp)
 
     # Request logging middleware
     @app.before_request

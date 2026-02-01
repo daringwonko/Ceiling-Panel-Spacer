@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react'
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import ErrorBoundary from './components/ErrorBoundary'
 
 // Lazy load heavy components
 // CEILING WORKBENCH JAILED - Phase 8 decoupling - moved to staging/ceiling-panel-jail/
@@ -80,8 +81,9 @@ function App() {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <BrowserRouter>
-          <Suspense fallback={<LoadingFallback />}>
-            <Routes>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingFallback />}>
+              <Routes>
               {/* Savage Cabinetry - Default */}
               <Route path="/" element={<KitchenWorkbench />} />
               <Route path="/ceiling" element={<KitchenWorkbench />} />
@@ -106,7 +108,8 @@ function App() {
               {/* Legacy redirect */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
-          </Suspense>
+            </Suspense>
+          </ErrorBoundary>
         </BrowserRouter>
       </ThemeProvider>
     </QueryClientProvider>
