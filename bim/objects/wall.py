@@ -17,8 +17,8 @@ class Wall:
     to a specified height with a given thickness.
 
     Attributes:
-        start_point: Base line start (x, y, z)
-        end_point: Base line end (x, y, z)
+        start: Base line start (x, y, z)
+        end: Base line end (x, y, z)
         height: Vertical extrusion height in mm
         thickness: Wall thickness in mm
         material: Material identifier
@@ -26,15 +26,30 @@ class Wall:
         id: Unique identifier
     """
 
-    start_point: Tuple[float, float, float] = (0.0, 0.0, 0.0)
-    end_point: Tuple[float, float, float] = (3000.0, 0.0, 0.0)
-    start: Tuple[float, float, float] = None  # Alias for start_point
-    end: Tuple[float, float, float] = None  # Alias for end_point
+    start: Tuple[float, float, float] = (0.0, 0.0, 0.0)
+    end: Tuple[float, float, float] = (3000.0, 0.0, 0.0)
     height: float = 2800.0  # mm
     thickness: float = 200.0  # mm
     material: str = "Concrete"
     level: str = "Level 0"
     id: str = field(default_factory=lambda: f"wall_{id(Wall)}{hash(Wall)}")
+
+    # Alias for convenience
+    @property
+    def start_point(self) -> Tuple[float, float, float]:
+        return self.start
+
+    @start_point.setter
+    def start_point(self, value: Tuple[float, float, float]):
+        self.start = value
+
+    @property
+    def end_point(self) -> Tuple[float, float, float]:
+        return self.end
+
+    @end_point.setter
+    def end_point(self, value: Tuple[float, float, float]):
+        self.end = value
 
     def __post_init__(self):
         """Validate wall properties after initialization."""
@@ -50,15 +65,15 @@ class Wall:
             raise ValueError(f"Wall height must be positive, got {self.height}")
         if self.thickness <= 0:
             raise ValueError(f"Wall thickness must be positive, got {self.thickness}")
-        if self.start_point == self.end_point:
+        if self.start == self.end:
             raise ValueError("Wall start and end points cannot be the same")
 
     @property
     def length(self) -> float:
         """Calculate wall length from base line."""
-        dx = self.end_point[0] - self.start_point[0]
-        dy = self.end_point[1] - self.start_point[1]
-        dz = self.end_point[2] - self.start_point[2]
+        dx = self.end[0] - self.start[0]
+        dy = self.end[1] - self.start[1]
+        dz = self.end[2] - self.start[2]
         return math.sqrt(dx**2 + dy**2 + dz**2)
 
     @property
@@ -74,7 +89,7 @@ class Wall:
     @property
     def base_elevation(self) -> float:
         """Get base elevation (Z coordinate of start point)."""
-        return self.start_point[2]
+        return self.start[2]
 
     @property
     def top_elevation(self) -> float:
@@ -86,7 +101,7 @@ class Wall:
         self,
     ) -> Tuple[Tuple[float, float, float], Tuple[float, float, float]]:
         """Get wall center line (start and end points)."""
-        return (self.start_point, self.end_point)
+        return (self.start, self.end)
 
     def get_face_polygons(self) -> Dict[str, List[Tuple[float, float, float]]]:
         """Get wall face polygons for 3D rendering.
@@ -95,8 +110,8 @@ class Wall:
             Dictionary with face names and their vertices
         """
         # Calculate wall direction vector
-        dx = self.end_point[0] - self.start_point[0]
-        dy = self.end_point[1] - self.start_point[1]
+        dx = self.end[0] - self.start[0]
+        dy = self.end[1] - self.start[1]
         length = math.sqrt(dx**2 + dy**2)
 
         if length == 0:
@@ -110,19 +125,19 @@ class Wall:
         ty = ux * (self.thickness / 2)
 
         # Base elevation
-        z0 = self.start_point[2]
+        z0 = self.start[2]
         z1 = z0 + self.height
 
         # Calculate corner points
-        p1 = (self.start_point[0] + tx, self.start_point[1] + ty, z0)
-        p2 = (self.end_point[0] + tx, self.end_point[1] + ty, z0)
-        p3 = (self.end_point[0] + tx, self.end_point[1] + ty, z1)
-        p4 = (self.start_point[0] + tx, self.start_point[1] + ty, z1)
+        p1 = (self.start[0] + tx, self.start[1] + ty, z0)
+        p2 = (self.end[0] + tx, self.end[1] + ty, z0)
+        p3 = (self.end[0] + tx, self.end[1] + ty, z1)
+        p4 = (self.start[0] + tx, self.start[1] + ty, z1)
 
-        p5 = (self.start_point[0] - tx, self.start_point[1] - ty, z0)
-        p6 = (self.end_point[0] - tx, self.end_point[1] - ty, z0)
-        p7 = (self.end_point[0] - tx, self.end_point[1] - ty, z1)
-        p8 = (self.start_point[0] - tx, self.start_point[1] - ty, z1)
+        p5 = (self.start[0] - tx, self.start[1] - ty, z0)
+        p6 = (self.end[0] - tx, self.end[1] - ty, z0)
+        p7 = (self.end[0] - tx, self.end[1] - ty, z1)
+        p8 = (self.start[0] - tx, self.start[1] - ty, z1)
 
         return {
             "front": [p1, p2, p3, p4],
@@ -138,8 +153,10 @@ class Wall:
         return {
             "id": self.id,
             "type": "wall",
-            "start_point": self.start_point,
-            "end_point": self.end_point,
+            "start": self.start,
+            "end": self.end,
+            "start_point": self.start,
+            "end_point": self.end,
             "height": self.height,
             "thickness": self.thickness,
             "material": self.material,
@@ -153,12 +170,16 @@ class Wall:
         """Update wall geometry properties.
 
         Args:
-            **kwargs: Properties to update (start_point, end_point, height, thickness)
+            **kwargs: Properties to update (start, end, start_point, end_point, height, thickness)
         """
+        if "start" in kwargs:
+            self.start = kwargs["start"]
+        if "end" in kwargs:
+            self.end = kwargs["end"]
         if "start_point" in kwargs:
-            self.start_point = kwargs["start_point"]
+            self.start = kwargs["start_point"]
         if "end_point" in kwargs:
-            self.end_point = kwargs["end_point"]
+            self.end = kwargs["end_point"]
         if "height" in kwargs:
             self.height = kwargs["height"]
         if "thickness" in kwargs:
@@ -201,8 +222,8 @@ def create_wall(
         >>> print(f"Wall length: {wall.length}mm, Volume: {wall.volume}mm³")
     """
     wall = Wall(
-        start_point=start,
-        end_point=end,
+        start=start,
+        end=end,
         height=height,
         thickness=thickness,
         material=material,
