@@ -1,0 +1,521 @@
+/**
+ * Image Export Module CSS
+ */
+
+.container {
+  display: inline-block;
+}
+
+/* Trigger Button */
+.triggerButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #2d2d2d;
+  border: 1px solid #3d3d3d;
+  border-radius: 6px;
+  color: #e0e0e0;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.triggerButton:hover {
+  background: #3d3d3d;
+  border-color: #4d4d4d;
+}
+
+/* Overlay */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Modal */
+.modal {
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  background: #1e1e1e;
+  border: 1px solid #3d3d3d;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #3d3d3d;
+}
+
+.header h3 {
+  margin: 0;
+  color: #e0e0e0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.closeButton {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: #888;
+  font-size: 20px;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s;
+}
+
+.closeButton:hover {
+  color: #e0e0e0;
+  background: #2d2d2d;
+}
+
+.content {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Sections */
+.section {
+  margin-bottom: 20px;
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+.section h4 {
+  margin: 0 0 12px;
+  color: #888;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Preset Grid */
+.presetGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.presetButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px;
+  background: #2d2d2d;
+  border: 1px solid #3d3d3d;
+  border-radius: 8px;
+  color: #e0e0e0;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.presetButton:hover {
+  background: #3d3d3d;
+}
+
+.presetButton.active {
+  border-color: #4a9eff;
+  background: rgba(74, 158, 255, 0.1);
+}
+
+.presetButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.presetLabel {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.presetSize {
+  font-size: 10px;
+  color: #888;
+  margin-top: 4px;
+}
+
+/* Custom Resolution */
+.customResolution {
+  background: #2d2d2d;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.inputRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.inputRow label {
+  flex: 1;
+  color: #888;
+  font-size: 11px;
+}
+
+.input {
+  width: 100%;
+  padding: 8px 10px;
+  margin-top: 4px;
+  background: #1e1e1e;
+  border: 1px solid #3d3d3d;
+  border-radius: 4px;
+  color: #e0e0e0;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #4a9eff;
+}
+
+.input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.multiply {
+  color: #888;
+  padding-bottom: 10px;
+}
+
+.aspectRatioRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #888;
+  font-size: 11px;
+}
+
+.aspectRatioButtons {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.aspectButton {
+  padding: 4px 8px;
+  background: #1e1e1e;
+  border: 1px solid #3d3d3d;
+  border-radius: 4px;
+  color: #888;
+  font-size: 10px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.aspectButton:hover {
+  color: #e0e0e0;
+  border-color: #4d4d4d;
+}
+
+.aspectButton.active {
+  border-color: #4a9eff;
+  color: #4a9eff;
+}
+
+.aspectButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.resolutionInfo {
+  margin: 8px 0 0;
+  color: #888;
+  font-size: 11px;
+}
+
+.resolutionInfo strong {
+  color: #4a9eff;
+}
+
+/* Format Buttons */
+.formatButtons {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.formatButton {
+  flex: 1;
+  padding: 10px;
+  background: #2d2d2d;
+  border: 1px solid #3d3d3d;
+  border-radius: 6px;
+  color: #e0e0e0;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.formatButton:hover {
+  background: #3d3d3d;
+}
+
+.formatButton.active {
+  border-color: #4a9eff;
+  background: rgba(74, 158, 255, 0.1);
+}
+
+.formatButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Quality Slider */
+.qualitySlider label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #888;
+  font-size: 11px;
+}
+
+.slider {
+  width: 100%;
+  height: 4px;
+  background: #3d3d3d;
+  border-radius: 2px;
+  appearance: none;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #4a9eff;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.slider:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Background Buttons */
+.backgroundButtons {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.bgButton {
+  flex: 1;
+  padding: 10px;
+  background: #2d2d2d;
+  border: 1px solid #3d3d3d;
+  border-radius: 6px;
+  color: #e0e0e0;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.bgButton:hover {
+  background: #3d3d3d;
+}
+
+.bgButton.active {
+  border-color: #4a9eff;
+  background: rgba(74, 158, 255, 0.1);
+}
+
+.bgButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Color Picker */
+.colorPicker {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.colorInput {
+  width: 40px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid #3d3d3d;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.colorInput:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.colorText {
+  flex: 1;
+  padding: 8px 10px;
+  background: #2d2d2d;
+  border: 1px solid #3d3d3d;
+  border-radius: 4px;
+  color: #e0e0e0;
+  font-size: 12px;
+  font-family: monospace;
+}
+
+.colorText:focus {
+  outline: none;
+  border-color: #4a9eff;
+}
+
+.colorText:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Checkboxes */
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #e0e0e0;
+  font-size: 12px;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+.checkbox:last-child {
+  margin-bottom: 0;
+}
+
+.checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #4a9eff;
+  cursor: pointer;
+}
+
+.checkbox input[type="checkbox"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Progress Section */
+.progressSection {
+  background: #2d2d2d;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.progressBar {
+  height: 8px;
+  background: #1e1e1e;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #4a9eff, #7ab8ff);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.progressText {
+  color: #888;
+  font-size: 11px;
+  text-align: center;
+  display: block;
+}
+
+/* Footer */
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 16px 20px;
+  border-top: 1px solid #3d3d3d;
+}
+
+.cancelButton,
+.exportButton {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+}
+
+.cancelButton {
+  background: #3d3d3d;
+  color: #e0e0e0;
+}
+
+.cancelButton:hover {
+  background: #4d4d4d;
+}
+
+.cancelButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.exportButton {
+  background: #4a9eff;
+  color: white;
+}
+
+.exportButton:hover {
+  background: #3d8ce8;
+}
+
+.exportButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}

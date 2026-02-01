@@ -1,0 +1,434 @@
+/**
+ * Camera Controls Module CSS
+ */
+
+.container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #1e1e1e;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* View Mode Selector */
+.viewModeSelector {
+  position: relative;
+}
+
+.selectorButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #2d2d2d;
+  border: 1px solid #3d3d3d;
+  border-radius: 6px;
+  color: #e0e0e0;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.selectorButton:hover {
+  background: #3d3d3d;
+  border-color: #4d4d4d;
+}
+
+.viewIcon {
+  font-size: 16px;
+}
+
+.viewName {
+  font-weight: 500;
+}
+
+.chevron {
+  font-size: 10px;
+  color: #888;
+  transition: transform 0.2s;
+}
+
+.chevron.expanded {
+  transform: rotate(180deg);
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 280px;
+  background: #1e1e1e;
+  border: 1px solid #3d3d3d;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.categoryTabs {
+  display: flex;
+  border-bottom: 1px solid #3d3d3d;
+}
+
+.categoryTab {
+  flex: 1;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  color: #888;
+  font-size: 12px;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s;
+}
+
+.categoryTab:hover {
+  color: #e0e0e0;
+  background: #2d2d2d;
+}
+
+.categoryTab.active {
+  color: #4a9eff;
+  background: #2d2d2d;
+}
+
+.presetGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+  padding: 8px;
+}
+
+.presetButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: #2d2d2d;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: #e0e0e0;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.presetButton:hover {
+  background: #3d3d3d;
+}
+
+.presetButton.active {
+  border-color: #4a9eff;
+  background: rgba(74, 158, 255, 0.1);
+}
+
+.presetIcon {
+  font-size: 18px;
+}
+
+.presetName {
+  font-weight: 500;
+}
+
+/* Navigation Controls */
+.navControls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  background: #2d2d2d;
+  border-radius: 6px;
+}
+
+.navButton {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: #e0e0e0;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.navButton:hover:not(:disabled) {
+  background: #3d3d3d;
+}
+
+.navButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Saved Views Panel */
+.savedViewsPanel {
+  position: relative;
+}
+
+.toggleButton {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 10px;
+  background: #2d2d2d;
+  border: 1px solid #3d3d3d;
+  border-radius: 6px;
+  color: #e0e0e0;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.toggleButton:hover {
+  background: #3d3d3d;
+  border-color: #4d4d4d;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  background: #4a9eff;
+  border-radius: 9px;
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.savedViewsDropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  width: 260px;
+  background: #1e1e1e;
+  border: 1px solid #3d3d3d;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.savedViewsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  border-bottom: 1px solid #3d3d3d;
+}
+
+.savedViewsHeader h4 {
+  margin: 0;
+  color: #e0e0e0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.saveButton {
+  padding: 6px 10px;
+  background: #4a9eff;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.saveButton:hover {
+  background: #3d8ce8;
+}
+
+.emptyMessage {
+  padding: 20px;
+  margin: 0;
+  color: #888;
+  font-size: 12px;
+  text-align: center;
+}
+
+.savedViewsList {
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.savedViewItem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.savedViewItem:hover {
+  background: #2d2d2d;
+}
+
+.viewItemButton {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 8px 10px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: #e0e0e0;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.viewItemButton:hover {
+  background: #3d3d3d;
+}
+
+.viewItemName {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.viewItemDate {
+  font-size: 10px;
+  color: #888;
+}
+
+.deleteButton {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: #888;
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s, color 0.2s, background 0.2s;
+}
+
+.savedViewItem:hover .deleteButton {
+  opacity: 1;
+}
+
+.deleteButton:hover {
+  color: #ff4a4a;
+  background: rgba(255, 74, 74, 0.1);
+}
+
+/* Save Dialog */
+.saveDialog {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  width: 240px;
+  padding: 16px;
+  background: #1e1e1e;
+  border: 1px solid #3d3d3d;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  z-index: 1001;
+}
+
+.saveDialog h4 {
+  margin: 0 0 12px;
+  color: #e0e0e0;
+  font-size: 14px;
+}
+
+.input,
+.textarea {
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  background: #2d2d2d;
+  border: 1px solid #3d3d3d;
+  border-radius: 4px;
+  color: #e0e0e0;
+  font-size: 12px;
+  box-sizing: border-box;
+}
+
+.input:focus,
+.textarea:focus {
+  outline: none;
+  border-color: #4a9eff;
+}
+
+.textarea {
+  min-height: 60px;
+  resize: vertical;
+}
+
+.dialogActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.dialogActions button {
+  padding: 6px 12px;
+  background: #3d3d3d;
+  border: none;
+  border-radius: 4px;
+  color: #e0e0e0;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.dialogActions button:hover {
+  background: #4d4d4d;
+}
+
+.primaryButton {
+  background: #4a9eff !important;
+  color: white !important;
+}
+
+.primaryButton:hover {
+  background: #3d8ce8 !important;
+}
+
+/* Transition Indicator */
+.transitionIndicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: rgba(74, 158, 255, 0.1);
+  border: 1px solid rgba(74, 158, 255, 0.3);
+  border-radius: 4px;
+  color: #4a9eff;
+  font-size: 11px;
+}
+
+.transitionIndicator::before {
+  content: '';
+  width: 12px;
+  height: 12px;
+  border: 2px solid #4a9eff;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
