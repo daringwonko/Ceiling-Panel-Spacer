@@ -17,7 +17,7 @@ class Slab:
     The elevation represents the top of the slab, with extrusion downward.
 
     Attributes:
-        boundary_points: List of (x, y) points forming closed polygon
+        boundary: List of (x, y) points forming closed polygon
         thickness: Slab thickness in mm
         elevation: Top of slab elevation in mm
         material: Material identifier
@@ -26,7 +26,7 @@ class Slab:
         id: Unique identifier
     """
 
-    boundary_points: List[Tuple[float, float]] = field(
+    boundary: List[Tuple[float, float]] = field(
         default_factory=lambda: [
             (0.0, 0.0),
             (5000.0, 0.0),
@@ -41,6 +41,15 @@ class Slab:
     level: str = "Level 1"
     id: str = field(default_factory=lambda: f"slab_{id(Slab)}{hash(Slab)}")
 
+    # Alias for convenience
+    @property
+    def boundary_points(self) -> List[Tuple[float, float]]:
+        return self.boundary
+
+    @boundary_points.setter
+    def boundary_points(self, value: List[Tuple[float, float]]):
+        self.boundary = value
+
     def __post_init__(self):
         """Validate slab properties after initialization."""
         self.validate()
@@ -54,9 +63,9 @@ class Slab:
         if self.thickness <= 0:
             raise ValueError(f"Slab thickness must be positive, got {self.thickness}")
 
-        if len(self.boundary_points) < 3:
+        if len(self.boundary) < 3:
             raise ValueError(
-                f"Slab boundary must have at least 3 points, got {len(self.boundary_points)}"
+                f"Slab boundary must have at least 3 points, got {len(self.boundary)}"
             )
 
         # Check for self-intersections (simplified)
@@ -74,7 +83,7 @@ class Slab:
         Returns:
             True if polygon self-intersects
         """
-        n = len(self.boundary_points)
+        n = len(self.boundary)
         if n < 4:
             return False
 
@@ -90,15 +99,15 @@ class Slab:
 
         # Check each pair of non-adjacent edges
         for i in range(n):
-            p1 = self.boundary_points[i]
-            p2 = self.boundary_points[(i + 1) % n]
+            p1 = self.boundary[i]
+            p2 = self.boundary[(i + 1) % n]
 
             for j in range(i + 2, n):
                 if j == (i + n - 1) % n:  # Skip adjacent edges
                     continue
 
-                p3 = self.boundary_points[j]
-                p4 = self.boundary_points[(j + 1) % n]
+                p3 = self.boundary[j]
+                p4 = self.boundary[(j + 1) % n]
 
                 if segments_intersect(p1, p2, p3, p4):
                     return True
@@ -108,13 +117,13 @@ class Slab:
     @property
     def area(self) -> float:
         """Calculate slab area using shoelace formula."""
-        n = len(self.boundary_points)
+        n = len(self.boundary)
         area = 0.0
 
         for i in range(n):
             j = (i + 1) % n
-            area += self.boundary_points[i][0] * self.boundary_points[j][1]
-            area -= self.boundary_points[j][0] * self.boundary_points[i][1]
+            area += self.boundary[i][0] * self.boundary[j][1]
+            area -= self.boundary[j][0] * self.boundary[i][1]
 
         return abs(area) / 2
 
@@ -126,13 +135,13 @@ class Slab:
     @property
     def perimeter(self) -> float:
         """Calculate slab perimeter."""
-        n = len(self.boundary_points)
+        n = len(self.boundary)
         perim = 0.0
 
         for i in range(n):
             j = (i + 1) % n
-            dx = self.boundary_points[j][0] - self.boundary_points[i][0]
-            dy = self.boundary_points[j][1] - self.boundary_points[i][1]
+            dx = self.boundary[j][0] - self.boundary[i][0]
+            dy = self.boundary[j][1] - self.boundary[i][1]
             perim += math.sqrt(dx**2 + dy**2)
 
         return perim
@@ -156,7 +165,7 @@ class Slab:
     @property
     def centroid(self) -> Tuple[float, float]:
         """Calculate polygon centroid."""
-        n = len(self.boundary_points)
+        n = len(self.boundary)
         cx, cy = 0.0, 0.0
         area = self.area
 
@@ -166,11 +175,11 @@ class Slab:
         for i in range(n):
             j = (i + 1) % n
             factor = (
-                self.boundary_points[i][0] * self.boundary_points[j][1]
-                - self.boundary_points[j][0] * self.boundary_points[i][1]
+                self.boundary[i][0] * self.boundary[j][1]
+                - self.boundary[j][0] * self.boundary[i][1]
             )
-            cx += (self.boundary_points[i][0] + self.boundary_points[j][0]) * factor
-            cy += (self.boundary_points[i][1] + self.boundary_points[j][1]) * factor
+            cx += (self.boundary[i][0] + self.boundary[j][0]) * factor
+            cy += (self.boundary[i][1] + self.boundary[j][1]) * factor
 
         cx = cx / (6 * area)
         cy = cy / (6 * area)
@@ -184,7 +193,7 @@ class Slab:
             List of 3D points forming the top face
         """
         z = self.top_elevation
-        return [(p[0], p[1], z) for p in self.boundary_points]
+        return [(p[0], p[1], z) for p in self.boundary]
 
     def get_bottom_face(self) -> List[Tuple[float, float, float]]:
         """Get bottom face vertices.
@@ -193,7 +202,7 @@ class Slab:
             List of 3D points forming the bottom face
         """
         z = self.bottom_elevation
-        return [(p[0], p[1], z) for p in self.boundary_points]
+        return [(p[0], p[1], z) for p in self.boundary]
 
     def get_side_faces(self) -> List[List[Tuple[float, float, float]]]:
         """Get side face vertices.
@@ -202,14 +211,14 @@ class Slab:
             List of faces, each containing 4 vertices
         """
         faces = []
-        n = len(self.boundary_points)
+        n = len(self.boundary)
         top_z = self.top_elevation
         bottom_z = self.bottom_elevation
 
         for i in range(n):
             j = (i + 1) % n
-            p1 = self.boundary_points[i]
-            p2 = self.boundary_points[j]
+            p1 = self.boundary[i]
+            p2 = self.boundary[j]
 
             face = [
                 (p1[0], p1[1], top_z),
@@ -229,10 +238,10 @@ class Slab:
         Returns:
             Tuple of (min_point, max_point)
         """
-        min_x = min(p[0] for p in self.boundary_points)
-        max_x = max(p[0] for p in self.boundary_points)
-        min_y = min(p[1] for p in self.boundary_points)
-        max_y = max(p[1] for p in self.boundary_points)
+        min_x = min(p[0] for p in self.boundary)
+        max_x = max(p[0] for p in self.boundary)
+        min_y = min(p[1] for p in self.boundary)
+        max_y = max(p[1] for p in self.boundary)
         min_z = self.bottom_elevation
         max_z = self.top_elevation
 
@@ -248,13 +257,13 @@ class Slab:
             True if point is inside polygon
         """
         x, y = point
-        n = len(self.boundary_points)
+        n = len(self.boundary)
         inside = False
 
         j = n - 1
         for i in range(n):
-            xi, yi = self.boundary_points[i]
-            xj, yj = self.boundary_points[j]
+            xi, yi = self.boundary[i]
+            xj, yj = self.boundary[j]
 
             if ((yi > y) != (yj > y)) and (x < (xj - xi) * (y - yi) / (yj - yi) + xi):
                 inside = not inside
@@ -267,7 +276,8 @@ class Slab:
         return {
             "id": self.id,
             "type": "slab",
-            "boundary_points": self.boundary_points,
+            "boundary": self.boundary,
+            "boundary_points": self.boundary,
             "thickness": self.thickness,
             "elevation": self.elevation,
             "top_elevation": self.top_elevation,
@@ -285,11 +295,13 @@ class Slab:
         """Update slab geometry properties.
 
         Args:
-            **kwargs: Properties to update (boundary_points, thickness, elevation,
+            **kwargs: Properties to update (boundary, boundary_points, thickness, elevation,
                      extrude_direction)
         """
+        if "boundary" in kwargs:
+            self.boundary = kwargs["boundary"]
         if "boundary_points" in kwargs:
-            self.boundary_points = kwargs["boundary_points"]
+            self.boundary = kwargs["boundary_points"]
         if "thickness" in kwargs:
             self.thickness = kwargs["thickness"]
         if "elevation" in kwargs:
@@ -342,7 +354,7 @@ def create_slab(
         ... )
     """
     slab = Slab(
-        boundary_points=boundary,
+        boundary=boundary,
         thickness=thickness,
         elevation=elevation,
         material=material,

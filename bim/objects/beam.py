@@ -17,8 +17,8 @@ class Beam:
     profile that is extruded along the beam axis.
 
     Attributes:
-        start_point: Beam start (x, y, z)
-        end_point: Beam end (x, y, z)
+        start: Beam start (x, y, z)
+        end: Beam end (x, y, z)
         profile_width: Profile width in mm (perpendicular to length)
         profile_height: Profile height in mm (typically vertical)
         material: Material identifier
@@ -26,13 +26,30 @@ class Beam:
         id: Unique identifier
     """
 
-    start_point: Tuple[float, float, float] = (0.0, 0.0, 2800.0)
-    end_point: Tuple[float, float, float] = (5000.0, 0.0, 2800.0)
+    start: Tuple[float, float, float] = (0.0, 0.0, 2800.0)
+    end: Tuple[float, float, float] = (5000.0, 0.0, 2800.0)
     profile_width: float = 200.0  # mm
     profile_height: float = 400.0  # mm
     material: str = "Concrete"
     elevation: float = 2800.0  # mm above level
     id: str = field(default_factory=lambda: f"beam_{id(Beam)}{hash(Beam)}")
+
+    # Aliases for convenience
+    @property
+    def start_point(self) -> Tuple[float, float, float]:
+        return self.start
+
+    @start_point.setter
+    def start_point(self, value: Tuple[float, float, float]):
+        self.start = value
+
+    @property
+    def end_point(self) -> Tuple[float, float, float]:
+        return self.end
+
+    @end_point.setter
+    def end_point(self, value: Tuple[float, float, float]):
+        self.end = value
 
     def __post_init__(self):
         """Validate beam properties after initialization."""
@@ -52,15 +69,15 @@ class Beam:
             raise ValueError(
                 f"Beam profile height must be positive, got {self.profile_height}"
             )
-        if self.start_point == self.end_point:
+        if self.start == self.end:
             raise ValueError("Beam start and end points cannot be the same")
 
     @property
     def length(self) -> float:
         """Calculate beam length from start to end point."""
-        dx = self.end_point[0] - self.start_point[0]
-        dy = self.end_point[1] - self.start_point[1]
-        dz = self.end_point[2] - self.start_point[2]
+        dx = self.end[0] - self.start[0]
+        dy = self.end[1] - self.start[1]
+        dz = self.end[2] - self.start[2]
         return math.sqrt(dx**2 + dy**2 + dz**2)
 
     @property
@@ -89,9 +106,9 @@ class Beam:
     @property
     def axis_vector(self) -> Tuple[float, float, float]:
         """Get normalized beam axis vector."""
-        dx = self.end_point[0] - self.start_point[0]
-        dy = self.end_point[1] - self.start_point[1]
-        dz = self.end_point[2] - self.start_point[2]
+        dx = self.end[0] - self.start[0]
+        dy = self.end[1] - self.start[1]
+        dz = self.end[2] - self.start[2]
         length = math.sqrt(dx**2 + dy**2 + dz**2)
 
         if length == 0:
@@ -142,7 +159,7 @@ class Beam:
         w2 = self.profile_width / 2
         h2 = self.profile_height / 2
 
-        sx, sy, sz = self.start_point
+        sx, sy, sz = self.start
 
         # Calculate profile corners
         p1 = (
@@ -209,8 +226,10 @@ class Beam:
         return {
             "id": self.id,
             "type": "beam",
-            "start_point": self.start_point,
-            "end_point": self.end_point,
+            "start": self.start,
+            "end": self.end,
+            "start_point": self.start,
+            "end_point": self.end,
             "profile_width": self.profile_width,
             "profile_height": self.profile_height,
             "material": self.material,
@@ -225,12 +244,16 @@ class Beam:
         """Update beam geometry properties.
 
         Args:
-            **kwargs: Properties to update (start_point, end_point, profile_width, profile_height, elevation)
+            **kwargs: Properties to update (start, end, start_point, end_point, profile_width, profile_height, elevation)
         """
+        if "start" in kwargs:
+            self.start = kwargs["start"]
+        if "end" in kwargs:
+            self.end = kwargs["end"]
         if "start_point" in kwargs:
-            self.start_point = kwargs["start_point"]
+            self.start = kwargs["start_point"]
         if "end_point" in kwargs:
-            self.end_point = kwargs["end_point"]
+            self.end = kwargs["end_point"]
         if "profile_width" in kwargs:
             self.profile_width = kwargs["profile_width"]
         if "profile_height" in kwargs:
@@ -278,8 +301,8 @@ def create_beam(
         elevation = start[2]  # Use Z coordinate as default
 
     beam = Beam(
-        start_point=start,
-        end_point=end,
+        start=start,
+        end=end,
         profile_width=profile_width,
         profile_height=profile_height,
         material=material,

@@ -5,14 +5,82 @@ name: Project Hierarchy (PARALLEL EXECUTION B)
 subsystem: BIM Workbench
 status: complete
 tags: [bim, hierarchy, levels, react, typescript]
-duration: 2h 30m
-completed: 2026-01-31
+duration: 2h 45m
+completed: 2026-02-01
 ---
 
 # Phase 06 Plan 12: Project Hierarchy Summary
 
 ## Overview
-Implemented a complete project hierarchy system for the BIM Workbench enabling users to organize their work using a **Site → Building → Level → Objects** structure. This provides the foundational organization system that makes BIM projects manageable and mirrors real-world construction project structures.
+Implemented a comprehensive project hierarchy system for the BIM Workbench with **Site → Building → Level → Object** structure. This implementation includes full tree management with drag-drop reorganization, context menus, and complete BIM Store integration.
+
+## What Was Built
+
+### Core Hierarchy Classes
+
+1. **Site** (`Site.ts`)
+   - Geographic coordinates (lat/lon/elevation)
+   - Terrain representation (flat/sloped/irregular)
+   - Container for buildings
+   - Address and location properties
+   - JSON serialization
+
+2. **Building** (`Building.ts`)
+   - Container for levels
+   - Building types (residential/commercial/industrial/etc.)
+   - Auto-calculated bounding box
+   - Level reordering
+   - Properties: height, area, stories, structural system
+
+3. **Level** (`Level.ts`)
+   - Container for objects at specific elevation
+   - Elevation and height data
+   - Show/hide visibility toggle
+   - 2D plan representation (scale, rotation, origin)
+   - Ground level and roof level flags
+
+4. **HierarchyManager** (`HierarchyManager.ts`)
+   - Complete tree management system
+   - CRUD operations for all hierarchy types
+   - Drag-and-drop with validation
+   - Context menu operations
+   - Selection management (single/multi)
+   - Expand/collapse tracking
+   - Visibility toggles
+   - Tree traversal utilities
+   - Event system for changes
+   - Full JSON serialization
+
+### UI Components
+
+1. **HierarchyTree** (`HierarchyTree.tsx`)
+   - React tree view component
+   - Expand/collapse toggles
+   - Node type icons
+   - Selection highlighting
+   - Visibility toggles
+   - Drag-and-drop support
+   - Context menu (right-click)
+   - Multi-select with Ctrl/Cmd
+
+2. **HierarchyDemo** (`HierarchyDemo.tsx`)
+   - Interactive demo
+   - Sample project with buildings and levels
+   - Real-time statistics
+   - Usage instructions
+
+### BIM Store Integration
+
+Extended `useBIMStore` with:
+- `hierarchyManager` state
+- `createSite`, `createBuilding`, `createLevel` actions
+- `removeSite`, `removeBuilding`, `removeLevel` actions
+- `selectHierarchyNode`, `deselectHierarchyNode`
+- `expandHierarchyNode`, `collapseHierarchyNode`
+- `moveHierarchyNode` for drag-drop
+- `renameHierarchyNode`
+- `toggleHierarchyNodeVisibility`
+- Project load/save with hierarchy
 
 ## What Was Built
 
@@ -99,18 +167,20 @@ Updated export/import to preserve hierarchy data.
 
 ```
 Site (geographic location)
-  └── Building (construction type, year)
-        └── Level (elevation, height, usage)
+  └── Building (construction type, year, bounding box)
+        └── Level (elevation, height, usage, 2D plan)
               └── Objects (positioned at level elevation)
 ```
 
 ### Key Design Decisions
 
-1. **Hierarchical IDs**: Each level maintains `buildingId`, each building maintains `siteId` for easy traversal
-2. **Object Assignment**: Objects have a `level` property and are also tracked in `level.objectIds` array for bidirectional lookup
-3. **Auto-Elevation**: New levels auto-calculate elevation based on existing levels in building
-4. **Visibility System**: Per-level visibility with Show All/Hide All/Isolate operations
-5. **Validation**: Real-time checking for overlapping level elevations
+1. **UUID-based identifiers** for all hierarchy nodes
+2. **Event-driven updates** via `onChange` callbacks
+3. **Validation for drag-drop** ensuring valid parent-child relationships
+4. **Map-based storage** for O(1) lookups
+5. **Separation of concerns** between data classes and management
+6. **Immutable operations** with new object creation
+7. **Bidirectional references** for easy traversal
 
 ## Integration Points
 
@@ -139,79 +209,119 @@ const visibleObjects = objects.filter(obj => {
 })
 ```
 
-## Files Created/Modified
+## Files Created
 
-### New Files
-- `frontend/src/types/level.ts` - TypeScript type definitions
-- `frontend/src/hooks/useLevels.ts` - Level management hook
-- `frontend/src/utils/levelUtils.ts` - Helper functions
-- `frontend/src/components/LevelPanel/LevelPanel.tsx` - Main panel component
-- `frontend/src/components/LevelPanel/LevelListItem.tsx` - Level list item
-- `frontend/src/components/LevelPanel/LevelProperties.tsx` - Property editor
-- `frontend/src/components/LevelPanel/PlanView.tsx` - 2D plan view
-- `frontend/src/components/LevelPanel/index.ts` - Component exports
-- `frontend/src/test/levelSystem.test.ts` - Test suite
+| File | Lines | Purpose |
+|------|-------|---------|
+| `src/bim/hierarchy/Site.ts` | 133 | Site with geo coordinates |
+| `src/bim/hierarchy/Building.ts` | 166 | Building with bounding box |
+| `src/bim/hierarchy/Level.ts` | 187 | Level with visibility |
+| `src/bim/hierarchy/HierarchyManager.ts` | 695 | Tree management |
+| `src/bim/hierarchy/index.ts` | 21 | Module exports |
+| `src/components/bim/HierarchyTree.tsx` | 455 | React tree view |
+| `src/components/bim/HierarchyDemo.tsx` | 182 | Demo component |
+| `src/store/useBIMStore.js` | +450 | Store integration |
 
-### Modified Files
-- `frontend/src/stores/useBIMStore.ts` - Added hierarchy state and persistence
+**Total:** ~2,289 lines
 
 ## Usage Examples
 
 ### Creating a Project Hierarchy
 ```tsx
-const { createSite, createBuilding, createLevel } = useLevels()
+const store = useBIMStore()
 
-// Create Site
-const site = createSite('Downtown Project', {
+// Create Site with geographic coordinates
+const site = store.createSite('Main Campus', {
   latitude: 40.7128,
   longitude: -74.0060,
-  elevation: 10.5
+  elevation: 10
+}, {
+  address: '123 Construction Ave',
+  city: 'New York',
+  state: 'NY',
+  country: 'USA'
 })
 
 // Create Building
-const building = createBuilding(site.id, 'Office Tower', {
+const building = store.createBuilding('Office Tower', site.id, {
   buildingType: 'commercial',
-  constructionYear: 2024
+  totalHeight: 45,
+  totalArea: 5000,
+  numberOfStories: 3
 })
 
-// Create Levels
-const ground = createLevel(building.id, 'Ground Floor', 0, {
+// Create Level
+const level = store.createLevel('Ground Floor', building.id, {
+  elevation: 0,
   height: 4.5,
-  usageType: 'retail'
-})
-
-const floor1 = createLevel(building.id, 'Floor 1', 4.5, {
-  height: 3.5,
-  usageType: 'office'
+  isGroundLevel: true,
+  usage: 'office'
 })
 ```
 
-### Assigning Objects to Levels
+### Managing Hierarchy
 ```tsx
-const { assignObjectToLevel, currentLevelId } = useLevels()
+// Expand/collapse nodes
+store.expandHierarchyNode(building.id)
+store.collapseHierarchyNode(building.id)
 
-// When creating an object:
-assignObjectToLevel(newObject.id, currentLevelId)
+// Select nodes
+store.selectHierarchyNode(level.id)
+store.selectHierarchyNode(otherLevel.id, true) // Additive
+
+// Drag-drop reorganization
+store.moveHierarchyNode(level.id, otherBuilding.id)
+
+// Visibility toggle
+store.toggleHierarchyNodeVisibility(level.id)
+
+// Rename
+store.renameHierarchyNode(level.id, 'First Floor')
 ```
 
-### Filtering by Level
+### Using HierarchyTree Component
 ```tsx
-const { getObjectsByLevel, getLevelById } = useLevels()
+const { hierarchyManager } = useBIMStore()
 
-// Get all objects on a specific level
-const levelObjects = getObjectsByLevel('level-1')
-
-// Get current level info
-const currentLevel = getLevelById(currentLevelId)
+<HierarchyTree
+  manager={hierarchyManager}
+  onNodeSelect={(nodeId, nodeType) => {
+    console.log('Selected:', nodeType, nodeId)
+  }}
+  onNodeDoubleClick={(nodeId, nodeType) => {
+    console.log('Double-clicked:', nodeType, nodeId)
+  }}
+  onContextMenu={(nodeId, nodeType, event) => {
+    console.log('Context menu:', nodeType, nodeId)
+  }}
+  showIcons={true}
+  showVisibilityToggle={true}
+  allowDragDrop={true}
+/>
 ```
 
-### Copying Levels
+### Direct HierarchyManager Access
 ```tsx
-const { copyLevel } = useLevels()
+const { hierarchyManager } = useBIMStore()
 
-// Copy Floor 1 to create Floor 2
-copyLevel('level-1', 8.0, 'Floor 2')
-// Objects are automatically copied with updated elevation
+// Get root nodes (sites)
+const sites = hierarchyManager.getRootNodes()
+
+// Get children
+const buildings = hierarchyManager.getChildren(site.id)
+const levels = hierarchyManager.getChildren(building.id)
+
+// Get path from root
+const path = hierarchyManager.getPathToNode(level.id)
+// [Site, Building, Level]
+
+// Get all descendants
+const allDescendants = hierarchyManager.getDescendants(site.id)
+
+// Check state
+const isSelected = hierarchyManager.isSelected(level.id)
+const isExpanded = hierarchyManager.isExpanded(building.id)
+const isVisible = hierarchyManager.isVisible(level.id)
 ```
 
 ## Testing
@@ -241,21 +351,29 @@ Test coverage:
 
 ## Compliance
 
-- ✅ Site object with geographic properties
+- ✅ Site object with geographic properties (lat/lon/elevation)
+- ✅ Site terrain representation (flat/sloped/irregular)
 - ✅ Building object with auto-calculated bounding box
-- ✅ Level object with elevation, height, and 2D plan view
-- ✅ Level management UI panel
-- ✅ Object creation assigns to current level
-- ✅ Level visibility controls
-- ✅ Copy objects between levels
-- ✅ Export/Import preserves hierarchy
+- ✅ Building type enumeration
+- ✅ Level object with elevation, height, and 2D plan
+- ✅ Level show/hide visibility toggle
+- ✅ Tree view UI component (HierarchyTree)
+- ✅ Drag-drop reorganization with validation
+- ✅ Context menus (right-click operations)
+- ✅ Expand/collapse functionality
+- ✅ Multi-select support
+- ✅ BIM Store integration
+- ✅ Project export/import with hierarchy
+- ✅ Event system for hierarchy changes
+- ✅ JSON serialization/deserialization
 
 ## Known Limitations
 
-1. No drag-drop UI (requires additional DnD library)
-2. PlanView uses simple canvas rendering (could be enhanced with SVG)
-3. No 3D level plane visualization yet
-4. Elevation validation is basic (could check structural conflicts)
+1. No search/filter in tree view
+2. No undo/redo for hierarchy operations
+3. Copy/paste not yet implemented
+4. No 3D visualization of hierarchy selection
+5. Context menu uses basic browser prompts
 
 ## Performance Notes
 
