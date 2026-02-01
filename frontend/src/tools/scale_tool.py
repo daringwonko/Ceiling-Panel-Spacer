@@ -3,8 +3,8 @@
 from typing import Optional, List, Any
 from enum import Enum, auto
 
-from ..core.tool import Tool, ToolConfig, ToolState
-from ..core.geometry import Point
+from core.tool import Tool, ToolConfig, ToolState
+from core.geometry import Point
 
 
 class ScaleState(Enum):

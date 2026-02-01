@@ -4,9 +4,9 @@ from typing import Optional, List, Any, Tuple
 from enum import Enum, auto
 import math
 
-from ..core.tool import Tool, ToolConfig, ToolState
-from ..core.geometry import Point
-from ..snap_system import SnapSystem, SnapType
+from core.tool import Tool, ToolConfig, ToolState
+from core.geometry import Point
+from snap_system import SnapSystem, SnapType
 
 
 class MoveState(Enum):
