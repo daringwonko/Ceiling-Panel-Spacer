@@ -1,4 +1,17 @@
-// UI Components - Barrel Exports
+// Material Design Components (BIM Workbench Professional Interface)
+export { MaterialButton } from "./MaterialButton"
+export type { MaterialButtonProps } from "./MaterialButton"
+
+export { MaterialSlider } from "./MaterialSlider"
+export type { MaterialSliderProps } from "./MaterialSlider"
+
+export { MaterialCard } from "./MaterialCard"
+export type { MaterialCardProps } from "./MaterialCard"
+
+export { MaterialDialog } from "./MaterialDialog"
+export type { MaterialDialogProps } from "./MaterialDialog"
+
+// Original Radix UI + Tailwind Components (kept for backward compatibility)
 
 export { Button, buttonVariants } from "./Button"
 export type { ButtonProps } from "./Button"
