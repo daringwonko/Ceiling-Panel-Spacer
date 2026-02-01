@@ -1,9 +1,9 @@
-import { createTheme } from '@mui/material/styles'
+import { createTheme, ThemeOptions } from '@mui/material/styles'
 
 // BIM Workbench Professional Theme
-// Equivalent to commercial CAD tools styling
+// Professional styling equivalent to commercial CAD tools
 
-export const bimTheme = createTheme({
+const baseTheme: ThemeOptions = {
   palette: {
     mode: 'light',
     primary: {
@@ -52,6 +52,23 @@ export const bimTheme = createTheme({
       disabled: '#bdbdbd',
     },
     divider: '#e0e0e0',
+    // Custom BIM-specific colors
+    bim: {
+      grid: '#e0e0e0',
+      selection: '#1976d2',
+      ghost: 'rgba(25, 118, 210, 0.1)',
+      highlight: '#ffeb3b',
+      error: '#f44336',
+      warning: '#ff9800',
+      success: '#4caf50',
+      info: '#2196f3',
+    },
+    surface: {
+      level1: '#ffffff',
+      level2: '#f5f5f5',
+      level3: '#eeeeee',
+      border: '#e0e0e0',
+    },
   },
   typography: {
     fontFamily: ['Inter', 'Roboto', 'system-ui', 'sans-serif'].join(','),
@@ -131,6 +148,24 @@ export const bimTheme = createTheme({
       textTransform: 'uppercase',
       letterSpacing: '0.08em',
     },
+    // Technical/BIM-specific typography
+    technical: {
+      dimension: {
+        fontFamily: 'Roboto Mono, monospace',
+        fontSize: '0.8125rem',
+        fontWeight: 400,
+      },
+      coordinate: {
+        fontFamily: 'Roboto Mono, monospace',
+        fontSize: '0.75rem',
+        fontWeight: 500,
+      },
+      annotation: {
+        fontFamily: 'Roboto, sans-serif',
+        fontSize: '0.875rem',
+        fontWeight: 500,
+      },
+    },
   },
   breakpoints: {
     values: {
@@ -148,7 +183,12 @@ export const bimTheme = createTheme({
   shape: {
     borderRadius: 6, // Slightly rounded for modern look
   },
+}
+
+export const bimTheme = createTheme({
+  ...baseTheme,
   components: {
+    ...baseTheme.components,
     MuiButton: {
       styleOverrides: {
         root: {
@@ -234,5 +274,166 @@ export const bimTheme = createTheme({
         },
       },
     },
+    MuiTable: {
+      styleOverrides: {
+        root: {
+          borderCollapse: 'collapse',
+        },
+      },
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        root: {
+          borderBottom: '1px solid #e0e0e0',
+          padding: '12px 16px',
+        },
+        head: {
+          fontWeight: 600,
+          backgroundColor: '#fafafa',
+        },
+      },
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          borderRadius: 6,
+        },
+      },
+    },
+    MuiTooltip: {
+      styleOverrides: {
+        tooltip: {
+          borderRadius: 4,
+          fontSize: '0.75rem',
+        },
+      },
+    },
+    MuiMenu: {
+      styleOverrides: {
+        paper: {
+          borderRadius: 6,
+          boxShadow: '0px 4px 14px rgba(0, 0, 0, 0.15)',
+        },
+      },
+    },
+    MuiSelect: {
+      styleOverrides: {
+        outlined: {
+          borderRadius: 6,
+        },
+      },
+    },
+    MuiTab: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+          fontWeight: 500,
+          minHeight: 48,
+        },
+      },
+    },
+    MuiTabs: {
+      styleOverrides: {
+        indicator: {
+          height: 3,
+          borderRadius: '3px 3px 0 0',
+        },
+      },
+    },
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.12)',
+        },
+      },
+    },
+    MuiDrawer: {
+      styleOverrides: {
+        paper: {
+          borderRight: '1px solid #e0e0e0',
+        },
+      },
+    },
+    MuiListItemButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 6,
+          margin: '2px 8px',
+          '&.Mui-selected': {
+            backgroundColor: 'rgba(25, 118, 210, 0.08)',
+          },
+        },
+      },
+    },
+    MuiExpansionPanel: {
+      styleOverrides: {
+        root: {
+          borderRadius: 6,
+          '&:before': {
+            display: 'none',
+          },
+        },
+      },
+    },
+    MuiExpansionPanelSummary: {
+      styleOverrides: {
+        root: {
+          minHeight: 48,
+        },
+      },
+    },
   },
 })
+
+// Dark theme variant for professional BIM workbench
+export const bimDarkTheme = createTheme({
+  ...baseTheme,
+  palette: {
+    ...baseTheme.palette,
+    mode: 'dark',
+    background: {
+      default: '#121212',
+      paper: '#1e1e1e',
+    },
+    text: {
+      primary: '#ffffff',
+      secondary: '#b0b0b0',
+      disabled: '#606060',
+    },
+    divider: '#333333',
+    surface: {
+      level1: '#1e1e1e',
+      level2: '#2d2d2d',
+      level3: '#3d3d3d',
+      border: '#333333',
+    },
+  },
+  components: {
+    ...baseTheme.components,
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          backgroundImage: 'none',
+          border: '1px solid #333333',
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          '&:hover': {
+            boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.4)',
+          },
+        },
+        contained: {
+          '&:hover': {
+            backgroundColor: '#42a5f5',
+            boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.4)',
+          },
+        },
+      },
+    },
+  },
+})
+
+export default bimTheme
