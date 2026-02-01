@@ -95,6 +95,18 @@ WAVE 3 COMPLETION SUMMARY (In Progress):
   - Full BIM Store integration with hierarchy state
   - Demo component with sample project structure
 
+- Material & Layer Management (06-13): Complete with PBR materials
+  - Material System: 20+ predefined PBR materials (concrete, wood, metal, glass, etc.)
+  - Three.js Integration: MeshStandardMaterial with caching for performance
+  - MaterialLibrary: CRUD operations, localStorage persistence, JSON import/export
+  - MaterialPanel: Grid view with search, filter, preview, editor
+  - MaterialPreview: 3D sphere with auto-rotation and proper lighting
+  - Layer System: Hierarchical layers with visibility/lock controls
+  - LayerManager: CRUD, parent-child relationships, active layer management
+  - LayerPanel: Tree view with expand/collapse, inline editing, context menu
+  - Default Layers: 0, Structure, Architecture, MEP, Furniture, Annotations
+  - useMaterials/useLayers hooks for React integration
+
 DECISIONS MADE:
 - Absolute imports to avoid package conflicts
 - State machine pattern for clear tool operation flow
@@ -113,6 +125,6 @@ DECISIONS MADE:
 - Event-driven updates for hierarchy changes
 - UUID-based identifiers for all hierarchy nodes
 
-AGENT DEPLOYMENT: WAVE 3 IN PROGRESS
+AGENT DEPLOYMENT: WAVE 4 READY
 Following AGENTS-PIPELINE.md v3.0 pattern
-Next: Continue Wave 3 plans (06-13)
+Next: Execute Wave 4 plans (06-14 through 06-16) - Annotations & Sections
