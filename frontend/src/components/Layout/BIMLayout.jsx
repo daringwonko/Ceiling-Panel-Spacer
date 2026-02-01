@@ -76,12 +76,13 @@ const toolCategories = [
 // Tool catalog (100+ tools - sample for 2D and 3D)
 const toolsByCategory = {
   '2d-drafting': [
-    { id: 'line', name: 'Line', icon: PencilIcon, path: '/bim/2d-drafting?tool=line' },
-    { id: 'polyline', name: 'Polyline', icon: PencilIcon, path: '/bim/2d-drafting?tool=polyline' },
-    { id: 'rectangle', name: 'Rectangle', icon: PencilIcon, path: '/bim/2d-drafting?tool=rectangle' },
-    { id: 'circle', name: 'Circle', icon: PencilIcon, path: '/bim/2d-drafting?tool=circle' },
-    { id: 'arc', name: 'Arc', icon: PencilIcon, path: '/bim/2d-drafting?tool=arc' },
-    { id: 'polygon', name: 'Polygon', icon: PencilIcon, path: '/bim/2d-drafting?tool=polygon' },
+    { id: 'line', name: 'Line', icon: PencilIcon, path: '/bim/tools/line' },
+    { id: 'polyline', name: 'Polyline', icon: PencilIcon, path: '/bim/tools/polyline' },
+    { id: 'rectangle', name: 'Rectangle', icon: PencilIcon, path: '/bim/tools/rectangle' },
+    { id: 'circle', name: 'Circle', icon: PencilIcon, path: '/bim/tools/circle' },
+    { id: 'ellipse', name: 'Ellipse', icon: PencilIcon, path: '/bim/tools/ellipse' },
+    { id: 'arc', name: 'Arc', icon: PencilIcon, path: '/bim/tools/arc' },
+    { id: 'polygon', name: 'Polygon', icon: PencilIcon, path: '/bim/tools/polygon' },
     // ... 8 more 2D tools
   ],
   '3d-modeling': [
@@ -97,9 +98,9 @@ const toolsByCategory = {
     // ... 6 more structural tools
   ],
   'building-elements': [
-    { id: 'door', name: 'Door', icon: DoorIcon, path: '/bim/building-elements?tool=door' },
-    { id: 'window', name: 'Window', icon: DoorIcon, path: '/bim/building-elements?tool=window' },
-    { id: 'stairs', name: 'Stairs', icon: DoorIcon, path: '/bim/building-elements?tool=stairs' },
+    { id: 'door', name: 'Door', icon: DoorIcon, path: '/bim/tools/door' },
+    { id: 'window', name: 'Window', icon: DoorIcon, path: '/bim/tools/window' },
+    { id: 'stairs', name: 'Stairs', icon: DoorIcon, path: '/bim/tools/stairs' },
     { id: 'roof', name: 'Roof', icon: DoorIcon, path: '/bim/building-elements?tool=roof' },
     // ... 4 more building elements
   ],

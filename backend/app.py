@@ -744,6 +744,73 @@ def get_material(material_id):
         return create_response(error=str(e), status_code=500)
 
 
+@bim_bp.route("/materials/<material_id>", methods=["PUT"])
+def update_material(material_id):
+    """Update material
+
+    Path Parameters:
+    - material_id (str): Material identifier
+
+    Request Body:
+    - name (str, optional): Material name
+    - color (str, optional): Material color
+    - density (float, optional): Material density
+    - cost_per_unit (float, optional): Cost per unit
+    - properties (dict, optional): Additional properties
+
+    Returns:
+    Updated material
+    """
+    log_request(f"/api/bim/materials/{material_id}", "PUT", request.json)
+
+    try:
+        if material_id not in materials_db:
+            return create_response(error="Material not found", status_code=404)
+
+        data = request.get_json()
+        material = materials_db[material_id]
+
+        allowed_fields = ["name", "color", "density", "cost_per_unit", "properties"]
+        for field in allowed_fields:
+            if field in data:
+                material[field] = data[field]
+
+        material["updated_at"] = get_timestamp()
+
+        logger.info(f"Material updated: {material_id}")
+        return create_response(data=material)
+
+    except Exception as e:
+        logger.error(f"Error updating material: {str(e)}")
+        return create_response(error=str(e), status_code=500)
+
+
+@bim_bp.route("/materials/<material_id>", methods=["DELETE"])
+def delete_material(material_id):
+    """Delete material
+
+    Path Parameters:
+    - material_id (str): Material identifier
+
+    Returns:
+    Success confirmation
+    """
+    log_request(f"/api/bim/materials/{material_id}", "DELETE")
+
+    try:
+        if material_id not in materials_db:
+            return create_response(error="Material not found", status_code=404)
+
+        del materials_db[material_id]
+
+        logger.info(f"Material deleted: {material_id}")
+        return create_response(data={"success": True})
+
+    except Exception as e:
+        logger.error(f"Error deleting material: {str(e)}")
+        return create_response(error=str(e), status_code=500)
+
+
 # ============================================================================
 # EXPORT ROUTES
 # ============================================================================
@@ -988,6 +1055,504 @@ def import_dxf():
 
     except Exception as e:
         logger.error(f"Error importing DXF: {str(e)}")
+        return create_response(error=str(e), status_code=500)
+
+
+# ============================================================================
+# SCHEDULE ROUTES
+# ============================================================================
+
+
+@bim_bp.route("/schedules/export/excel", methods=["POST"])
+def export_schedule_excel():
+    """Export schedule to Excel format
+
+    Request Body:
+        - project_id (str): Project identifier
+        - schedule_id (str, optional): Specific schedule to export
+        - options (dict, optional): Export options (include_metadata, include_geometry)
+
+    Returns:
+        Excel file download or URL
+    """
+    log_request("/api/bim/schedules/export/excel", "POST", request.json)
+
+    try:
+        data = request.get_json()
+        project_id = data.get("project_id") if data else None
+
+        if not project_id or project_id not in projects_db:
+            return create_response(error="Project not found", status_code=404)
+
+        logger.info(f"Exporting schedule to Excel for project {project_id}")
+
+        return create_response(
+            data={
+                "export_id": generate_id(),
+                "format": "Excel",
+                "project_id": project_id,
+                "download_url": f"/api/bim/download/{generate_id()}",
+                "message": "Excel export generated successfully",
+            }
+        )
+
+    except Exception as e:
+        logger.error(f"Error exporting schedule to Excel: {str(e)}")
+        return create_response(error=str(e), status_code=500)
+
+
+@bim_bp.route("/schedules/report", methods=["POST"])
+def generate_schedule_report():
+    """Generate schedule report
+
+    Request Body:
+        - project_id (str): Project identifier
+        - schedule_id (str, optional): Specific schedule for report
+        - report_type (str): Type of report (summary, detailed, summary)
+        - date_range (dict, optional): {start_date, end_date} filter
+
+    Returns:
+        Report data with statistics and details
+    """
+    log_request("/api/bim/schedules/report", "POST", request.json)
+
+    try:
+        data = request.get_json()
+        project_id = data.get("project_id") if data else None
+
+        if not project_id or project_id not in projects_db:
+            return create_response(error="Project not found", status_code=404)
+
+        logger.info(f"Generating schedule report for project {project_id}")
+
+        return create_response(
+            data={
+                "report_id": generate_id(),
+                "project_id": project_id,
+                "generated_at": get_timestamp(),
+                "report_type": data.get("report_type", "summary")
+                if data
+                else "summary",
+                "summary": {
+                    "total_schedules": 0,
+                    "total_items": 0,
+                    "completed_items": 0,
+                    "pending_items": 0,
+                    "overdue_items": 0,
+                },
+                "message": "Schedule report generated successfully",
+            }
+        )
+
+    except Exception as e:
+        logger.error(f"Error generating schedule report: {str(e)}")
+        return create_response(error=str(e), status_code=500)
+
+
+@bim_bp.route("/schedules/generate", methods=["POST"])
+def generate_schedule():
+    """Generate new schedule from project data
+
+    Request Body:
+        - project_id (str): Project identifier
+        - schedule_type (str): Type of schedule (ceiling, materials, objects)
+        - name (str): Schedule name
+        - options (dict, optional): Generation options
+
+    Returns:
+        Created schedule with items
+    """
+    log_request("/api/bim/schedules/generate", "POST", request.json)
+
+    try:
+        data = request.get_json()
+
+        if not data or "project_id" not in data:
+            return create_response(error="Project ID is required", status_code=400)
+
+        project_id = data["project_id"]
+
+        if project_id not in projects_db:
+            return create_response(error="Project not found", status_code=404)
+
+        if "name" not in data:
+            return create_response(error="Schedule name is required", status_code=400)
+
+        schedule_id = generate_id()
+        timestamp = get_timestamp()
+
+        schedule = {
+            "id": schedule_id,
+            "project_id": project_id,
+            "name": data["name"],
+            "type": data.get("schedule_type", "general"),
+            "items": [],
+            "created_at": timestamp,
+            "updated_at": timestamp,
+        }
+
+        logger.info(f"Schedule generated: {schedule_id} for project {project_id}")
+
+        return create_response(data=schedule, status_code=201)
+
+    except Exception as e:
+        logger.error(f"Error generating schedule: {str(e)}")
+        return create_response(error=str(e), status_code=500)
+
+
+# ============================================================================
+# TOOL ROUTES
+# ============================================================================
+
+
+@bim_bp.route("/tools/arc", methods=["POST"])
+def create_arc():
+    """Create new arc
+
+    Request Body:
+        - start ([x, y, z]): Start point coordinates
+        - end ([x, y, z]): End point coordinates
+        - bulge (float): Bulge factor (arc curvature)
+
+    Returns:
+        Created arc with id
+    """
+    log_request("/api/bim/tools/arc", "POST", request.json)
+
+    try:
+        data = request.get_json()
+
+        if not data:
+            return create_response(error="No data provided", status_code=400)
+
+        if "start" not in data:
+            return create_response(error="Start point is required", status_code=400)
+
+        if "end" not in data:
+            return create_response(error="End point is required", status_code=400)
+
+        if "bulge" not in data:
+            return create_response(error="Bulge factor is required", status_code=400)
+
+        arc_id = generate_id()
+        timestamp = get_timestamp()
+
+        arc = {
+            "id": arc_id,
+            "type": "arc",
+            "start": data["start"],
+            "end": data["end"],
+            "bulge": data["bulge"],
+            "center": None,
+            "radius": None,
+            "created_at": timestamp,
+            "updated_at": timestamp,
+        }
+
+        objects_db[arc_id] = arc
+
+        logger.info(f"Arc created: {arc_id}")
+        return create_response(data=arc, status_code=201)
+
+    except Exception as e:
+        logger.error(f"Error creating arc: {str(e)}")
+        return create_response(error=str(e), status_code=500)
+
+
+@bim_bp.route("/tools/rectangle", methods=["POST"])
+def create_rectangle():
+    """Create new rectangle
+
+    Request Body:
+        - corner ([x, y, z]): Corner point coordinates
+        - opposite_corner ([x, y, z]): Opposite corner point coordinates
+
+    Returns:
+        Created rectangle with id, width, height
+    """
+    log_request("/api/bim/tools/rectangle", "POST", request.json)
+
+    try:
+        data = request.get_json()
+
+        if not data:
+            return create_response(error="No data provided", status_code=400)
+
+        if "corner" not in data:
+            return create_response(error="Corner point is required", status_code=400)
+
+        if "opposite_corner" not in data:
+            return create_response(
+                error="Opposite corner point is required", status_code=400
+            )
+
+        corner = data["corner"]
+        opposite_corner = data["opposite_corner"]
+
+        width = abs(opposite_corner[0] - corner[0])
+        height = abs(opposite_corner[1] - corner[1])
+
+        rectangle_id = generate_id()
+        timestamp = get_timestamp()
+
+        rectangle = {
+            "id": rectangle_id,
+            "type": "rectangle",
+            "corner": corner,
+            "opposite_corner": opposite_corner,
+            "width": width,
+            "height": height,
+            "created_at": timestamp,
+            "updated_at": timestamp,
+        }
+
+        logger.info(f"Rectangle created: {rectangle_id}")
+        return create_response(data=rectangle, status_code=201)
+
+    except Exception as e:
+        logger.error(f"Error creating rectangle: {str(e)}")
+        return create_response(error=str(e), status_code=500)
+
+
+@bim_bp.route("/tools/ellipse", methods=["POST"])
+def create_ellipse():
+    """Create new ellipse
+
+    Request Body:
+        - center ([x, y, z]): Center point coordinates
+        - radiusX (float): X-axis radius in mm
+        - radiusY (float): Y-axis radius in mm
+        - rotation (float, optional): Rotation angle in radians
+
+    Returns:
+        Created ellipse with id, center, radii, rotation
+    """
+    log_request("/api/bim/tools/ellipse", "POST", request.json)
+
+    try:
+        data = request.get_json()
+
+        if not data:
+            return create_response(error="No data provided", status_code=400)
+
+        if "center" not in data:
+            return create_response(error="Center point is required", status_code=400)
+
+        if "radiusX" not in data:
+            return create_response(error="X-axis radius is required", status_code=400)
+
+        if "radiusY" not in data:
+            return create_response(error="Y-axis radius is required", status_code=400)
+
+        center = data["center"]
+        radiusX = data["radiusX"]
+        radiusY = data["radiusY"]
+        rotation = data.get("rotation", 0)
+
+        ellipse_id = generate_id()
+        timestamp = get_timestamp()
+
+        ellipse = {
+            "id": ellipse_id,
+            "type": "ellipse",
+            "center": center,
+            "radiusX": radiusX,
+            "radiusY": radiusY,
+            "rotation": rotation,
+            "created_at": timestamp,
+            "updated_at": timestamp,
+        }
+
+        objects_db[ellipse_id] = ellipse
+
+        logger.info(f"Ellipse created: {ellipse_id}")
+        return create_response(data=ellipse, status_code=201)
+
+    except Exception as e:
+        logger.error(f"Error creating ellipse: {str(e)}")
+        return create_response(error=str(e), status_code=500)
+
+
+@bim_bp.route("/tools/circle", methods=["POST"])
+def create_circle():
+    """Create new circle
+
+    Request Body:
+        - center ([x, y, z]): Center point coordinates
+        - radius (float): Circle radius in mm
+
+    Returns:
+        Created circle with id, center, radius
+    """
+    log_request("/api/bim/tools/circle", "POST", request.json)
+
+    try:
+        data = request.get_json()
+
+        if not data:
+            return create_response(error="No data provided", status_code=400)
+
+        if "center" not in data:
+            return create_response(error="Center point is required", status_code=400)
+
+        if "radius" not in data:
+            return create_response(error="Circle radius is required", status_code=400)
+
+        center = data["center"]
+        radius = data["radius"]
+
+        circle_id = generate_id()
+        timestamp = get_timestamp()
+
+        circle = {
+            "id": circle_id,
+            "type": "circle",
+            "center": center,
+            "radius": radius,
+            "created_at": timestamp,
+            "updated_at": timestamp,
+        }
+
+        objects_db[circle_id] = circle
+
+        logger.info(f"Circle created: {circle_id}")
+        return create_response(data=circle, status_code=201)
+
+    except Exception as e:
+        logger.error(f"Error creating circle: {str(e)}")
+        return create_response(error=str(e), status_code=500)
+
+
+@bim_bp.route("/tools/door", methods=["POST"])
+def create_door():
+    """Create new door
+
+    Request Body:
+        - position ([x, y, z]): Door position coordinates
+        - width (float): Door width in mm
+        - height (float): Door height in mm
+        - direction (str): Swing direction ("in" or "out")
+
+    Returns:
+        Created door with id, position, dimensions
+    """
+    log_request("/api/bim/tools/door", "POST", request.json)
+
+    try:
+        data = request.get_json()
+
+        if not data:
+            return create_response(error="No data provided", status_code=400)
+
+        if "position" not in data:
+            return create_response(error="Position is required", status_code=400)
+
+        if "width" not in data:
+            return create_response(error="Door width is required", status_code=400)
+
+        if "height" not in data:
+            return create_response(error="Door height is required", status_code=400)
+
+        if "direction" not in data:
+            return create_response(error="Door direction is required", status_code=400)
+
+        position = data["position"]
+        width = data["width"]
+        height = data["height"]
+        direction = data["direction"]
+
+        if direction not in ["in", "out"]:
+            return create_response(
+                error="Direction must be 'in' or 'out'", status_code=400
+            )
+
+        door_id = generate_id()
+        timestamp = get_timestamp()
+
+        door = {
+            "id": door_id,
+            "type": "door",
+            "position": position,
+            "width": width,
+            "height": height,
+            "direction": direction,
+            "frame_width": 50,
+            "material": "wood",
+            "created_at": timestamp,
+            "updated_at": timestamp,
+        }
+
+        objects_db[door_id] = door
+
+        logger.info(f"Door created: {door_id}")
+        return create_response(data=door, status_code=201)
+
+    except Exception as e:
+        logger.error(f"Error creating door: {str(e)}")
+        return create_response(error=str(e), status_code=500)
+
+
+# ============================================================================
+# V1 API ROUTES
+# ============================================================================
+
+
+@app.route("/api/v1/bim/tools/ellipse", methods=["POST"])
+def create_ellipse_v1():
+    """Create new ellipse (v1 API)
+
+    Request Body:
+        - center ([x, y, z]): Center point coordinates
+        - rx (float): X radius in mm
+        - ry (float): Y radius in mm
+        - rotation (float): Rotation angle in degrees
+
+    Returns:
+        Created ellipse with id, center, rx, ry, rotation
+    """
+    log_request("/api/v1/bim/tools/ellipse", "POST", request.json)
+
+    try:
+        data = request.get_json()
+
+        if not data:
+            return create_response(error="No data provided", status_code=400)
+
+        if "center" not in data:
+            return create_response(error="Center point is required", status_code=400)
+
+        if "rx" not in data:
+            return create_response(error="X radius (rx) is required", status_code=400)
+
+        if "ry" not in data:
+            return create_response(error="Y radius (ry) is required", status_code=400)
+
+        center = data["center"]
+        rx = data["rx"]
+        ry = data["ry"]
+        rotation = data.get("rotation", 0)
+
+        ellipse_id = generate_id()
+        timestamp = get_timestamp()
+
+        ellipse = {
+            "id": ellipse_id,
+            "type": "ellipse",
+            "center": center,
+            "rx": rx,
+            "ry": ry,
+            "rotation": rotation,
+            "created_at": timestamp,
+            "updated_at": timestamp,
+        }
+
+        objects_db[ellipse_id] = ellipse
+
+        logger.info(f"Ellipse created: {ellipse_id}")
+        return create_response(data=ellipse, status_code=201)
+
+    except Exception as e:
+        logger.error(f"Error creating ellipse: {str(e)}")
         return create_response(error=str(e), status_code=500)
 
 

@@ -12,8 +12,9 @@ export { MaterialDialog } from "./MaterialDialog"
 export type { MaterialDialogProps } from "./MaterialDialog"
 
 // Control Interfaces (Upgraded ceiling tool controls)
-export { default as CeilingControlPanel } from "./CeilingControlPanel"
-export type { CeilingControlPanelProps } from "./CeilingControlPanel"
+// JAILED in staging/ceiling-panel-jail/ - Phase 8 decoupling
+// export { default as CeilingControlPanel } from "./CeilingControlPanel"
+// export type { CeilingControlPanelProps } from "./CeilingControlPanel"
 
 // Theme Integration (Global Material Design integration)
 export { default as ThemeWrapper, useThemeContext, useResponsive, ResponsiveWrapper } from "./ThemeWrapper"

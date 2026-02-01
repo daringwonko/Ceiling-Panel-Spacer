@@ -1,35 +1,35 @@
-======================================================================
+============================================================
 CEILING PANEL LAYOUT REPORT
-Generated: 2026-01-10 13:52:00
-======================================================================
+Generated: 2026-02-01 06:37:51
+============================================================
 
 CEILING DIMENSIONS
-----------------------------------------------------------------------
+------------------------------------------------------------
 Length:      8000.0 mm  (  8.00 m)
 Width:       6000.0 mm  (  6.00 m)
 Area:         48.00 m²
 
 SPACING SPECIFICATIONS
-----------------------------------------------------------------------
+------------------------------------------------------------
 Perimeter Gap:   200.0 mm (all edges)
 Panel Gap:       200.0 mm (between panels)
 
 PANEL LAYOUT (OPTIMIZED)
-----------------------------------------------------------------------
-Panel Dimensions:  1250.0 mm × 1750.0 mm
-Panel Area:        2.1875 m²
-Panels Per Row:    4
+------------------------------------------------------------
+Panel Dimensions:  1733.3 mm × 1750.0 mm
+Panel Area:        3.0333 m²
+Panels Per Row:    3
 Panels Per Column: 4
-Total Panels:      16
+Total Panels:      12
 
 COVERAGE ANALYSIS
-----------------------------------------------------------------------
-Panel Coverage:     35.00 m²
-Gap/Service Area:   13.00 m²
-Coverage %:          72.9%
+------------------------------------------------------------
+Panel Coverage:     36.40 m²
+Gap/Service Area:   11.60 m²
+Coverage %:          75.8%
 
 MATERIAL SPECIFICATION
-----------------------------------------------------------------------
+------------------------------------------------------------
 Product:       LED Panel
 Category:      lighting
 Color:         White
@@ -37,17 +37,13 @@ Reflectivity:  85%
 Cost/m²:       $450.00
 Notes:         Integrated LED lighting, 4000K
 
-MATERIAL REQUIREMENTS & COST BREAKDOWN
-----------------------------------------------------------------------
-Panels Required:     16 units
-
-COST CALCULATION:
-  Panel Coverage:         35.00 m² @ $450.00/m² = $ 15,750.00
-  Material Waste:          5.25 m² (15%) @ $450.00/m² = $  2,362.50
-  Subtotal (Material):                                          $ 18,112.50
-  TOTAL PROJECT COST:                                           $ 18,112.50
+MATERIAL REQUIREMENTS & COST
+------------------------------------------------------------
+Panels Required: 12 units
+Total m²:        36.40 m²
+Total Cost:      $16,380.00
 
 CUTTING LIST
-----------------------------------------------------------------------
-Panel Size: 1250.0 mm × 1750.0 mm
-Quantity: 16 pieces
+------------------------------------------------------------
+Panel Size: 1733.3 mm × 1750.0 mm
+Quantity: 12 pieces

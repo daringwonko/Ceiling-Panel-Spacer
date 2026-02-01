@@ -12,8 +12,7 @@ from flask_cors import CORS
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -31,25 +30,30 @@ def create_app(config: dict = None) -> Flask:
     app = Flask(__name__)
 
     # Default configuration
-    app.config.update({
-        'DEBUG': os.getenv('FLASK_DEBUG', 'false').lower() == 'true',
-        'SECRET_KEY': os.getenv('SECRET_KEY', 'ceiling-panel-secret-key'),
-        'JSON_SORT_KEYS': False,
-        'MAX_CONTENT_LENGTH': 16 * 1024 * 1024,  # 16MB max request size
-    })
+    app.config.update(
+        {
+            "DEBUG": os.getenv("FLASK_DEBUG", "false").lower() == "true",
+            "SECRET_KEY": os.getenv("SECRET_KEY", "ceiling-panel-secret-key"),
+            "JSON_SORT_KEYS": False,
+            "MAX_CONTENT_LENGTH": 16 * 1024 * 1024,  # 16MB max request size
+        }
+    )
 
     # Apply custom config
     if config:
         app.config.update(config)
 
     # Enable CORS
-    CORS(app, resources={
-        r"/api/*": {
-            "origins": os.getenv('CORS_ORIGINS', '*').split(','),
-            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization", "X-Request-ID"]
-        }
-    })
+    CORS(
+        app,
+        resources={
+            r"/api/*": {
+                "origins": os.getenv("CORS_ORIGINS", "*").split(","),
+                "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+                "allow_headers": ["Content-Type", "Authorization", "X-Request-ID"],
+            }
+        },
+    )
 
     # Register blueprints
     from .routes.calculations import calculations_bp
@@ -57,12 +61,16 @@ def create_app(config: dict = None) -> Flask:
     from .routes.materials import materials_bp
     from .routes.exports import exports_bp
     from .routes.health import health_bp
+    from .routes.bim import bim_bp
+    from .routes.kitchen import kitchen_bp
 
     app.register_blueprint(calculations_bp)
     app.register_blueprint(projects_bp)
     app.register_blueprint(materials_bp)
     app.register_blueprint(exports_bp)
     app.register_blueprint(health_bp)
+    app.register_blueprint(bim_bp)
+    app.register_blueprint(kitchen_bp)
 
     # Request logging middleware
     @app.before_request
@@ -74,156 +82,167 @@ def create_app(config: dict = None) -> Flask:
     @app.after_request
     def add_headers(response):
         """Add standard headers to responses."""
-        response.headers['X-API-Version'] = 'v1'
-        response.headers['X-Request-Time'] = datetime.utcnow().isoformat()
+        response.headers["X-API-Version"] = "v1"
+        response.headers["X-Request-Time"] = datetime.utcnow().isoformat()
         return response
 
     # Error handlers
     @app.errorhandler(400)
     def bad_request(error):
-        return jsonify({
-            "success": False,
-            "data": None,
-            "error": {
-                "code": "BAD_REQUEST",
-                "message": str(error.description) if hasattr(error, 'description') else "Bad request"
+        return jsonify(
+            {
+                "success": False,
+                "data": None,
+                "error": {
+                    "code": "BAD_REQUEST",
+                    "message": str(error.description)
+                    if hasattr(error, "description")
+                    else "Bad request",
+                },
             }
-        }), 400
+        ), 400
 
     @app.errorhandler(401)
     def unauthorized(error):
-        return jsonify({
-            "success": False,
-            "data": None,
-            "error": {
-                "code": "UNAUTHORIZED",
-                "message": "Authentication required"
+        return jsonify(
+            {
+                "success": False,
+                "data": None,
+                "error": {"code": "UNAUTHORIZED", "message": "Authentication required"},
             }
-        }), 401
+        ), 401
 
     @app.errorhandler(403)
     def forbidden(error):
-        return jsonify({
-            "success": False,
-            "data": None,
-            "error": {
-                "code": "FORBIDDEN",
-                "message": "Access denied"
+        return jsonify(
+            {
+                "success": False,
+                "data": None,
+                "error": {"code": "FORBIDDEN", "message": "Access denied"},
             }
-        }), 403
+        ), 403
 
     @app.errorhandler(404)
     def not_found(error):
-        return jsonify({
-            "success": False,
-            "data": None,
-            "error": {
-                "code": "NOT_FOUND",
-                "message": "Resource not found"
+        return jsonify(
+            {
+                "success": False,
+                "data": None,
+                "error": {"code": "NOT_FOUND", "message": "Resource not found"},
             }
-        }), 404
+        ), 404
 
     @app.errorhandler(405)
     def method_not_allowed(error):
-        return jsonify({
-            "success": False,
-            "data": None,
-            "error": {
-                "code": "METHOD_NOT_ALLOWED",
-                "message": f"Method {request.method} not allowed"
+        return jsonify(
+            {
+                "success": False,
+                "data": None,
+                "error": {
+                    "code": "METHOD_NOT_ALLOWED",
+                    "message": f"Method {request.method} not allowed",
+                },
             }
-        }), 405
+        ), 405
 
     @app.errorhandler(429)
     def rate_limited(error):
-        return jsonify({
-            "success": False,
-            "data": None,
-            "error": {
-                "code": "RATE_LIMITED",
-                "message": "Too many requests"
+        return jsonify(
+            {
+                "success": False,
+                "data": None,
+                "error": {"code": "RATE_LIMITED", "message": "Too many requests"},
             }
-        }), 429
+        ), 429
 
     @app.errorhandler(500)
     def internal_error(error):
         logger.error(f"Internal error: {error}")
-        return jsonify({
-            "success": False,
-            "data": None,
-            "error": {
-                "code": "INTERNAL_ERROR",
-                "message": "An internal error occurred"
+        return jsonify(
+            {
+                "success": False,
+                "data": None,
+                "error": {
+                    "code": "INTERNAL_ERROR",
+                    "message": "An internal error occurred",
+                },
             }
-        }), 500
+        ), 500
 
     # Root endpoint
-    @app.route('/')
+    @app.route("/")
     def root():
-        return jsonify({
-            "success": True,
-            "data": {
-                "name": "Ceiling Panel Calculator API",
-                "version": "2.0.0",
-                "documentation": "/api/v1/docs",
-                "health": "/api/v1/health"
-            },
-            "error": None
-        })
+        return jsonify(
+            {
+                "success": True,
+                "data": {
+                    "name": "Ceiling Panel Calculator API",
+                    "version": "2.0.0",
+                    "documentation": "/api/v1/docs",
+                    "health": "/api/v1/health",
+                },
+                "error": None,
+            }
+        )
 
     # OpenAPI documentation endpoint
-    @app.route('/api/v1/docs')
+    @app.route("/api/v1/docs")
     def api_docs():
-        return jsonify({
-            "success": True,
-            "data": {
-                "openapi": "3.0.0",
-                "info": {
-                    "title": "Ceiling Panel Calculator API",
-                    "version": "2.0.0",
-                    "description": "REST API for ceiling panel layout calculation and export"
+        return jsonify(
+            {
+                "success": True,
+                "data": {
+                    "openapi": "3.0.0",
+                    "info": {
+                        "title": "Ceiling Panel Calculator API",
+                        "version": "2.0.0",
+                        "description": "REST API for ceiling panel layout calculation and export",
+                    },
+                    "servers": [
+                        {"url": "http://localhost:5000", "description": "Development"},
+                        {
+                            "url": "https://api.ceilingcalc.com",
+                            "description": "Production",
+                        },
+                    ],
+                    "endpoints": {
+                        "calculations": {
+                            "POST /api/v1/calculate": "Perform panel calculation",
+                            "GET /api/v1/calculate/{id}": "Get calculation result",
+                            "POST /api/v1/calculate/optimize": "Optimized calculation",
+                        },
+                        "projects": {
+                            "POST /api/v1/projects": "Create project",
+                            "GET /api/v1/projects": "List projects",
+                            "GET /api/v1/projects/{id}": "Get project",
+                            "PUT /api/v1/projects/{id}": "Update project",
+                            "DELETE /api/v1/projects/{id}": "Delete project",
+                            "POST /api/v1/projects/{id}/calculate": "Calculate project",
+                        },
+                        "materials": {
+                            "GET /api/v1/materials": "List materials",
+                            "GET /api/v1/materials/{id}": "Get material",
+                            "GET /api/v1/materials/categories": "List categories",
+                            "POST /api/v1/materials/cost-estimate": "Estimate cost",
+                        },
+                        "exports": {
+                            "POST /api/v1/exports/svg": "Generate SVG",
+                            "POST /api/v1/exports/dxf": "Generate DXF",
+                            "POST /api/v1/exports/3d": "Generate 3D model",
+                            "GET /api/v1/exports/{id}": "Get export info",
+                            "GET /api/v1/exports/download/{id}": "Download file",
+                        },
+                        "system": {
+                            "GET /api/v1/health": "Health check",
+                            "GET /api/v1/health/ready": "Readiness probe",
+                            "GET /api/v1/health/live": "Liveness probe",
+                            "GET /api/v1/version": "Version info",
+                        },
+                    },
                 },
-                "servers": [
-                    {"url": "http://localhost:5000", "description": "Development"},
-                    {"url": "https://api.ceilingcalc.com", "description": "Production"}
-                ],
-                "endpoints": {
-                    "calculations": {
-                        "POST /api/v1/calculate": "Perform panel calculation",
-                        "GET /api/v1/calculate/{id}": "Get calculation result",
-                        "POST /api/v1/calculate/optimize": "Optimized calculation"
-                    },
-                    "projects": {
-                        "POST /api/v1/projects": "Create project",
-                        "GET /api/v1/projects": "List projects",
-                        "GET /api/v1/projects/{id}": "Get project",
-                        "PUT /api/v1/projects/{id}": "Update project",
-                        "DELETE /api/v1/projects/{id}": "Delete project",
-                        "POST /api/v1/projects/{id}/calculate": "Calculate project"
-                    },
-                    "materials": {
-                        "GET /api/v1/materials": "List materials",
-                        "GET /api/v1/materials/{id}": "Get material",
-                        "GET /api/v1/materials/categories": "List categories",
-                        "POST /api/v1/materials/cost-estimate": "Estimate cost"
-                    },
-                    "exports": {
-                        "POST /api/v1/exports/svg": "Generate SVG",
-                        "POST /api/v1/exports/dxf": "Generate DXF",
-                        "POST /api/v1/exports/3d": "Generate 3D model",
-                        "GET /api/v1/exports/{id}": "Get export info",
-                        "GET /api/v1/exports/download/{id}": "Download file"
-                    },
-                    "system": {
-                        "GET /api/v1/health": "Health check",
-                        "GET /api/v1/health/ready": "Readiness probe",
-                        "GET /api/v1/health/live": "Liveness probe",
-                        "GET /api/v1/version": "Version info"
-                    }
-                }
-            },
-            "error": None
-        })
+                "error": None,
+            }
+        )
 
     logger.info("Ceiling Panel Calculator API initialized")
     return app
@@ -233,9 +252,9 @@ def create_app(config: dict = None) -> Flask:
 app = create_app()
 
 
-if __name__ == '__main__':
-    port = int(os.getenv('PORT', 5000))
-    debug = os.getenv('FLASK_DEBUG', 'false').lower() == 'true'
+if __name__ == "__main__":
+    port = int(os.getenv("PORT", 5000))
+    debug = os.getenv("FLASK_DEBUG", "false").lower() == "true"
 
     print(f"""
     ╔════════════════════════════════════════════════════════════╗
@@ -247,4 +266,4 @@ if __name__ == '__main__':
     ╚════════════════════════════════════════════════════════════╝
     """)
 
-    app.run(host='0.0.0.0', port=port, debug=debug)
+    app.run(host="0.0.0.0", port=port, debug=debug)
