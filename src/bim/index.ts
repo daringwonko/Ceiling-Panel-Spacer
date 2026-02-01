@@ -49,6 +49,13 @@ export {
   RoofPropertyPanel,
 } from './propertyPanels';
 
+// Section Planes
+export { SectionPlaneClass, default as SectionPlane } from './section_plane';
+export { SectionClipper, createSectionClipper, default as SectionClipperDefault } from './section_clipper';
+export { SectionPlaneTool, createSectionPlaneTool, default as SectionPlaneToolDefault } from './tools/section_plane_tool';
+export { SectionManager, getSectionManager, createSectionManager, default as SectionManagerDefault } from './ui/section_manager';
+export { SectionPanel, sectionPanelStyles } from './ui/section_panel';
+
 // Default exports
 export { default as WallCutterDefault } from './geometry/WallCutter';
 export { default as StairsGeneratorDefault } from './geometry/StairsGenerator';
