@@ -51,6 +51,44 @@ export interface BIMProject {
   }
 }
 
+// ============================================================================
+// HIERARCHY TYPES (Site → Building → Level)
+// ============================================================================
+
+export interface Site {
+  id: string
+  name: string
+  description: string
+  buildingIds: string[]
+  elevation: number
+  address?: string
+  latitude?: number
+  longitude?: number
+}
+
+export interface Building {
+  id: string
+  name: string
+  siteId: string
+  levelIds: string[]
+  buildingType: 'residential' | 'commercial' | 'industrial' | 'mixed' | 'other'
+  constructionYear?: number
+  address?: string
+}
+
+export interface Level {
+  id: string
+  name: string
+  elevation: number
+  height: number
+  levelNumber: number
+  usageType: 'living' | 'office' | 'retail' | 'utility' | 'industrial' | 'other'
+  isVisible: boolean
+  color: [number, number, number]
+  buildingId: string
+  objectIds: string[]
+}
+
 export interface BIMLayer {
   id: string
   name: string
@@ -157,6 +195,14 @@ interface BIMStore {
   // Layers
   layers: BIMLayer[]
   activeLayerId: string | null
+
+  // Hierarchy (Site → Building → Level)
+  sites: Site[]
+  buildings: Building[]
+  levels: Level[]
+  currentSiteId: string | null
+  currentBuildingId: string | null
+  currentLevelId: string | null
   
   // Tools
   activeTool: string | null

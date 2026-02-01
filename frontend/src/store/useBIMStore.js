@@ -1,6 +1,13 @@
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
 import { bimClient } from '../api/bimClient'
+import {
+  HierarchyManager,
+  Site,
+  Building,
+  Level,
+  HierarchyNodeType,
+} from '../bim/hierarchy'
 
 /**
  * BIM Store State
@@ -9,6 +16,7 @@ import { bimClient } from '../api/bimClient'
  * @property {Array} objects - Project objects
  * @property {Array} layers - Project layers
  * @property {Array} selectedObjects - IDs of selected objects
+ * @property {HierarchyManager|null} hierarchyManager - Hierarchy manager instance
  * @property {boolean} isLoading - Loading state for async operations
  * @property {boolean} isSaving - Saving state
  * @property {boolean} isDirty - Whether project has unsaved changes
@@ -33,6 +41,16 @@ import { bimClient } from '../api/bimClient'
  * @property {Function} clearError - Clear error state
  * @property {Function} setActiveTool - Set active drawing tool
  * @property {Function} reset - Reset store to initial state
+ * @property {Function} createSite - Create a new site
+ * @property {Function} createBuilding - Create a new building
+ * @property {Function} createLevel - Create a new level
+ * @property {Function} removeSite - Remove a site
+ * @property {Function} removeBuilding - Remove a building
+ * @property {Function} removeLevel - Remove a level
+ * @property {Function} selectHierarchyNode - Select hierarchy node
+ * @property {Function} expandHierarchyNode - Expand hierarchy node
+ * @property {Function} collapseHierarchyNode - Collapse hierarchy node
+ * @property {Function} moveHierarchyNode - Move node in hierarchy
  */
 
 /**
@@ -52,6 +70,7 @@ export const useBIMStore = create(
         objects: [],
         layers: [],
         selectedObjects: [],
+        hierarchyManager: null,
         isLoading: false,
         isSaving: false,
         isDirty: false,
@@ -74,10 +93,19 @@ export const useBIMStore = create(
           try {
             const project = await bimClient.getProject(projectId)
             
+            // Initialize or restore hierarchy
+            let hierarchyManager
+            if (project.hierarchy) {
+              hierarchyManager = HierarchyManager.fromJSON(project.hierarchy)
+            } else {
+              hierarchyManager = new HierarchyManager()
+            }
+            
             set({
               currentProject: project,
               objects: project.objects || [],
               layers: project.layers || [],
+              hierarchyManager,
               selectedObjects: [],
               isDirty: false,
               isLoading: false,
@@ -92,6 +120,7 @@ export const useBIMStore = create(
               currentProject: null,
               objects: [],
               layers: [],
+              hierarchyManager: null,
             })
             throw error
           }
@@ -108,10 +137,14 @@ export const useBIMStore = create(
           try {
             const project = await bimClient.createProject(projectData)
             
+            // Initialize hierarchy manager
+            const hierarchyManager = new HierarchyManager()
+            
             set({
               currentProject: project,
               objects: [],
               layers: [],
+              hierarchyManager,
               selectedObjects: [],
               isDirty: false,
               isLoading: false,
@@ -134,22 +167,28 @@ export const useBIMStore = create(
          * @returns {Promise<Object>} Saved project
          */
         saveProject: async (projectData) => {
-          const { currentProject } = get()
+          const { currentProject, hierarchyManager } = get()
           set({ isSaving: true, error: null })
           
           try {
             let savedProject
             
+            // Include hierarchy in project data
+            const dataToSave = {
+              ...projectData,
+              hierarchy: hierarchyManager?.toJSON(),
+            }
+            
             if (currentProject?.id) {
               // Update existing project
-              const dataToUpdate = projectData || currentProject
+              const dataToUpdate = dataToSave || currentProject
               savedProject = await bimClient.updateProject(
                 currentProject.id, 
                 dataToUpdate
               )
             } else {
               // Create new project
-              const dataToCreate = projectData || currentProject
+              const dataToCreate = dataToSave || currentProject
               if (!dataToCreate?.name) {
                 throw new Error('Project name is required')
               }
@@ -192,6 +231,7 @@ export const useBIMStore = create(
               currentProject: null,
               objects: [],
               layers: [],
+              hierarchyManager: null,
               selectedObjects: [],
               isDirty: false,
               isLoading: false,
@@ -220,6 +260,215 @@ export const useBIMStore = create(
         },
         
         // ============================================================================
+        // HIERARCHY ACTIONS
+        // ============================================================================
+
+        /**
+         * Create a new site
+         * @param {string} name - Site name
+         * @param {Object} coordinates - Geographic coordinates
+         * @param {Object} properties - Site properties
+         */
+        createSite: (name, coordinates, properties = {}) => {
+          const { hierarchyManager } = get()
+          if (!hierarchyManager) {
+            throw new Error('No hierarchy manager initialized')
+          }
+          
+          const site = new Site(name, coordinates, properties)
+          hierarchyManager.addSite(site)
+          
+          set({ isDirty: true })
+          return site
+        },
+
+        /**
+         * Create a new building
+         * @param {string} name - Building name
+         * @param {string} siteId - Parent site ID
+         * @param {Object} properties - Building properties
+         */
+        createBuilding: (name, siteId, properties) => {
+          const { hierarchyManager } = get()
+          if (!hierarchyManager) {
+            throw new Error('No hierarchy manager initialized')
+          }
+          
+          const building = new Building(name, siteId, properties)
+          hierarchyManager.addBuilding(building)
+          
+          set({ isDirty: true })
+          return building
+        },
+
+        /**
+         * Create a new level
+         * @param {string} name - Level name
+         * @param {string} buildingId - Parent building ID
+         * @param {Object} properties - Level properties
+         */
+        createLevel: (name, buildingId, properties) => {
+          const { hierarchyManager } = get()
+          if (!hierarchyManager) {
+            throw new Error('No hierarchy manager initialized')
+          }
+          
+          const level = new Level(name, buildingId, properties)
+          hierarchyManager.addLevel(level)
+          
+          set({ isDirty: true })
+          return level
+        },
+
+        /**
+         * Remove a site
+         * @param {string} siteId - Site ID
+         */
+        removeSite: (siteId) => {
+          const { hierarchyManager } = get()
+          if (!hierarchyManager) return
+          
+          hierarchyManager.removeSite(siteId)
+          set({ isDirty: true })
+        },
+
+        /**
+         * Remove a building
+         * @param {string} buildingId - Building ID
+         */
+        removeBuilding: (buildingId) => {
+          const { hierarchyManager } = get()
+          if (!hierarchyManager) return
+          
+          hierarchyManager.removeBuilding(buildingId)
+          set({ isDirty: true })
+        },
+
+        /**
+         * Remove a level
+         * @param {string} levelId - Level ID
+         */
+        removeLevel: (levelId) => {
+          const { hierarchyManager } = get()
+          if (!hierarchyManager) return
+          
+          hierarchyManager.removeLevel(levelId)
+          set({ isDirty: true })
+        },
+
+        /**
+         * Select a hierarchy node
+         * @param {string} nodeId - Node ID
+         * @param {boolean} additive - Add to selection
+         */
+        selectHierarchyNode: (nodeId, additive = false) => {
+          const { hierarchyManager } = get()
+          if (!hierarchyManager) return
+          
+          hierarchyManager.selectNode(nodeId, additive)
+          set({})
+        },
+
+        /**
+         * Deselect a hierarchy node
+         * @param {string} nodeId - Node ID
+         */
+        deselectHierarchyNode: (nodeId) => {
+          const { hierarchyManager } = get()
+          if (!hierarchyManager) return
+          
+          hierarchyManager.deselectNode(nodeId)
+          set({})
+        },
+
+        /**
+         * Clear hierarchy selection
+         */
+        clearHierarchySelection: () => {
+          const { hierarchyManager } = get()
+          if (!hierarchyManager) return
+          
+          hierarchyManager.clearSelection()
+          set({})
+        },
+
+        /**
+         * Expand a hierarchy node
+         * @param {string} nodeId - Node ID
+         */
+        expandHierarchyNode: (nodeId) => {
+          const { hierarchyManager } = get()
+          if (!hierarchyManager) return
+          
+          hierarchyManager.expandNode(nodeId)
+          set({})
+        },
+
+        /**
+         * Collapse a hierarchy node
+         * @param {string} nodeId - Node ID
+         */
+        collapseHierarchyNode: (nodeId) => {
+          const { hierarchyManager } = get()
+          if (!hierarchyManager) return
+          
+          hierarchyManager.collapseNode(nodeId)
+          set({})
+        },
+
+        /**
+         * Toggle hierarchy node expansion
+         * @param {string} nodeId - Node ID
+         */
+        toggleHierarchyNodeExpansion: (nodeId) => {
+          const { hierarchyManager } = get()
+          if (!hierarchyManager) return
+          
+          hierarchyManager.toggleExpansion(nodeId)
+          set({})
+        },
+
+        /**
+         * Move a node in the hierarchy
+         * @param {string} sourceId - Source node ID
+         * @param {string} targetId - Target parent ID
+         */
+        moveHierarchyNode: (sourceId, targetId) => {
+          const { hierarchyManager } = get()
+          if (!hierarchyManager) return
+          
+          if (hierarchyManager.canDrop(sourceId, targetId)) {
+            hierarchyManager.drop(sourceId, targetId)
+            set({ isDirty: true })
+          }
+        },
+
+        /**
+         * Rename a hierarchy node
+         * @param {string} nodeId - Node ID
+         * @param {string} newName - New name
+         */
+        renameHierarchyNode: (nodeId, newName) => {
+          const { hierarchyManager } = get()
+          if (!hierarchyManager) return
+          
+          hierarchyManager.renameNode(nodeId, newName)
+          set({ isDirty: true })
+        },
+
+        /**
+         * Toggle hierarchy node visibility
+         * @param {string} nodeId - Node ID
+         */
+        toggleHierarchyNodeVisibility: (nodeId) => {
+          const { hierarchyManager } = get()
+          if (!hierarchyManager) return
+          
+          hierarchyManager.toggleVisibility(nodeId)
+          set({})
+        },
+        
+        // ============================================================================
         // OBJECT ACTIONS
         // ============================================================================
 
@@ -229,7 +478,7 @@ export const useBIMStore = create(
          * @returns {Promise<Object>} Created object
          */
         createObject: async (objectData) => {
-          const { currentProject } = get()
+          const { currentProject, hierarchyManager } = get()
           
           if (!currentProject?.id) {
             throw new Error('No project loaded')
@@ -253,6 +502,11 @@ export const useBIMStore = create(
               currentProject.id, 
               objectData
             )
+            
+            // Add object to hierarchy if level ID is provided
+            if (objectData.levelId && hierarchyManager) {
+              hierarchyManager.addObjectToLevel(newObject.id, objectData.levelId)
+            }
             
             set((state) => ({
               objects: [...state.objects, newObject],
@@ -313,10 +567,16 @@ export const useBIMStore = create(
          * @returns {Promise<void>}
          */
         deleteObject: async (objectId) => {
+          const { hierarchyManager } = get()
           set({ isLoading: true, error: null })
           
           try {
             await bimClient.deleteObject(objectId)
+            
+            // Remove from hierarchy
+            if (hierarchyManager) {
+              hierarchyManager.removeObject(objectId)
+            }
             
             set((state) => ({
               objects: state.objects.filter(obj => obj.id !== objectId),
@@ -360,7 +620,7 @@ export const useBIMStore = create(
          * @returns {Promise<void>}
          */
         deleteSelectedObjects: async () => {
-          const { selectedObjects } = get()
+          const { selectedObjects, hierarchyManager } = get()
           
           if (selectedObjects.length === 0) return
           
@@ -371,6 +631,11 @@ export const useBIMStore = create(
             await Promise.all(
               selectedObjects.map(id => bimClient.deleteObject(id))
             )
+            
+            // Remove from hierarchy
+            if (hierarchyManager) {
+              selectedObjects.forEach(id => hierarchyManager.removeObject(id))
+            }
             
             set((state) => ({
               objects: state.objects.filter(obj => !selectedObjects.includes(obj.id)),
@@ -669,6 +934,7 @@ export const useBIMStore = create(
             currentProject: null,
             objects: [],
             layers: [],
+            hierarchyManager: null,
             selectedObjects: [],
             isLoading: false,
             isSaving: false,
