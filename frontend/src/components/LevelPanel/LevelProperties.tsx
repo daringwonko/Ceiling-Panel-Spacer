@@ -181,7 +181,7 @@ export function LevelProperties({ levelId, onUpdate, onClose }: LevelPropertiesP
         </div>
         {statistics.bounds && (
           <div className="text-xs text-slate-500">
-            Bounds: {statistics.bounds.maxX - statistics.bounds.minX:.1f}m × {statistics.bounds.maxY - statistics.bounds.minY:.1f}m
+            Bounds: {(statistics.bounds.maxX - statistics.bounds.minX).toFixed(1)}m × {(statistics.bounds.maxY - statistics.bounds.minY).toFixed(1)}m
           </div>
         )}
       </div>

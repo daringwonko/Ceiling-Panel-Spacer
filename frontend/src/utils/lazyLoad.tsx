@@ -1,5 +1,6 @@
+import React, { lazy, Suspense, LazyExoticComponent, ComponentType } from 'react';
+
 // Lazy loading utilities for heavy components
-import { lazy, Suspense, LazyExoticComponent, ComponentType } from 'react'
 
 // Lazy load heavy BIM components
 export const LazyBIM3DCanvas = lazy(() => import('../components/BIM3DCanvas'))
@@ -168,6 +169,3 @@ export default {
   useIntersectionLazyLoad,
   useNetworkAwareLazyLoad
 }
-
-// Need to import React for hooks
-import React from 'react'

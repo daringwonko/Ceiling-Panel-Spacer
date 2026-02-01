@@ -1,0 +1,16 @@
+{
+  "data": {
+    "created_at": "2026-02-01T14:07:18.003437Z",
+    "description": "Comprehensive BIM Test",
+    "dimensions": {},
+    "id": "651047dc-80f3-49b1-bbf7-432564d022d0",
+    "layers": [],
+    "materials": [],
+    "metadata": {},
+    "name": "Wave 5 Test Project",
+    "objects": [],
+    "unit": "mm",
+    "updated_at": "2026-02-01T14:07:18.003437Z"
+  },
+  "success": true
+}

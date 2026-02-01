@@ -455,4 +455,4 @@ export class WorkingPlaneSystem {
 }
 
 export default WorkingPlaneSystem;
-export { PlaneOrientation };
+export type { PlaneOrientation };

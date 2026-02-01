@@ -281,8 +281,8 @@ export class StructuralValidator {
       }
 
       // Slenderness check for rectangular
-      if (height > 0 && width > 0) {
-        const slenderness = height / Math.min(width, depth || width)
+      if (height > 0 && width !== undefined && width > 0 && depth !== undefined && depth > 0) {
+        const slenderness = height / Math.min(width, depth)
         if (slenderness > 25) {
           warnings.push(`Column slenderness ratio (${slenderness.toFixed(1)}:1) is high - may buckle under load`)
         }
@@ -301,7 +301,7 @@ export class StructuralValidator {
       }
 
       // Slenderness check for circular
-      if (height > 0 && diameter > 0) {
+      if (height > 0 && diameter !== undefined && diameter > 0) {
         const slenderness = height / diameter
         if (slenderness > 25) {
           warnings.push(`Column slenderness ratio (${slenderness.toFixed(1)}:1) is high - may buckle under load`)

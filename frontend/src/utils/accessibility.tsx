@@ -1,3 +1,5 @@
+import React, { useState, useEffect, useCallback } from 'react';
+
 /**
  * Accessibility Utilities
  * WCAG 2.1 AA compliant utilities for BIM Workbench
@@ -361,8 +363,6 @@ export const getValidationMessage = (
 
   return null;
 };
-
-import React, { useState, useEffect, useCallback } from 'react';
 
 // Screen reader only content
 export const VisuallyHidden: React.FC<{ children: React.ReactNode }> = ({ children }) => (

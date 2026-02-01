@@ -35,7 +35,7 @@ import {
   Grid3X3
 } from 'lucide-react'
 
-interface SlabPropertiesProps {
+export interface SlabPropertiesProps {
   slab: SlabData
   onUpdate?: (updates: Partial<SlabProperties>) => void
   onValidate?: (result: ValidationResult) => void

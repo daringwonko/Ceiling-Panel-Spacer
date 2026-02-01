@@ -104,6 +104,42 @@ export class BIMObjectFactory {
       roughness: 0.5,
       metalness: 0.2,
     }));
+
+    // 2D shape materials
+    this._materials.set('circle', new THREE.MeshBasicMaterial({
+      color: 0x3498db,
+      side: THREE.DoubleSide,
+    }));
+
+    this._materials.set('rectangle', new THREE.MeshBasicMaterial({
+      color: 0xe74c3c,
+      side: THREE.DoubleSide,
+    }));
+
+    this._materials.set('arc', new THREE.MeshBasicMaterial({
+      color: 0x9b59b6,
+      side: THREE.DoubleSide,
+    }));
+
+    this._materials.set('line', new THREE.LineBasicMaterial({
+      color: 0x2ecc71,
+      linewidth: 2,
+    }));
+
+    this._materials.set('ellipse', new THREE.MeshBasicMaterial({
+      color: 0xf39c12,
+      side: THREE.DoubleSide,
+    }));
+
+    this._materials.set('polygon', new THREE.MeshBasicMaterial({
+      color: 0x1abc9c,
+      side: THREE.DoubleSide,
+    }));
+
+    this._materials.set('polyline', new THREE.LineBasicMaterial({
+      color: 0xe91e63,
+      linewidth: 2,
+    }));
   }
 
   /**
@@ -152,13 +188,23 @@ export class BIMObjectFactory {
    */
   create(options: BIMObjectCreateOptions): BIM3DObject {
     const geometry = this._createGeometry(options.type, options);
-    const material = this._getMaterial(options.material);
-    
-    // Create mesh
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
-    
+
+    const isLineType = options.type === 'line' || options.type === 'polyline';
+
+    let object3D: THREE.Object3D;
+
+    if (isLineType) {
+      const material = this._getMaterial(options.material) as THREE.LineBasicMaterial;
+      const line = new THREE.Line(geometry, material);
+      object3D = line;
+    } else {
+      const material = this._getMaterial(options.material);
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      object3D = mesh;
+    }
+
     // Create metadata
     const metadata: BIMObjectMetadata = {
       ifcType: IFC_TYPE_MAP[options.type],
@@ -168,22 +214,22 @@ export class BIMObjectFactory {
       properties: options.properties || {},
       name: options.name || `${options.type.charAt(0).toUpperCase() + options.type.slice(1)}`,
     };
-    
+
     // Create BIM object
     const bimObject = new BIM3DObject(metadata);
-    bimObject.add(mesh);
-    
+    bimObject.add(object3D);
+
     // Apply transforms
     this._positionOnPlane(bimObject, options.position);
-    
+
     if (options.rotation) {
       bimObject.rotation.copy(options.rotation);
     }
-    
+
     if (options.scale) {
       bimObject.scale.copy(options.scale);
     }
-    
+
     return bimObject;
   }
 
@@ -215,6 +261,20 @@ export class BIMObjectFactory {
         return this._createStairGeometry(options);
       case 'railing':
         return this._createRailingGeometry(options);
+      case 'circle':
+        return this._createCircleGeometry(options);
+      case 'rectangle':
+        return this._createRectangleGeometry(options);
+      case 'arc':
+        return this._createArcGeometry(options);
+      case 'line':
+        return this._createLineGeometry(options);
+      case 'ellipse':
+        return this._createEllipseGeometry(options);
+      case 'polygon':
+        return this._createPolygonGeometry(options);
+      case 'polyline':
+        return this._createPolylineGeometry(options);
       case 'custom':
       default:
         return new THREE.BoxGeometry(1000, 1000, 1000);
@@ -330,9 +390,101 @@ export class BIMObjectFactory {
   private _createRailingGeometry(options: BIMObjectCreateOptions): THREE.BufferGeometry {
     const length = options.properties?.length || 1000;
     const height = options.properties?.height || 1100;
-    
+
     // Simple railing as a thin box
     return new THREE.BoxGeometry(length, height, 50);
+  }
+
+  /**
+   * Create circle geometry
+   */
+  private _createCircleGeometry(options: BIMObjectCreateOptions): THREE.BufferGeometry {
+    const radius = options.properties?.radius || 500;
+    const segments = options.properties?.segments || 32;
+    return new THREE.CircleGeometry(radius, segments);
+  }
+
+  /**
+   * Create rectangle geometry
+   */
+  private _createRectangleGeometry(options: BIMObjectCreateOptions): THREE.BufferGeometry {
+    const width = options.properties?.width || 1000;
+    const height = options.properties?.height || 1000;
+    return new THREE.PlaneGeometry(width, height);
+  }
+
+  /**
+   * Create arc geometry
+   */
+  private _createArcGeometry(options: BIMObjectCreateOptions): THREE.BufferGeometry {
+    const radius = options.properties?.radius || 500;
+    const startAngle = options.properties?.startAngle || 0;
+    const endAngle = options.properties?.endAngle || Math.PI;
+    const segments = options.properties?.segments || 32;
+
+    const shape = new THREE.Shape();
+    shape.absarc(0, 0, radius, startAngle, endAngle, false);
+
+    return new THREE.ShapeGeometry(shape, segments);
+  }
+
+  /**
+   * Create line geometry
+   */
+  private _createLineGeometry(options: BIMObjectCreateOptions): THREE.BufferGeometry {
+    const points = options.properties?.points || [
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(1000, 0, 0),
+    ];
+    return new THREE.BufferGeometry().setFromPoints(points);
+  }
+
+  /**
+   * Create ellipse geometry
+   */
+  private _createEllipseGeometry(options: BIMObjectCreateOptions): THREE.BufferGeometry {
+    const xRadius = options.properties?.xRadius || 500;
+    const yRadius = options.properties?.yRadius || 300;
+    const segments = options.properties?.segments || 32;
+
+    const curve = new THREE.EllipseCurve(0, 0, xRadius, yRadius, 0, 2 * Math.PI, false, 0);
+    const points = curve.getPoints(segments);
+    const shape = new THREE.Shape(points);
+
+    return new THREE.ShapeGeometry(shape, segments);
+  }
+
+  /**
+   * Create polygon geometry
+   */
+  private _createPolygonGeometry(options: BIMObjectCreateOptions): THREE.BufferGeometry {
+    const vertices = options.properties?.vertices || [
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(1000, 0, 0),
+      new THREE.Vector3(1000, 1000, 0),
+      new THREE.Vector3(0, 1000, 0),
+    ];
+
+    const shape = new THREE.Shape();
+    shape.moveTo(vertices[0].x, vertices[0].y);
+    for (let i = 1; i < vertices.length; i++) {
+      shape.lineTo(vertices[i].x, vertices[i].y);
+    }
+    shape.closePath();
+
+    return new THREE.ShapeGeometry(shape);
+  }
+
+  /**
+   * Create polyline geometry
+   */
+  private _createPolylineGeometry(options: BIMObjectCreateOptions): THREE.BufferGeometry {
+    const points = options.properties?.points || [
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(500, 500, 0),
+      new THREE.Vector3(1000, 0, 0),
+    ];
+    return new THREE.BufferGeometry().setFromPoints(points);
   }
 
   /**
@@ -483,8 +635,8 @@ export class BIMObjectFactory {
    * @param options - Additional options
    */
   createBeam(
-    width: number, 
-    height: number, 
+    width: number,
+    height: number,
     length: number,
     options: Partial<BIMObjectCreateOptions> = {}
   ): BIM3DObject {
@@ -495,6 +647,157 @@ export class BIMObjectFactory {
         width,
         height,
         length,
+        ...options.properties,
+      },
+    });
+  }
+
+  /**
+   * Create a circle
+   * @param radius - Circle radius in mm
+   * @param segments - Number of segments
+   * @param options - Additional options
+   */
+  createCircle(
+    radius: number,
+    segments: number = 32,
+    options: Partial<BIMObjectCreateOptions> = {}
+  ): BIM3DObject {
+    return this.create({
+      type: 'circle',
+      ...options,
+      properties: {
+        radius,
+        segments,
+        ...options.properties,
+      },
+    });
+  }
+
+  /**
+   * Create a rectangle
+   * @param width - Rectangle width in mm
+   * @param height - Rectangle height in mm
+   * @param options - Additional options
+   */
+  createRectangle(
+    width: number,
+    height: number,
+    options: Partial<BIMObjectCreateOptions> = {}
+  ): BIM3DObject {
+    return this.create({
+      type: 'rectangle',
+      ...options,
+      properties: {
+        width,
+        height,
+        ...options.properties,
+      },
+    });
+  }
+
+  /**
+   * Create an arc
+   * @param radius - Arc radius in mm
+   * @param startAngle - Start angle in radians
+   * @param endAngle - End angle in radians
+   * @param options - Additional options
+   */
+  createArc(
+    radius: number,
+    startAngle: number = 0,
+    endAngle: number = Math.PI,
+    options: Partial<BIMObjectCreateOptions> = {}
+  ): BIM3DObject {
+    return this.create({
+      type: 'arc',
+      ...options,
+      properties: {
+        radius,
+        startAngle,
+        endAngle,
+        ...options.properties,
+      },
+    });
+  }
+
+  /**
+   * Create a line
+   * @param points - Array of points defining the line
+   * @param options - Additional options
+   */
+  createLine(
+    points: THREE.Vector3[],
+    options: Partial<BIMObjectCreateOptions> = {}
+  ): BIM3DObject {
+    return this.create({
+      type: 'line',
+      ...options,
+      properties: {
+        points,
+        ...options.properties,
+      },
+    });
+  }
+
+  /**
+   * Create an ellipse
+   * @param xRadius - X-axis radius in mm
+   * @param yRadius - Y-axis radius in mm
+   * @param segments - Number of segments
+   * @param options - Additional options
+   */
+  createEllipse(
+    xRadius: number,
+    yRadius: number,
+    segments: number = 32,
+    options: Partial<BIMObjectCreateOptions> = {}
+  ): BIM3DObject {
+    return this.create({
+      type: 'ellipse',
+      ...options,
+      properties: {
+        xRadius,
+        yRadius,
+        segments,
+        ...options.properties,
+      },
+    });
+  }
+
+  /**
+   * Create a polygon
+   * @param vertices - Array of vertices defining the polygon
+   * @param options - Additional options
+   */
+  createPolygon(
+    vertices: THREE.Vector3[],
+    options: Partial<BIMObjectCreateOptions> = {}
+  ): BIM3DObject {
+    return this.create({
+      type: 'polygon',
+      ...options,
+      properties: {
+        vertices,
+        ...options.properties,
+      },
+    });
+  }
+
+  /**
+   * Create a polyline
+   * @param points - Array of points defining the polyline
+   * @param options - Additional options
+   */
+  createPolyline(
+    points: THREE.Vector3[],
+    options: Partial<BIMObjectCreateOptions> = {}
+  ): BIM3DObject {
+    return this.create({
+      type: 'polyline',
+      ...options,
+      properties: {
+        points,
         ...options.properties,
       },
     });

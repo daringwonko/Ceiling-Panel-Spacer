@@ -13,11 +13,11 @@ import {
 import { Button } from "../ui/Button"
 import { Input } from "../ui/Input"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/Card"
-import { 
-  Calculator, 
-  Download, 
-  Grid3X3, 
-  Kitchen as KitchenIcon, 
+import {
+  Calculator,
+  Download,
+  Grid3X3,
+  LayoutTemplate as KitchenIcon,
   Ruler,
   Palette,
   Box,

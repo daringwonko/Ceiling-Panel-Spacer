@@ -1,7 +1,7 @@
-export { Site, GeographicCoordinates, TerrainData, SiteProperties } from './Site'
-export { Building, BuildingType, BoundingBox, BuildingProperties } from './Building'
-export { Level, ElevationData, PlanRepresentation, LevelProperties } from './Level'
-export {
+export type { Site, GeographicCoordinates, TerrainData, SiteProperties } from './Site'
+export type { Building, BuildingType, BoundingBox, BuildingProperties } from './Building'
+export type { Level, ElevationData, PlanRepresentation, LevelProperties } from './Level'
+export type {
   HierarchyManager,
   HierarchyNode,
   HierarchyNodeType,

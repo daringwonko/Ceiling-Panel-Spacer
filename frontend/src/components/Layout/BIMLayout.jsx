@@ -1,5 +1,5 @@
 import { Outlet, NavLink } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useBIMStore } from '../../stores/useBIMStore'
 import SavageLogo from './SavageLogo'
 import {
@@ -9,6 +9,9 @@ import {
 import BIMHeader from './BIMHeader'
 import BIMStatusBar from './BIMStatusBar'
 import QuickActions from './QuickActions'
+import ExportMenu from './ExportMenu'
+import { BIM3DCanvas } from '../BIMWorkbench/BIM3DCanvas'
+import { BIM3DObject } from '../BIMWorkbench/BIM3DObject'
 
 // ============================================================================
 // BIM TOOL CATEGORIES
@@ -132,21 +135,187 @@ const toolsByCategory = {
   ],
 }
 
+function ObjectPropertiesPanel({ object, onObjectUpdate }) {
+  if (!object) {
+    return null
+  }
+
+  const handleNameChange = (e) => {
+    onObjectUpdate(object.id, { name: e.target.value })
+  }
+
+  const handlePositionChange = (axis, value) => {
+    const newPosition = [...object.position]
+    newPosition[axis] = parseFloat(value) || 0
+    onObjectUpdate(object.id, { position: newPosition })
+  }
+
+  const handleRotationChange = (axis, value) => {
+    const newRotation = [...object.rotation]
+    newRotation[axis] = parseFloat(value) || 0
+    onObjectUpdate(object.id, { rotation: newRotation })
+  }
+
+  const handleScaleChange = (axis, value) => {
+    const newScale = [...object.scale]
+    newScale[axis] = parseFloat(value) || 1
+    onObjectUpdate(object.id, { scale: newScale })
+  }
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <label className="block text-xs text-savage-text-muted mb-1">Name</label>
+        <input
+          type="text"
+          value={object.name}
+          onChange={handleNameChange}
+          className="w-full px-3 py-2 bg-savage-dark border border-slate-600 rounded text-savage-text text-sm focus:outline-none focus:border-savage-primary"
+        />
+      </div>
+
+      <div>
+        <label className="block text-xs text-savage-text-muted mb-1">Type</label>
+        <div className="px-3 py-2 bg-savage-dark border border-slate-600 rounded text-savage-text text-sm">
+          {object.type}
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-xs text-savage-text-muted mb-1">ID</label>
+        <div className="px-3 py-2 bg-savage-dark border border-slate-600 rounded text-savage-text-muted text-xs font-mono">
+          {object.id.slice(0, 8)}...
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-xs text-savage-text-muted mb-2">Position (X, Y, Z)</label>
+        <div className="grid grid-cols-3 gap-2">
+          {['X', 'Y', 'Z'].map((axis, i) => (
+            <div key={axis} className="flex items-center gap-2">
+              <span className="w-4 text-xs text-savage-text-muted">{axis}</span>
+              <input
+                type="number"
+                value={object.position[i] || 0}
+                onChange={(e) => handlePositionChange(i, e.target.value)}
+                className="w-full px-2 py-1 bg-savage-dark border border-slate-600 rounded text-savage-text text-xs focus:outline-none focus:border-savage-primary"
+                step="10"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-xs text-savage-text-muted mb-2">Rotation (X, Y, Z)</label>
+        <div className="grid grid-cols-3 gap-2">
+          {['X', 'Y', 'Z'].map((axis, i) => (
+            <div key={axis} className="flex items-center gap-2">
+              <span className="w-4 text-xs text-savage-text-muted">{axis}</span>
+              <input
+                type="number"
+                value={object.rotation[i] || 0}
+                onChange={(e) => handleRotationChange(i, e.target.value)}
+                className="w-full px-2 py-1 bg-savage-dark border border-slate-600 rounded text-savage-text text-xs focus:outline-none focus:border-savage-primary"
+                step="0.1"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-xs text-savage-text-muted mb-2">Scale (X, Y, Z)</label>
+        <div className="grid grid-cols-3 gap-2">
+          {['X', 'Y', 'Z'].map((axis, i) => (
+            <div key={axis} className="flex items-center gap-2">
+              <span className="w-4 text-xs text-savage-text-muted">{axis}</span>
+              <input
+                type="number"
+                value={object.scale[i] || 1}
+                onChange={(e) => handleScaleChange(i, e.target.value)}
+                className="w-full px-2 py-1 bg-savage-dark border border-slate-600 rounded text-savage-text text-xs focus:outline-none focus:border-savage-primary"
+                step="0.1"
+                min="0.1"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function convertStoreObjectsToBIM3DObjects(storeObjects) {
+  return storeObjects.map(obj => {
+    const object = new BIM3DObject({
+      id: obj.id,
+      name: obj.name,
+      ifcType: `Ifc${obj.type.charAt(0).toUpperCase() + obj.type.slice(1)}`,
+      material: obj.material,
+      level: obj.level,
+      properties: obj.properties,
+      createdAt: Date.now(),
+      modifiedAt: Date.now(),
+    })
+
+    object.position.set(...obj.position)
+    object.rotation.set(...obj.rotation)
+    object.scale.set(...obj.scale)
+
+    if (obj.isSelected) {
+      object.select()
+    }
+
+    return object
+  })
+}
+
 export default function BIMLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [activeCategory, setActiveCategory] = useState('2d-drafting')
   const [searchQuery, setSearchQuery] = useState('')
+  const [propertiesPanelOpen, setPropertiesPanelOpen] = useState(true)
 
   const {
     setActiveTool,
     objects,
     selectedObjectIds,
+    selectObject,
+    deselectAll,
+    updateObject,
     undo,
     redo,
     project,
     saveProject,
     createProject,
+    view,
+    setViewMode,
   } = useBIMStore()
+
+  const bimObjects = useMemo(() => convertStoreObjectsToBIM3DObjects(objects), [objects])
+
+  const selectedObject = useMemo(() => {
+    if (selectedObjectIds.length === 1) {
+      return objects.find(obj => obj.id === selectedObjectIds[0]) || null
+    }
+    return null
+  }, [objects, selectedObjectIds])
+
+  const handleObjectUpdate = useCallback((id, updates) => {
+    updateObject(id, updates)
+  }, [updateObject])
+
+  const handleObjectSelect = useCallback((id, multi) => {
+    selectObject(id, multi)
+  }, [selectObject])
+
+  const handleObjectDeselect = useCallback((id) => {
+  }, [])
+
+  const handleCanvasClick = useCallback((point) => {
+    deselectAll()
+  }, [deselectAll])
 
   const filteredTools = toolsByCategory[activeCategory]?.filter(tool =>
     tool.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -244,12 +413,16 @@ export default function BIMLayout() {
 
               {/* Quick Actions */}
               {sidebarOpen && (
-                <QuickActions
-                  onNewProject={() => createProject('New BIM Project')}
-                  onSave={saveProject}
-                  onExport={() => console.log('Export project')}
-                  projectModified={true}
-                />
+                <>
+                  <QuickActions
+                    onNewProject={() => createProject('New BIM Project')}
+                    onSave={saveProject}
+                    projectModified={true}
+                  />
+                  <div className="p-4 border-t border-slate-700">
+                    <ExportMenu />
+                  </div>
+                </>
               )}
             </div>
           )}
@@ -267,8 +440,50 @@ export default function BIMLayout() {
           onViewModeChange={(mode) => console.log('View mode:', mode)}
           projectName={project?.name || 'Untitled Project'}
         />
-        <div className="flex-1 overflow-hidden">
-          <Outlet />
+        <div className="flex-1 overflow-hidden relative flex">
+          <div className="flex-1 relative">
+            <BIM3DCanvas
+              objects={bimObjects}
+              selectedIds={selectedObjectIds}
+              backgroundColor="#1a1a1a"
+              gridSize={view.grid.size}
+              gridDivisions={100}
+              showGrid={view.grid.enabled}
+              cameraPosition={view.camera.position}
+              cameraTarget={view.camera.target}
+              onObjectSelect={handleObjectSelect}
+              onObjectDeselect={handleObjectDeselect}
+              onCanvasClick={handleCanvasClick}
+              onObjectHover={(id) => {}}
+            />
+          </div>
+          {propertiesPanelOpen && (
+            <aside className="w-72 bg-savage-surface border-l border-slate-700 flex flex-col overflow-hidden">
+              <div className="flex items-center justify-between h-12 px-4 border-b border-slate-700 bg-savage-dark">
+                <span className="text-sm font-semibold text-savage-text">Properties</span>
+                <button
+                  onClick={() => setPropertiesPanelOpen(false)}
+                  className="p-1 rounded hover:bg-slate-700 text-savage-text-muted"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-4">
+                {selectedObject ? (
+                  <ObjectPropertiesPanel
+                    object={selectedObject}
+                    onObjectUpdate={handleObjectUpdate}
+                  />
+                ) : (
+                  <div className="text-center text-savage-text-muted text-sm py-8">
+                    Select an object to view and edit its properties
+                  </div>
+                )}
+              </div>
+            </aside>
+          )}
         </div>
         <BIMStatusBar
           activeTool="Select"

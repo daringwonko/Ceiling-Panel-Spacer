@@ -34,7 +34,7 @@ import {
   Anchor
 } from 'lucide-react'
 
-interface BeamPropertiesProps {
+export interface BeamPropertiesProps {
   beam: BeamData
   onUpdate?: (updates: Partial<BeamProperties>) => void
   onValidate?: (result: ValidationResult) => void

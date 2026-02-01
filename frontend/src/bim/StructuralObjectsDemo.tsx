@@ -17,10 +17,9 @@ import {
   SlabData,
 } from './types/structural'
 import { ValidationResult } from './validators/StructuralValidator'
-import { 
-  Wall, 
-  GripHorizontal, 
-  Square, 
+import {
+  GripHorizontal,
+  Square,
   Layers,
   CheckCircle2,
   AlertTriangle
@@ -184,7 +183,7 @@ export default function StructuralObjectsDemo() {
         <Tabs defaultValue="wall" className="w-full">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="wall" className="flex items-center gap-2">
-              <Wall className="h-4 w-4" />
+              <Square className="h-4 w-4" />
               Wall
               {wallValidation && !wallValidation.valid && (
                 <AlertTriangle className="h-4 w-4 text-red-500" />
@@ -603,7 +602,7 @@ export default function StructuralObjectsDemo() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="p-4 bg-slate-800 rounded-lg">
                 <h4 className="font-semibold mb-2 flex items-center gap-2">
-                  <Wall className="h-4 w-4 text-savage-primary" />
+                  <Square className="h-4 w-4 text-savage-primary" />
                   Wall Tool
                 </h4>
                 <ul className="text-sm text-savage-text-muted space-y-1">

@@ -1,3 +1,5 @@
+import React from 'react';
+
 // Performance monitoring utilities for BIM Workbench
 export interface PerformanceMetrics {
   fps: number

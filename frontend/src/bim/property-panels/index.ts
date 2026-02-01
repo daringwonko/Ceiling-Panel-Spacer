@@ -10,7 +10,7 @@ export { ColumnPropertiesPanel } from './ColumnProperties'
 export { SlabPropertiesPanel } from './SlabProperties'
 
 // Re-export types
-export type { WallPropertiesProps } from './WallProperties'
-export type { BeamPropertiesProps } from './BeamProperties'
-export type { ColumnPropertiesProps } from './ColumnProperties'
-export type { SlabPropertiesProps } from './SlabProperties'
+export { type WallPropertiesProps } from './WallProperties'
+export { type BeamPropertiesProps } from './BeamProperties'
+export { type ColumnPropertiesProps } from './ColumnProperties'
+export { type SlabPropertiesProps } from './SlabProperties'

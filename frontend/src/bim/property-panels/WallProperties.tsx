@@ -21,18 +21,17 @@ import {
   ValidationResult 
 } from '../validators/StructuralValidator'
 import { useBIMStore } from '../../stores/useBIMStore'
-import { 
-  Wall, 
-  Ruler, 
-  Box, 
-  Palette, 
-  AlertTriangle, 
+import {
+  Ruler,
+  Box,
+  Palette,
+  AlertTriangle,
   CheckCircle2,
   RotateCcw,
   Calculator
 } from 'lucide-react'
 
-interface WallPropertiesProps {
+export interface WallPropertiesProps {
   wall: WallData
   onUpdate?: (updates: Partial<WallProperties>) => void
   onValidate?: (result: ValidationResult) => void
@@ -119,7 +118,7 @@ export function WallPropertiesPanel({ wall, onUpdate, onValidate }: WallProperti
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Wall className="h-5 w-5 text-savage-primary" />
+              <Box className="h-5 w-5 text-savage-primary" />
               <CardTitle className="text-lg">Wall Properties</CardTitle>
             </div>
             <Badge variant={validation.valid ? 'default' : 'destructive'}>

@@ -10,10 +10,11 @@ from flask import Blueprint, request, jsonify, send_file
 
 from ..middleware.rate_limit import rate_limit
 
-exports_bp = Blueprint('exports', __name__, url_prefix='/api/v1')
+exports_bp = Blueprint("exports", __name__, url_prefix="/api/v1")
 
 # Import generators
 import sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 try:
@@ -24,17 +25,20 @@ try:
         SVGGenerator,
         DXFGenerator,
         ProjectExporter,
-        MATERIALS,
+        MaterialLibrary,
     )
+
     GENERATORS_AVAILABLE = True
-except ImportError:
+except ImportError as e:
     GENERATORS_AVAILABLE = False
+    print(f"Import error: {e}")
 
 try:
     from output.renderer_3d import (
         CeilingPanel3DGenerator,
         MeshExporter,
     )
+
     RENDERER_3D_AVAILABLE = True
 except ImportError:
     RENDERER_3D_AVAILABLE = False
@@ -44,7 +48,7 @@ _exports_store = {}
 _output_dir = tempfile.mkdtemp(prefix="ceiling_exports_")
 
 
-@exports_bp.route('/exports/svg', methods=['POST'])
+@exports_bp.route("/exports/svg", methods=["POST"])
 @rate_limit()
 def export_svg():
     """
@@ -71,40 +75,43 @@ def export_svg():
         description: SVG file generated
     """
     if not GENERATORS_AVAILABLE:
-        return jsonify({
-            "success": False,
-            "data": None,
-            "error": {
-                "code": "SERVICE_UNAVAILABLE",
-                "message": "Export generators not available"
+        return jsonify(
+            {
+                "success": False,
+                "data": None,
+                "error": {
+                    "code": "SERVICE_UNAVAILABLE",
+                    "message": "Export generators not available",
+                },
             }
-        }), 503
+        ), 503
 
     data = request.get_json()
     if not data:
-        return jsonify({
-            "success": False,
-            "data": None,
-            "error": {
-                "code": "INVALID_REQUEST",
-                "message": "Request body is required"
+        return jsonify(
+            {
+                "success": False,
+                "data": None,
+                "error": {
+                    "code": "INVALID_REQUEST",
+                    "message": "Request body is required",
+                },
             }
-        }), 400
+        ), 400
 
     try:
-        dims = data.get('dimensions', {})
-        spacing = data.get('spacing', {})
-        options = data.get('options', {})
+        dims = data.get("dimensions", {})
+        spacing = data.get("spacing", {})
+        options = data.get("options", {})
 
         # Create objects
         ceiling_dims = CeilingDimensions(
-            length_mm=dims.get('length_mm', 5000),
-            width_mm=dims.get('width_mm', 4000)
+            length_mm=dims.get("length_mm", 5000), width_mm=dims.get("width_mm", 4000)
         )
 
         panel_spacing = PanelSpacing(
-            perimeter_gap_mm=spacing.get('perimeter_gap_mm', 200),
-            panel_gap_mm=spacing.get('panel_gap_mm', 50)
+            perimeter_gap_mm=spacing.get("perimeter_gap_mm", 200),
+            panel_gap_mm=spacing.get("panel_gap_mm", 50),
         )
 
         # Calculate layout
@@ -116,8 +123,10 @@ def export_svg():
         filename = f"{export_id}.svg"
         filepath = os.path.join(_output_dir, filename)
 
-        svg_gen = SVGGenerator(scale=options.get('scale', 0.5))
-        svg_gen.generate(filepath, ceiling_dims, panel_spacing, layout)
+        svg_gen = SVGGenerator(
+            ceiling_dims, panel_spacing, layout, scale=options.get("scale", 0.5)
+        )
+        svg_gen.generate_svg(filepath)
 
         # Get file size
         file_size = os.path.getsize(filepath)
@@ -125,33 +134,30 @@ def export_svg():
         # Store export record
         expires_at = datetime.utcnow() + timedelta(hours=24)
         _exports_store[export_id] = {
-            'id': export_id,
-            'format': 'svg',
-            'file_path': filepath,
-            'file_url': f"/api/v1/exports/download/{export_id}",
-            'file_size_bytes': file_size,
-            'expires_at': expires_at.isoformat(),
-            'created_at': datetime.utcnow().isoformat()
+            "id": export_id,
+            "format": "svg",
+            "file_path": filepath,
+            "file_url": f"/api/v1/exports/download/{export_id}",
+            "file_size_bytes": file_size,
+            "expires_at": expires_at.isoformat(),
+            "created_at": datetime.utcnow().isoformat(),
         }
 
-        return jsonify({
-            "success": True,
-            "data": _exports_store[export_id],
-            "error": None
-        }), 200
+        return jsonify(
+            {"success": True, "data": _exports_store[export_id], "error": None}
+        ), 200
 
     except Exception as e:
-        return jsonify({
-            "success": False,
-            "data": None,
-            "error": {
-                "code": "EXPORT_ERROR",
-                "message": str(e)
+        return jsonify(
+            {
+                "success": False,
+                "data": None,
+                "error": {"code": "EXPORT_ERROR", "message": str(e)},
             }
-        }), 500
+        ), 500
 
 
-@exports_bp.route('/exports/dxf', methods=['POST'])
+@exports_bp.route("/exports/dxf", methods=["POST"])
 @rate_limit()
 def export_dxf():
     """
@@ -171,40 +177,43 @@ def export_dxf():
         description: DXF file generated
     """
     if not GENERATORS_AVAILABLE:
-        return jsonify({
-            "success": False,
-            "data": None,
-            "error": {
-                "code": "SERVICE_UNAVAILABLE",
-                "message": "Export generators not available"
+        return jsonify(
+            {
+                "success": False,
+                "data": None,
+                "error": {
+                    "code": "SERVICE_UNAVAILABLE",
+                    "message": "Export generators not available",
+                },
             }
-        }), 503
+        ), 503
 
     data = request.get_json()
     if not data:
-        return jsonify({
-            "success": False,
-            "data": None,
-            "error": {
-                "code": "INVALID_REQUEST",
-                "message": "Request body is required"
+        return jsonify(
+            {
+                "success": False,
+                "data": None,
+                "error": {
+                    "code": "INVALID_REQUEST",
+                    "message": "Request body is required",
+                },
             }
-        }), 400
+        ), 400
 
     try:
-        dims = data.get('dimensions', {})
-        spacing = data.get('spacing', {})
-        options = data.get('options', {})
+        dims = data.get("dimensions", {})
+        spacing = data.get("spacing", {})
+        options = data.get("options", {})
 
         # Create objects
         ceiling_dims = CeilingDimensions(
-            length_mm=dims.get('length_mm', 5000),
-            width_mm=dims.get('width_mm', 4000)
+            length_mm=dims.get("length_mm", 5000), width_mm=dims.get("width_mm", 4000)
         )
 
         panel_spacing = PanelSpacing(
-            perimeter_gap_mm=spacing.get('perimeter_gap_mm', 200),
-            panel_gap_mm=spacing.get('panel_gap_mm', 50)
+            perimeter_gap_mm=spacing.get("perimeter_gap_mm", 200),
+            panel_gap_mm=spacing.get("panel_gap_mm", 50),
         )
 
         # Calculate layout
@@ -213,17 +222,17 @@ def export_dxf():
 
         # Get material
         material = None
-        material_id = data.get('material_id')
-        if material_id and material_id in MATERIALS:
-            material = MATERIALS[material_id]
+        material_id = data.get("material_id")
+        if material_id and material_id in MaterialLibrary.MATERIALS:
+            material = MaterialLibrary.MATERIALS[material_id]
 
         # Generate DXF
         export_id = f"exp_{uuid.uuid4().hex[:12]}"
         filename = f"{export_id}.dxf"
         filepath = os.path.join(_output_dir, filename)
 
-        dxf_gen = DXFGenerator()
-        dxf_gen.generate(filepath, ceiling_dims, panel_spacing, layout, material)
+        dxf_gen = DXFGenerator(ceiling_dims, panel_spacing, layout)
+        dxf_gen.generate_dxf(filepath, material)
 
         # Get file size
         file_size = os.path.getsize(filepath)
@@ -231,33 +240,30 @@ def export_dxf():
         # Store export record
         expires_at = datetime.utcnow() + timedelta(hours=24)
         _exports_store[export_id] = {
-            'id': export_id,
-            'format': 'dxf',
-            'file_path': filepath,
-            'file_url': f"/api/v1/exports/download/{export_id}",
-            'file_size_bytes': file_size,
-            'expires_at': expires_at.isoformat(),
-            'created_at': datetime.utcnow().isoformat()
+            "id": export_id,
+            "format": "dxf",
+            "file_path": filepath,
+            "file_url": f"/api/v1/exports/download/{export_id}",
+            "file_size_bytes": file_size,
+            "expires_at": expires_at.isoformat(),
+            "created_at": datetime.utcnow().isoformat(),
         }
 
-        return jsonify({
-            "success": True,
-            "data": _exports_store[export_id],
-            "error": None
-        }), 200
+        return jsonify(
+            {"success": True, "data": _exports_store[export_id], "error": None}
+        ), 200
 
     except Exception as e:
-        return jsonify({
-            "success": False,
-            "data": None,
-            "error": {
-                "code": "EXPORT_ERROR",
-                "message": str(e)
+        return jsonify(
+            {
+                "success": False,
+                "data": None,
+                "error": {"code": "EXPORT_ERROR", "message": str(e)},
             }
-        }), 500
+        ), 500
 
 
-@exports_bp.route('/exports/3d', methods=['POST'])
+@exports_bp.route("/exports/3d", methods=["POST"])
 @rate_limit(tier="pro")
 def export_3d():
     """
@@ -281,52 +287,58 @@ def export_3d():
         description: 3D model generated
     """
     if not RENDERER_3D_AVAILABLE:
-        return jsonify({
-            "success": False,
-            "data": None,
-            "error": {
-                "code": "SERVICE_UNAVAILABLE",
-                "message": "3D renderer not available"
-            }
-        }), 503
-
-    data = request.get_json()
-    if not data:
-        return jsonify({
-            "success": False,
-            "data": None,
-            "error": {
-                "code": "INVALID_REQUEST",
-                "message": "Request body is required"
-            }
-        }), 400
-
-    try:
-        dims = data.get('dimensions', {})
-        spacing = data.get('spacing', {})
-        format_type = data.get('format', 'obj').lower()
-        options = data.get('options', {})
-
-        if format_type not in ['obj', 'stl', 'gltf']:
-            return jsonify({
+        return jsonify(
+            {
                 "success": False,
                 "data": None,
                 "error": {
-                    "code": "INVALID_FORMAT",
-                    "message": f"Unsupported format: {format_type}"
+                    "code": "SERVICE_UNAVAILABLE",
+                    "message": "3D renderer not available",
+                },
+            }
+        ), 503
+
+    data = request.get_json()
+    if not data:
+        return jsonify(
+            {
+                "success": False,
+                "data": None,
+                "error": {
+                    "code": "INVALID_REQUEST",
+                    "message": "Request body is required",
+                },
+            }
+        ), 400
+
+    try:
+        dims = data.get("dimensions", {})
+        spacing = data.get("spacing", {})
+        format_type = data.get("format", "obj").lower()
+        options = data.get("options", {})
+
+        if format_type not in ["obj", "stl", "gltf"]:
+            return jsonify(
+                {
+                    "success": False,
+                    "data": None,
+                    "error": {
+                        "code": "INVALID_FORMAT",
+                        "message": f"Unsupported format: {format_type}",
+                    },
                 }
-            }), 400
+            ), 400
 
         # Generate 3D mesh
         generator = CeilingPanel3DGenerator(
-            panel_thickness_mm=options.get('thickness_mm', 20)
+            panel_thickness_mm=options.get("thickness_mm", 20)
         )
 
         # Calculate layout first
-        length_mm = dims.get('length_mm', 5000)
-        width_mm = dims.get('width_mm', 4000)
-        perimeter_gap = spacing.get('perimeter_gap_mm', 200)
-        panel_gap = spacing.get('panel_gap_mm', 50)
+        length_mm = dims.get("length_mm", 5000)
+        width_mm = dims.get("width_mm", 4000)
+        perimeter_gap = spacing.get("perimeter_gap_mm", 200)
+        panel_gap = spacing.get("panel_gap_mm", 50)
 
         # Simple layout calculation
         available_length = length_mm - 2 * perimeter_gap
@@ -341,7 +353,7 @@ def export_3d():
             panels_y=panels_y,
             panel_width_mm=panel_width,
             panel_height_mm=panel_height,
-            include_frame=options.get('include_frame', True)
+            include_frame=options.get("include_frame", True),
         )
 
         # Export to file
@@ -349,11 +361,11 @@ def export_3d():
         filename = f"{export_id}.{format_type}"
         filepath = os.path.join(_output_dir, filename)
 
-        if format_type == 'obj':
+        if format_type == "obj":
             MeshExporter.to_obj(mesh, filepath)
-        elif format_type == 'stl':
+        elif format_type == "stl":
             MeshExporter.to_stl(mesh, filepath)
-        elif format_type == 'gltf':
+        elif format_type == "gltf":
             MeshExporter.to_gltf(mesh, filepath)
 
         # Get file size
@@ -362,33 +374,30 @@ def export_3d():
         # Store export record
         expires_at = datetime.utcnow() + timedelta(hours=24)
         _exports_store[export_id] = {
-            'id': export_id,
-            'format': format_type,
-            'file_path': filepath,
-            'file_url': f"/api/v1/exports/download/{export_id}",
-            'file_size_bytes': file_size,
-            'expires_at': expires_at.isoformat(),
-            'created_at': datetime.utcnow().isoformat()
+            "id": export_id,
+            "format": format_type,
+            "file_path": filepath,
+            "file_url": f"/api/v1/exports/download/{export_id}",
+            "file_size_bytes": file_size,
+            "expires_at": expires_at.isoformat(),
+            "created_at": datetime.utcnow().isoformat(),
         }
 
-        return jsonify({
-            "success": True,
-            "data": _exports_store[export_id],
-            "error": None
-        }), 200
+        return jsonify(
+            {"success": True, "data": _exports_store[export_id], "error": None}
+        ), 200
 
     except Exception as e:
-        return jsonify({
-            "success": False,
-            "data": None,
-            "error": {
-                "code": "EXPORT_ERROR",
-                "message": str(e)
+        return jsonify(
+            {
+                "success": False,
+                "data": None,
+                "error": {"code": "EXPORT_ERROR", "message": str(e)},
             }
-        }), 500
+        ), 500
 
 
-@exports_bp.route('/exports/download/<export_id>', methods=['GET'])
+@exports_bp.route("/exports/download/<export_id>", methods=["GET"])
 @rate_limit()
 def download_export(export_id: str):
     """
@@ -414,46 +423,225 @@ def download_export(export_id: str):
     export = _exports_store.get(export_id)
 
     if export is None:
-        return jsonify({
-            "success": False,
-            "data": None,
-            "error": {
-                "code": "NOT_FOUND",
-                "message": f"Export {export_id} not found"
+        return jsonify(
+            {
+                "success": False,
+                "data": None,
+                "error": {
+                    "code": "NOT_FOUND",
+                    "message": f"Export {export_id} not found",
+                },
             }
-        }), 404
+        ), 404
 
     # Check expiration
-    expires_at = datetime.fromisoformat(export['expires_at'])
+    expires_at = datetime.fromisoformat(export["expires_at"])
     if datetime.utcnow() > expires_at:
-        return jsonify({
-            "success": False,
-            "data": None,
-            "error": {
-                "code": "EXPIRED",
-                "message": "Export has expired"
+        return jsonify(
+            {
+                "success": False,
+                "data": None,
+                "error": {"code": "EXPIRED", "message": "Export has expired"},
             }
-        }), 410
+        ), 410
 
     # Check file exists
-    if not os.path.exists(export['file_path']):
-        return jsonify({
-            "success": False,
-            "data": None,
-            "error": {
-                "code": "FILE_NOT_FOUND",
-                "message": "Export file not found"
+    if not os.path.exists(export["file_path"]):
+        return jsonify(
+            {
+                "success": False,
+                "data": None,
+                "error": {"code": "FILE_NOT_FOUND", "message": "Export file not found"},
             }
-        }), 404
+        ), 404
 
     return send_file(
-        export['file_path'],
+        export["file_path"],
         as_attachment=True,
-        download_name=os.path.basename(export['file_path'])
+        download_name=os.path.basename(export["file_path"]),
     )
 
 
-@exports_bp.route('/exports/<export_id>', methods=['GET'])
+@exports_bp.route("/exports/ifc", methods=["POST"])
+@rate_limit()
+def export_ifc():
+    if not GENERATORS_AVAILABLE:
+        return jsonify(
+            {
+                "success": False,
+                "data": None,
+                "error": {
+                    "code": "SERVICE_UNAVAILABLE",
+                    "message": "Export generators not available",
+                },
+            }
+        ), 503
+
+    data = request.get_json()
+    if not data:
+        return jsonify(
+            {
+                "success": False,
+                "data": None,
+                "error": {
+                    "code": "INVALID_REQUEST",
+                    "message": "Request body is required",
+                },
+            }
+        ), 400
+
+    try:
+        dims = data.get("dimensions", {})
+        spacing = data.get("spacing", {})
+
+        ceiling_dims = CeilingDimensions(
+            length_mm=dims.get("length_mm", 5000), width_mm=dims.get("width_mm", 4000)
+        )
+        panel_spacing = PanelSpacing(
+            perimeter_gap_mm=spacing.get("perimeter_gap_mm", 200),
+            panel_gap_mm=spacing.get("panel_gap_mm", 50),
+        )
+
+        calculator = CeilingPanelCalculator(ceiling_dims, panel_spacing)
+        layout = calculator.calculate_optimal_layout()
+
+        export_id = f"exp_{uuid.uuid4().hex[:12]}"
+        filename = f"{export_id}.ifc"
+        filepath = os.path.join(_output_dir, filename)
+
+        ifc_content = f"""ISO-10303-21;
+HEADER;
+FILE_DESCRIPTION(('ViewDefinition [CoordinationView]'),'2;1');
+FILE_NAME('{export_id}','{datetime.utcnow().isoformat()}',('Savage Cabinetry'),(''));
+FILE_SCHEMA(('IFC4'));
+ENDSEC;
+DATA;
+#1=IFCPROJECT('{export_id}',$,'Ceiling Project',$,$,$,$,$,$);
+ENDSEC;
+END-ISO-10303-21;
+"""
+        with open(filepath, "w") as f:
+            f.write(ifc_content)
+
+        file_size = os.path.getsize(filepath)
+        expires_at = datetime.utcnow() + timedelta(hours=24)
+        _exports_store[export_id] = {
+            "id": export_id,
+            "format": "ifc",
+            "file_path": filepath,
+            "file_url": f"/api/v1/exports/download/{export_id}",
+            "file_size_bytes": file_size,
+            "expires_at": expires_at.isoformat(),
+            "created_at": datetime.utcnow().isoformat(),
+        }
+
+        return jsonify(
+            {"success": True, "data": _exports_store[export_id], "error": None}
+        ), 200
+
+    except Exception as e:
+        return jsonify(
+            {
+                "success": False,
+                "data": None,
+                "error": {"code": "EXPORT_ERROR", "message": str(e)},
+            }
+        ), 500
+
+
+@exports_bp.route("/exports/json", methods=["POST"])
+@rate_limit()
+def export_json():
+    """
+    Generate JSON export for a project.
+
+    ---
+    tags:
+      - Exports
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+    responses:
+      200:
+        description: JSON file generated
+    """
+    data = request.get_json()
+    if not data:
+        return jsonify(
+            {
+                "success": False,
+                "data": None,
+                "error": {
+                    "code": "INVALID_REQUEST",
+                    "message": "Request body is required",
+                },
+            }
+        ), 400
+
+    try:
+        dims = data.get("dimensions", {})
+        spacing = data.get("spacing", {})
+
+        ceiling_dims = CeilingDimensions(
+            length_mm=dims.get("length_mm", 5000), width_mm=dims.get("width_mm", 4000)
+        )
+
+        panel_spacing = PanelSpacing(
+            perimeter_gap_mm=spacing.get("perimeter_gap_mm", 200),
+            panel_gap_mm=spacing.get("panel_gap_mm", 50),
+        )
+
+        calculator = CeilingPanelCalculator(ceiling_dims, panel_spacing)
+        layout = calculator.calculate_optimal_layout()
+
+        export_id = f"exp_{uuid.uuid4().hex[:12]}"
+        filename = f"{export_id}.json"
+        filepath = os.path.join(_output_dir, filename)
+
+        project_exporter = ProjectExporter(ceiling_dims, panel_spacing, layout)
+        project_data = project_exporter.export_project()
+        project_data["metadata"] = {
+            "exported_at": datetime.utcnow().isoformat(),
+            "application": "Savage Cabinetry Platform",
+            "version": "2.1.0",
+        }
+
+        with open(filepath, "w") as f:
+            import json
+
+            json.dump(project_data, f, indent=2)
+
+        file_size = os.path.getsize(filepath)
+
+        expires_at = datetime.utcnow() + timedelta(hours=24)
+        _exports_store[export_id] = {
+            "id": export_id,
+            "format": "json",
+            "file_path": filepath,
+            "file_url": f"/api/v1/exports/download/{export_id}",
+            "file_size_bytes": file_size,
+            "expires_at": expires_at.isoformat(),
+            "created_at": datetime.utcnow().isoformat(),
+        }
+
+        return jsonify(
+            {"success": True, "data": _exports_store[export_id], "error": None}
+        ), 200
+
+    except Exception as e:
+        return jsonify(
+            {
+                "success": False,
+                "data": None,
+                "error": {"code": "EXPORT_ERROR", "message": str(e)},
+            }
+        ), 500
+
+
+@exports_bp.route("/exports/<export_id>", methods=["GET"])
 @rate_limit()
 def get_export(export_id: str):
     """
@@ -477,20 +665,18 @@ def get_export(export_id: str):
     export = _exports_store.get(export_id)
 
     if export is None:
-        return jsonify({
-            "success": False,
-            "data": None,
-            "error": {
-                "code": "NOT_FOUND",
-                "message": f"Export {export_id} not found"
+        return jsonify(
+            {
+                "success": False,
+                "data": None,
+                "error": {
+                    "code": "NOT_FOUND",
+                    "message": f"Export {export_id} not found",
+                },
             }
-        }), 404
+        ), 404
 
     # Remove internal file_path from response
-    export_data = {k: v for k, v in export.items() if k != 'file_path'}
+    export_data = {k: v for k, v in export.items() if k != "file_path"}
 
-    return jsonify({
-        "success": True,
-        "data": export_data,
-        "error": None
-    }), 200
+    return jsonify({"success": True, "data": export_data, "error": None}), 200

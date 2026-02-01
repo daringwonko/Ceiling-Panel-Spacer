@@ -69,18 +69,25 @@ export interface WorkingPlane {
 /**
  * BIM Object types supported by the factory
  */
-export type BIMObjectType = 
-  | 'wall' 
-  | 'door' 
-  | 'window' 
-  | 'floor' 
-  | 'ceiling' 
+export type BIMObjectType =
+  | 'wall'
+  | 'door'
+  | 'window'
+  | 'floor'
+  | 'ceiling'
   | 'column'
   | 'beam'
   | 'roof'
   | 'stair'
   | 'railing'
-  | 'custom';
+  | 'custom'
+  | 'circle'
+  | 'rectangle'
+  | 'arc'
+  | 'line'
+  | 'ellipse'
+  | 'polygon'
+  | 'polyline';
 
 /**
  * Options for creating BIM objects
@@ -244,6 +251,37 @@ export const IFC_TYPE_MAP: Record<BIMObjectType, string> = {
   stair: 'IfcStair',
   railing: 'IfcRailing',
   custom: 'IfcBuildingElementProxy',
+  circle: 'IfcCircle',
+  rectangle: 'IfcRectangleProfileDef',
+  arc: 'IfcArc',
+  line: 'IfcLine',
+  ellipse: 'IfcEllipse',
+  polygon: 'IfcPolygon',
+  polyline: 'IfcPolyline',
+};
+
+/**
+ * Object to Three.js Mesh type mapping
+ */
+export const OBJECT_TO_MESH_TYPE: Record<BIMObjectType, string> = {
+  wall: 'BoxGeometry',
+  door: 'BoxGeometry',
+  window: 'BoxGeometry',
+  floor: 'BoxGeometry',
+  ceiling: 'BoxGeometry',
+  column: 'BoxGeometry',
+  beam: 'BoxGeometry',
+  roof: 'BoxGeometry',
+  stair: 'BoxGeometry',
+  railing: 'BoxGeometry',
+  custom: 'BoxGeometry',
+  circle: 'CircleGeometry',
+  rectangle: 'PlaneGeometry',
+  arc: 'ShapeGeometry',
+  line: 'LineGeometry',
+  ellipse: 'EllipseCurve',
+  polygon: 'ShapeGeometry',
+  polyline: 'BufferGeometry',
 };
 
 /**

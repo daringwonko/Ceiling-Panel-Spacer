@@ -7,21 +7,37 @@
 
 import React, { useRef, useCallback, useEffect, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import {
-  OrbitControls,
-  Grid,
+import { 
+  OrbitControls, 
+  Grid, 
   PerspectiveCamera,
   Plane
 } from '@react-three/drei';
-import { AxesHelper } from 'three';
 import * as THREE from 'three';
-import { BIM3DObject } from './BIM3DObject';
-import { BIM3DCanvasProps } from './types/3d';
-import { useBIMStore } from '../../stores/useBIMStore';
 
-/**
- * Props for the canvas scene component
- */
+export interface BIM3DObject extends THREE.Group {
+  id: string;
+  isSelected: () => boolean;
+  select: () => void;
+  deselect: () => void;
+}
+
+export interface BIM3DCanvasProps {
+  objects: BIM3DObject[];
+  selectedIds: string[];
+  workingPlane?: 'XY' | 'XZ' | 'YZ';
+  gridSize?: number;
+  gridDivisions?: number;
+  backgroundColor?: string;
+  showGrid?: boolean;
+  cameraPosition?: [number, number, number];
+  cameraTarget?: [number, number, number];
+  onObjectSelect?: (id: string, multi: boolean) => void;
+  onObjectDeselect?: (id: string) => void;
+  onCanvasClick?: (point: THREE.Vector3) => void;
+  onObjectHover?: (id: string | null) => void;
+}
+
 interface CanvasSceneProps {
   objects: BIM3DObject[];
   selectedIds: string[];
@@ -31,19 +47,17 @@ interface CanvasSceneProps {
   onObjectSelect?: (id: string, multi: boolean) => void;
   onObjectDeselect?: (id: string) => void;
   onCanvasClick?: (point: THREE.Vector3) => void;
+  onObjectHover?: (id: string | null) => void;
 }
 
-/**
- * Object wrapper component that manages BIM3DObject in the scene
- */
 const BIMObjectWrapper: React.FC<{ 
   object: BIM3DObject; 
   isSelected: boolean;
   onSelect: (id: string, multi: boolean) => void;
-}> = ({ object, isSelected, onSelect }) => {
+  onHover: (id: string | null) => void;
+}> = ({ object, isSelected, onSelect, onHover }) => {
   const meshRef = useRef<THREE.Group>(null);
   
-  // Update selection state when it changes
   useEffect(() => {
     if (isSelected && !object.isSelected()) {
       object.select();
@@ -52,7 +66,6 @@ const BIMObjectWrapper: React.FC<{
     }
   }, [isSelected, object]);
 
-  // Handle click
   const handleClick = useCallback((e: any) => {
     e.stopPropagation();
     const multi = e.ctrlKey || e.metaKey;
@@ -67,17 +80,16 @@ const BIMObjectWrapper: React.FC<{
       onPointerOver={(e: any) => {
         e.stopPropagation();
         document.body.style.cursor = 'pointer';
+        onHover(object.id);
       }}
       onPointerOut={() => {
         document.body.style.cursor = 'default';
+        onHover(null);
       }}
     />
   );
 };
 
-/**
- * Scene component that handles rendering and interaction
- */
 const Scene: React.FC<CanvasSceneProps> = ({
   objects,
   selectedIds,
@@ -87,20 +99,16 @@ const Scene: React.FC<CanvasSceneProps> = ({
   onObjectSelect,
   onObjectDeselect,
   onCanvasClick,
+  onObjectHover,
 }) => {
   const { camera, raycaster, scene, gl } = useThree();
   const controlsRef = useRef<any>(null);
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
 
-  // Handle canvas click for empty space
   const handleCanvasClick = useCallback((e: any) => {
-    // Only handle left clicks
     if (e.button !== 0) return;
     
-    // Check if we clicked on an object
     const intersects = e.intersections;
     if (intersects.length === 0) {
-      // Clicked on empty space
       const mouse = new THREE.Vector2(
         (e.clientX / window.innerWidth) * 2 - 1,
         -(e.clientY / window.innerHeight) * 2 + 1
@@ -115,21 +123,18 @@ const Scene: React.FC<CanvasSceneProps> = ({
         onCanvasClick(target);
       }
       
-      // Deselect all if not multi-selecting
       if (!e.ctrlKey && !e.metaKey) {
         selectedIds.forEach(id => onObjectDeselect?.(id));
       }
     }
   }, [camera, raycaster, onCanvasClick, onObjectDeselect, selectedIds]);
 
-  // Handle object selection
   const handleObjectSelect = useCallback((id: string, multi: boolean) => {
     if (onObjectSelect) {
       onObjectSelect(id, multi);
     }
   }, [onObjectSelect]);
 
-  // Update controls target if needed
   useFrame(() => {
     if (controlsRef.current) {
       controlsRef.current.update();
@@ -138,7 +143,6 @@ const Scene: React.FC<CanvasSceneProps> = ({
 
   return (
     <>
-      {/* Lighting */}
       <ambientLight intensity={0.4} />
       <directionalLight 
         position={[10, 10, 5]} 
@@ -151,7 +155,6 @@ const Scene: React.FC<CanvasSceneProps> = ({
         intensity={0.5}
       />
       
-      {/* Grid */}
       {showGrid && (
         <Grid
           position={[0, -0.01, 0]}
@@ -164,21 +167,17 @@ const Scene: React.FC<CanvasSceneProps> = ({
           infiniteGrid={false}
         />
       )}
-
-      {/* Axes */}
-      <axesHelper args={[gridSize * 0.1]} />
       
-      {/* BIM Objects */}
       {objects.map((obj) => (
         <BIMObjectWrapper
           key={obj.id}
           object={obj}
           isSelected={selectedIds.includes(obj.id)}
           onSelect={handleObjectSelect}
+          onHover={onObjectHover || (() => {})}
         />
       ))}
       
-      {/* Camera and Controls */}
       <PerspectiveCamera
         makeDefault
         position={[5000, 5000, 5000]}
@@ -198,7 +197,6 @@ const Scene: React.FC<CanvasSceneProps> = ({
         onClick={handleCanvasClick}
       />
       
-      {/* Background plane for click detection */}
       <Plane
         args={[100000, 100000]}
         rotation={[-Math.PI / 2, 0, 0]}
@@ -209,19 +207,10 @@ const Scene: React.FC<CanvasSceneProps> = ({
   );
 };
 
-/**
- * BIM3DCanvas - Main 3D Canvas Component
- * 
- * Provides a complete 3D viewport for BIM objects with:
- * - Orbit controls for navigation
- * - Grid for spatial reference
- * - Object selection via raycasting
- * - Proper lighting setup
- */
 export const BIM3DCanvas: React.FC<BIM3DCanvasProps> = ({
   objects,
   selectedIds,
-  workingPlane,
+  workingPlane = 'XY',
   gridSize = 10000,
   gridDivisions = 100,
   backgroundColor = '#1a1a1a',
@@ -324,10 +313,10 @@ export const BIM3DCanvas: React.FC<BIM3DCanvasProps> = ({
           onObjectSelect={onObjectSelect}
           onObjectDeselect={onObjectDeselect}
           onCanvasClick={onCanvasClick}
+          onObjectHover={onObjectHover}
         />
       </Canvas>
       
-      {/* Overlay UI for camera info */}
       <div style={{
         position: 'absolute',
         bottom: '10px',
@@ -345,9 +334,6 @@ export const BIM3DCanvas: React.FC<BIM3DCanvasProps> = ({
   );
 };
 
-/**
- * Hook to interact with the 3D canvas using local state
- */
 export function useBIM3DCanvas() {
   const [objects, setObjects] = useState<BIM3DObject[]>([]);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -363,7 +349,7 @@ export function useBIM3DCanvas() {
 
   const selectObject = useCallback((id: string, multi: boolean = false) => {
     if (multi) {
-      setSelectedIds(prev =>
+      setSelectedIds(prev => 
         prev.includes(id) ? prev : [...prev, id]
       );
     } else {
@@ -387,28 +373,6 @@ export function useBIM3DCanvas() {
     selectObject,
     deselectObject,
     clearSelection,
-  };
-}
-
-/**
- * Hook to connect BIM3DCanvas with useBIMStore
- * Provides automatic synchronization between store and canvas
- */
-export function useBIMCanvasStore() {
-  const store = useBIMStore();
-
-  return {
-    objects: store.objects,
-    selectedIds: store.selectedObjectIds,
-    addObject: store.addObject,
-    removeObject: store.removeObject,
-    selectObject: store.selectObject,
-    deselectAll: store.deselectAll,
-    updateObject: store.updateObject,
-    transformObject: store.transformObject,
-    view: store.view,
-    setCamera: store.setCamera,
-    setGridSettings: store.setGridSettings,
   };
 }
 

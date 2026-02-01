@@ -33,7 +33,7 @@ import {
   ArrowUpFromLine
 } from 'lucide-react'
 
-interface ColumnPropertiesProps {
+export interface ColumnPropertiesProps {
   column: ColumnData
   onUpdate?: (updates: Partial<ColumnProperties>) => void
   onValidate?: (result: ValidationResult) => void

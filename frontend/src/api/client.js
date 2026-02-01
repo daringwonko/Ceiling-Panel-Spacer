@@ -58,6 +58,8 @@ export const api = {
   // Exports
   exportSvg: (data) => apiClient.post('/exports/svg', data),
   exportDxf: (data) => apiClient.post('/exports/dxf', data),
+  exportIfc: (data) => apiClient.post('/exports/ifc', data),
+  exportJson: (data) => apiClient.post('/exports/json', data),
   export3d: (data) => apiClient.post('/exports/3d', data),
   getExport: (id) => apiClient.get(`/exports/${id}`),
   downloadExport: (id) => `${API_BASE_URL}/exports/download/${id}`,
