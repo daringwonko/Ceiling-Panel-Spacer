@@ -146,6 +146,12 @@ export interface ExportData {
     project: BIMProject | null
     objects: BIMObject[]
     layers: BIMLayer[]
+    sites: Site[]
+    buildings: Building[]
+    levels: Level[]
+    currentSiteId: string | null
+    currentBuildingId: string | null
+    currentLevelId: string | null
     view: ViewSettings
     toolSettings: BIMStore['toolSettings']
     canvas2D: BIMStore['canvas2D']
@@ -391,8 +397,8 @@ export const useBIMStore = create<BIMStore>((set, get) => ({
   },
   
   exportProject: () => {
-    const { project, objects, layers, view, toolSettings, canvas2D } = get()
-    
+    const { project, objects, layers, sites, buildings, levels, currentSiteId, currentBuildingId, currentLevelId, view, toolSettings, canvas2D } = get()
+
     const exportData: ExportData = {
       version: '2.1.0',
       exportedAt: new Date().toISOString(),
@@ -401,12 +407,18 @@ export const useBIMStore = create<BIMStore>((set, get) => ({
         project,
         objects,
         layers,
+        sites,
+        buildings,
+        levels,
+        currentSiteId,
+        currentBuildingId,
+        currentLevelId,
         view,
         toolSettings,
         canvas2D,
       },
     }
-    
+
     return JSON.stringify(exportData, null, 2)
   },
   
@@ -435,6 +447,12 @@ export const useBIMStore = create<BIMStore>((set, get) => ({
         project: parsed.data.project,
         objects: parsed.data.objects || [],
         layers: parsed.data.layers || [],
+        sites: parsed.data.sites || [],
+        buildings: parsed.data.buildings || [],
+        levels: parsed.data.levels || [],
+        currentSiteId: parsed.data.currentSiteId || null,
+        currentBuildingId: parsed.data.currentBuildingId || null,
+        currentLevelId: parsed.data.currentLevelId || null,
         view: parsed.data.view || get().view,
         toolSettings: parsed.data.toolSettings || get().toolSettings,
         canvas2D: parsed.data.canvas2D || get().canvas2D,
@@ -1017,7 +1035,18 @@ export const useBIMStore = create<BIMStore>((set, get) => ({
   setActiveLayer: (id) => {
     set({ activeLayerId: id })
   },
-  
+
+  // ========================================================================
+  // HIERARCHY MANAGEMENT (Site → Building → Level)
+  // ========================================================================
+
+  sites: [],
+  buildings: [],
+  levels: [],
+  currentSiteId: null,
+  currentBuildingId: null,
+  currentLevelId: null,
+
   // ========================================================================
   // TOOLS
   // ========================================================================
@@ -1195,8 +1224,8 @@ export const useBIMStore = create<BIMStore>((set, get) => ({
   },
   
   saveToLocalStorage: () => {
-    const { project, objects, layers, view, toolSettings, canvas2D } = get()
-    
+    const { project, objects, layers, sites, buildings, levels, currentSiteId, currentBuildingId, currentLevelId, view, toolSettings, canvas2D } = get()
+
     const data: ExportData = {
       version: '2.1.0',
       exportedAt: new Date().toISOString(),
@@ -1205,12 +1234,18 @@ export const useBIMStore = create<BIMStore>((set, get) => ({
         project,
         objects,
         layers,
+        sites,
+        buildings,
+        levels,
+        currentSiteId,
+        currentBuildingId,
+        currentLevelId,
         view,
         toolSettings,
         canvas2D,
       },
     }
-    
+
     try {
       localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(data))
       set((state) => ({
@@ -1233,6 +1268,12 @@ export const useBIMStore = create<BIMStore>((set, get) => ({
           project: data.data.project,
           objects: data.data.objects || [],
           layers: data.data.layers || [],
+          sites: data.data.sites || [],
+          buildings: data.data.buildings || [],
+          levels: data.data.levels || [],
+          currentSiteId: data.data.currentSiteId || null,
+          currentBuildingId: data.data.currentBuildingId || null,
+          currentLevelId: data.data.currentLevelId || null,
           view: data.data.view,
           toolSettings: data.data.toolSettings,
           canvas2D: data.data.canvas2D,

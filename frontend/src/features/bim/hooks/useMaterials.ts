@@ -1,6 +1,8 @@
 /**
  * useMaterials Hook
- * React hook for accessing and managing materials
+ * 
+ * React hook for accessing and managing materials through MaterialLibrary.
+ * Provides reactive state management for the material system.
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
@@ -10,11 +12,13 @@ import {
   MaterialCreateInput,
   MaterialUpdateInput
 } from '../models/Material';
-import { getMaterialLibrary } from '../services/MaterialLibrary';
+import { materialLibrary, MaterialFilter } from '../services/MaterialLibrary';
 
 interface UseMaterialsReturn {
   /** All materials (predefined + custom) */
   materials: Material[];
+  /** Currently selected material ID */
+  selectedMaterialId: string | null;
   /** Currently selected material */
   selectedMaterial: Material | null;
   /** Loading state */
@@ -29,7 +33,7 @@ interface UseMaterialsReturn {
   setFilterCategory: (category: MaterialCategory | null) => void;
   /** Set search query */
   setSearchQuery: (query: string) => void;
-  /** Select a material */
+  /** Select a material by ID */
   selectMaterial: (materialId: string | null) => void;
   /** Create a new material */
   createMaterial: (input: MaterialCreateInput) => Material;
@@ -42,22 +46,23 @@ interface UseMaterialsReturn {
   /** Export materials to JSON */
   exportMaterials: () => string;
   /** Import materials from JSON */
-  importMaterials: (json: string) => { imported: number; errors: string[] };
+  importMaterials: (json: string) => { success: number; errors: string[] };
   /** Get materials by category */
   getMaterialsByCategory: (category: MaterialCategory) => Material[];
+  /** Clear error */
+  clearError: () => void;
   /** Library statistics */
   stats: {
     total: number;
     predefined: number;
     custom: number;
-    byCategory: Record<MaterialCategory, number>;
+    byCategory: Map<MaterialCategory, number>;
   };
 }
 
 export function useMaterials(): UseMaterialsReturn {
-  const [library] = useState(() => getMaterialLibrary());
   const [materials, setMaterials] = useState<Material[]>([]);
-  const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(null);
+  const [selectedMaterialId, setSelectedMaterialId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filterCategory, setFilterCategory] = useState<MaterialCategory | null>(null);
@@ -67,142 +72,134 @@ export function useMaterials(): UseMaterialsReturn {
   useEffect(() => {
     setLoading(true);
 
-    // Subscribe to changes
-    const unsubscribeChanges = library.onChange((updatedMaterials) => {
-      setMaterials(updatedMaterials);
-      setLoading(false);
-    });
-
-    // Subscribe to selection changes
-    const unsubscribeSelect = library.onSelect((material) => {
-      setSelectedMaterial(material);
-    });
-
     // Initial load
     try {
-      setMaterials(library.getAllMaterials());
-      setSelectedMaterial(library.getSelectedMaterial());
+      setMaterials(materialLibrary.getAllMaterials());
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load materials');
     } finally {
       setLoading(false);
     }
 
+    // Subscribe to library changes
+    const unsubscribe = materialLibrary.onMaterialsChanged(() => {
+      setMaterials(materialLibrary.getAllMaterials());
+    });
+
     return () => {
-      unsubscribeChanges();
-      unsubscribeSelect();
+      unsubscribe();
     };
-  }, [library]);
+  }, []);
 
   // Filtered materials
   const filteredMaterials = useMemo(() => {
-    let result = materials;
-
-    // Apply category filter
+    const filter: MaterialFilter = {};
+    
     if (filterCategory) {
-      result = result.filter(m => m.category === filterCategory);
+      filter.category = filterCategory;
     }
-
-    // Apply search filter
+    
     if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      result = result.filter(
-        m =>
-          m.name.toLowerCase().includes(query) ||
-          m.category.toLowerCase().includes(query) ||
-          m.description?.toLowerCase().includes(query)
-      );
+      filter.nameQuery = searchQuery;
     }
+    
+    return materialLibrary.filterMaterials(filter);
+  }, [filterCategory, searchQuery]);
 
-    return result;
-  }, [materials, filterCategory, searchQuery]);
+  // Selected material
+  const selectedMaterial = useMemo(() => {
+    if (!selectedMaterialId) return null;
+    return materialLibrary.getMaterialById(selectedMaterialId) || null;
+  }, [selectedMaterialId]);
 
   // Actions
-  const selectMaterial = useCallback(
-    (materialId: string | null) => {
-      library.setSelectedMaterial(materialId);
-    },
-    [library]
-  );
+  const selectMaterial = useCallback((materialId: string | null) => {
+    setSelectedMaterialId(materialId);
+  }, []);
 
-  const createMaterial = useCallback(
-    (input: MaterialCreateInput) => {
-      try {
-        return library.createMaterial(input);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to create material');
-        throw err;
-      }
-    },
-    [library]
-  );
+  const createMaterial = useCallback((input: MaterialCreateInput) => {
+    try {
+      setError(null);
+      return materialLibrary.createMaterial(input);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to create material';
+      setError(message);
+      throw err;
+    }
+  }, []);
 
-  const updateMaterial = useCallback(
-    (id: string, input: MaterialUpdateInput) => {
-      try {
-        return library.updateMaterial(id, input);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to update material');
-        throw err;
-      }
-    },
-    [library]
-  );
+  const updateMaterial = useCallback((id: string, input: MaterialUpdateInput) => {
+    try {
+      setError(null);
+      return materialLibrary.updateMaterial(id, input);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to update material';
+      setError(message);
+      throw err;
+    }
+  }, []);
 
-  const deleteMaterial = useCallback(
-    (id: string) => {
-      try {
-        library.deleteMaterial(id);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to delete material');
-        throw err;
+  const deleteMaterial = useCallback((id: string) => {
+    try {
+      setError(null);
+      materialLibrary.deleteMaterial(id);
+      if (selectedMaterialId === id) {
+        setSelectedMaterialId(null);
       }
-    },
-    [library]
-  );
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to delete material';
+      setError(message);
+      throw err;
+    }
+  }, [selectedMaterialId]);
 
-  const duplicateMaterial = useCallback(
-    (id: string, newName?: string) => {
-      try {
-        return library.duplicateMaterial(id, newName);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to duplicate material');
-        throw err;
-      }
-    },
-    [library]
-  );
+  const duplicateMaterial = useCallback((id: string, newName?: string) => {
+    try {
+      setError(null);
+      return materialLibrary.duplicateMaterial(id, newName);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to duplicate material';
+      setError(message);
+      throw err;
+    }
+  }, []);
 
   const exportMaterials = useCallback(() => {
-    return library.exportToJSON();
-  }, [library]);
+    return materialLibrary.exportToJSON();
+  }, []);
 
-  const importMaterials = useCallback(
-    (json: string) => {
-      try {
-        return library.importFromJSON(json);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to import materials');
-        throw err;
-      }
-    },
-    [library]
-  );
+  const importMaterials = useCallback((json: string) => {
+    try {
+      setError(null);
+      return materialLibrary.importFromJSON(json);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to import materials';
+      setError(message);
+      throw err;
+    }
+  }, []);
 
-  const getMaterialsByCategory = useCallback(
-    (category: MaterialCategory) => {
-      return library.getMaterialsByCategory(category);
-    },
-    [library]
-  );
+  const getMaterialsByCategory = useCallback((category: MaterialCategory) => {
+    return materialLibrary.getMaterialsByCategory(category);
+  }, []);
+
+  const clearError = useCallback(() => {
+    setError(null);
+  }, []);
 
   // Stats
   const stats = useMemo(() => {
-    return library.getStats();
-  }, [library, materials]);
+    return {
+      total: materialLibrary.getMaterialCount(),
+      predefined: materialLibrary.getPredefinedMaterials().length,
+      custom: materialLibrary.getCustomMaterials().length,
+      byCategory: materialLibrary.getCategoryCounts()
+    };
+  }, [materials]);
 
   return {
     materials: filteredMaterials,
+    selectedMaterialId,
     selectedMaterial,
     loading,
     error,
@@ -218,6 +215,7 @@ export function useMaterials(): UseMaterialsReturn {
     exportMaterials,
     importMaterials,
     getMaterialsByCategory,
+    clearError,
     stats
   };
 }

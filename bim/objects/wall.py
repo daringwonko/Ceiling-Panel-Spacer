@@ -28,6 +28,8 @@ class Wall:
 
     start_point: Tuple[float, float, float] = (0.0, 0.0, 0.0)
     end_point: Tuple[float, float, float] = (3000.0, 0.0, 0.0)
+    start: Tuple[float, float, float] = None  # Alias for start_point
+    end: Tuple[float, float, float] = None  # Alias for end_point
     height: float = 2800.0  # mm
     thickness: float = 200.0  # mm
     material: str = "Concrete"
