@@ -50,6 +50,7 @@ class FilletTool(Tool):
                 cursor="crosshair",
             )
         )
+        self._default_radius = default_radius
         self.state = FilletState.IDLE
         self.first_line: Optional[Line] = None
         self.second_line: Optional[Line] = None
@@ -63,6 +64,7 @@ class FilletTool(Tool):
         self.state = FilletState.IDLE
         self.first_line = None
         self.second_line = None
+        self.radius = self._default_radius
         self._keyboard_buffer = ""
         self._preview_arc = None
         self.clear_preview()
