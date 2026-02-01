@@ -104,7 +104,8 @@ class WallPropertyPanel(BasePropertyPanel):
 
     def _init_fields(self, wall_data: Dict[str, Any]):
         """Initialize property fields from wall data."""
-        geometry = wall_data.get("geometry", {})
+        # Support both flat structure (from to_dict) and nested structure
+        geometry = wall_data.get("geometry", wall_data)
 
         # Start point coordinates
         start_point = geometry.get("start_point", (0, 0, 0))
@@ -241,7 +242,8 @@ class BeamPropertyPanel(BasePropertyPanel):
 
     def _init_fields(self, beam_data: Dict[str, Any]):
         """Initialize property fields from beam data."""
-        geometry = beam_data.get("geometry", {})
+        # Support both flat structure (from to_dict) and nested structure
+        geometry = beam_data.get("geometry", beam_data)
 
         # Start point coordinates
         start_point = geometry.get("start_point", (0, 0, 0))
@@ -387,7 +389,8 @@ class ColumnPropertyPanel(BasePropertyPanel):
 
     def _init_fields(self, column_data: Dict[str, Any]):
         """Initialize property fields from column data."""
-        geometry = column_data.get("geometry", {})
+        # Support both flat structure (from to_dict) and nested structure
+        geometry = column_data.get("geometry", column_data)
 
         # Position
         position = geometry.get("position", (0, 0))
@@ -519,7 +522,8 @@ class SlabPropertyPanel(BasePropertyPanel):
 
     def _init_fields(self, slab_data: Dict[str, Any]):
         """Initialize property fields from slab data."""
-        geometry = slab_data.get("geometry", {})
+        # Support both flat structure (from to_dict) and nested structure
+        geometry = slab_data.get("geometry", slab_data)
 
         # Thickness and elevation
         self.fields["thickness"] = PropertyField(
