@@ -7,7 +7,7 @@ Manages paths, defaults, and shared settings across GUI, CLI, and core modules.
 
 import os
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 import json
 
 

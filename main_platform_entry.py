@@ -22,7 +22,9 @@ try:
     from cli_interface import CLIInterface
 except ImportError as e:
     print(f"❌ Platform Import Error: {e}", file=sys.stderr)
-    print("🔧 Make sure you're running from the platform root directory.", file=sys.stderr)
+    print(
+        "🔧 Make sure you're running from the platform root directory.", file=sys.stderr
+    )
     sys.exit(1)
 
 
@@ -48,7 +50,9 @@ class PlatformLauncher:
         parsed_args = parser.parse_args(args)
 
         # Handle different launch modes
-        if parsed_args.mode == "cli" or (len(args) > 0 and args[0] in ["calculate", "estimate", "export", "status"]):
+        if parsed_args.mode == "cli" or (
+            len(args) > 0 and args[0] in ["calculate", "estimate", "export", "status"]
+        ):
             # Direct CLI command
             return self.cli_interface.run_command(args)
         elif parsed_args.mode == "gui":
@@ -67,19 +71,27 @@ class PlatformLauncher:
         """Create argument parser for main launcher."""
         parser = argparse.ArgumentParser(
             prog="savage-platform",
-            description="Savage Cabinetry Platform - Professional Kitchen Design"
+            description="Savage Cabinetry Platform - Professional Kitchen Design",
         )
 
-        parser.add_argument("--mode", choices=["cli", "gui", "status", "setup"],
-                          help="Launch mode (default: interactive help)")
+        parser.add_argument(
+            "--mode",
+            choices=["cli", "gui", "status", "setup"],
+            help="Launch mode (default: interactive help)",
+        )
 
         # GUI-specific options
-        parser.add_argument("--port", type=int, default=5000,
-                          help="Port for GUI server (default: 5000)")
-        parser.add_argument("--host", default="localhost",
-                          help="Host for GUI server (default: localhost)")
-        parser.add_argument("--no-browser", action="store_true",
-                          help="Don't automatically open browser")
+        parser.add_argument(
+            "--port", type=int, default=5000, help="Port for GUI server (default: 5000)"
+        )
+        parser.add_argument(
+            "--host",
+            default="localhost",
+            help="Host for GUI server (default: localhost)",
+        )
+        parser.add_argument(
+            "--no-browser", action="store_true", help="Don't automatically open browser"
+        )
 
         return parser
 
@@ -106,8 +118,10 @@ Professional kitchen design and ceiling panel calculation platform.
 
     def _show_status(self) -> int:
         """Show platform status information."""
-        print("
-🏗️  SAVAGE CABINETRY PLATFORM STATUS"        print("=" * 50)
+        print("""
+🏗️  SAVAGE CABINETRY PLATFORM STATUS
+        """)
+        print("=" * 50)
 
         # Platform info
         platform_info = self.config.get_platform_info()
@@ -140,10 +154,15 @@ Professional kitchen design and ceiling panel calculation platform.
         except Exception as e:
             print(f"CLI:      ❌ Error: {e}")
 
-        print("
-📋 AVAILABLE MODES:"        print("  • cli     - Command-line design tools"        print("  • gui     - Web-based 3D interface"        print("  • status  - Show this status page"        print("  • setup   - Platform configuration"
-        print("
-🔗 Try: savage-platform calculate --help"
+        print("""
+📋 AVAILABLE MODES:
+  • cli     - Command-line design tools
+  • gui     - Web-based 3D interface
+  • status  - Show this status page
+  • setup   - Platform configuration
+        """)
+        print("""
+🔗 Try: savage-platform calculate --help""")
         return 0
 
     def _launch_gui(self, args: argparse.Namespace) -> int:
@@ -152,15 +171,19 @@ Professional kitchen design and ceiling panel calculation platform.
             # Check if GUI is available
             gui_script = Path(__file__).parent / "gui_server.py"
             if not gui_script.exists():
-                print("❌ GUI not available. Run platform setup first.", file=sys.stderr)
+                print(
+                    "❌ GUI not available. Run platform setup first.", file=sys.stderr
+                )
                 return 1
 
             # Prepare GUI command
             cmd = [
                 sys.executable,
                 str(gui_script),
-                "--port", str(args.port),
-                "--host", args.host
+                "--port",
+                str(args.port),
+                "--host",
+                args.host,
             ]
 
             print(f"🌐 Starting GUI server on http://{args.host}:{args.port}")
@@ -175,7 +198,10 @@ Professional kitchen design and ceiling panel calculation platform.
             return result.returncode
 
         except FileNotFoundError:
-            print("❌ GUI server not found. Make sure all components are installed.", file=sys.stderr)
+            print(
+                "❌ GUI server not found. Make sure all components are installed.",
+                file=sys.stderr,
+            )
             return 1
         except KeyboardInterrupt:
             print("\n🛑 GUI server stopped by user")
@@ -209,6 +235,7 @@ Professional kitchen design and ceiling panel calculation platform.
         # Check CLI interface
         try:
             from cli_interface import CLIInterface
+
             CLIInterface()
             print("✅ CLI interface OK")
         except Exception as e:
@@ -218,7 +245,7 @@ Professional kitchen design and ceiling panel calculation platform.
         platform_components = [
             "Savage_Cabinetry_Platform/__init__.py",
             "Savage_Cabinetry_Platform/kitchen_orchestrator.py",
-            "Savage_Cabinetry_Platform/config.py"
+            "Savage_Cabinetry_Platform/config.py",
         ]
         for component in platform_components:
             if (Path(__file__).parent / component).exists():
@@ -228,8 +255,9 @@ Professional kitchen design and ceiling panel calculation platform.
 
         # Report issues
         if issues:
-            print("
-❌ SETUP ISSUES FOUND:"            for issue in issues:
+            print("""
+❌ SETUP ISSUES FOUND:""")
+            for issue in issues:
                 print(f"   • {issue}")
             print("\n🔧 Fix these issues and run setup again.")
             return 1
