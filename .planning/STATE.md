@@ -94,6 +94,10 @@ DECISIONS MADE:
 - Use @react-three/fiber for React-Three.js integration
 - Extend Three.js Object3D for BIM object compatibility
 - Cache materials for performance optimization
+- Emissive highlighting for selection feedback (performant)
+- TransformControls from three/examples for gizmos
+- Factory pattern for object creation with defaults
+- Working plane system for consistent object placement
 
 AGENT DEPLOYMENT: WAVE 3 IN PROGRESS
 Following AGENTS-PIPELINE.md v3.0 pattern
