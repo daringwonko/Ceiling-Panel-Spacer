@@ -411,7 +411,7 @@ class SVGGenerator:
         self.ceiling = ceiling
         self.spacing = spacing
         self.layout = layout
-        self.scale = scale
+        self.config = SVGConfig(scale=scale)
 
     def generate_svg(self, filename: str, material: Optional[Material] = None) -> str:
         """Generate SVG blueprint with top-down view.
