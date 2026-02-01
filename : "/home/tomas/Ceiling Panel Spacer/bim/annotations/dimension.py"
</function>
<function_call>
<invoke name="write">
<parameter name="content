@@ -1,0 +1,676 @@
+: "Dimension classes for BIM annotation system.
+
+Provides various dimension types for technical drawings:
+- AlignedDimension: Distance between two points at any angle
+- HorizontalDimension: Horizontal distance measurement
+- VerticalDimension: Vertical distance measurement
+- RadiusDimension: Circle/arc radius measurement
+- AngleDimension: Angle between two lines
+
+All dimensions support styling, precision control, and automatic text placement.
+"""
+
+from typing import Optional, Tuple, List, Dict, Any, Union
+from dataclasses import dataclass, field
+from enum import Enum, auto
+import math
+from uuid import uuid4
+
+
+class DimensionType(Enum):
+    """Types of dimensions supported."""
+    ALIGNED = auto()
+    HORIZONTAL = auto()
+    VERTICAL = auto()
+    RADIUS = auto()
+    DIAMETER = auto()
+    ANGLE = auto()
+
+
+@dataclass
+class Point2D:
+    """2D point for dimension calculations."""
+    x: float
+    y: float
+    
+    def distance_to(self, other: 'Point2D') -> float:
+        """Calculate distance to another point."""
+        return math.sqrt((self.x - other.x)**2 + (self.y - other.y)**2)
+    
+    def to_tuple(self) -> Tuple[float, float]:
+        """Convert to tuple."""
+        return (self.x, self.y)
+
+
+@dataclass
+class DimensionStyle:
+    """Style configuration for dimension appearance."""
+    # Text properties
+    text_height: float = 2.5  # mm
+    text_color: str = "black"
+    text_font: str = "Arial"
+    text_precision: int = 0  # Decimal places
+    text_prefix: str = ""
+    text_suffix: str = ""
+    
+    # Arrow properties
+    arrow_size: float = 2.5  # mm
+    arrow_type: str = "closed"  # closed, open, dot, architectural
+    arrow_color: str = "black"
+    
+    # Line properties
+    line_weight: float = 0.25  # mm
+    line_color: str = "black"
+    extension_line_offset: float = 2.0  # mm
+    extension_line_extension: float = 2.0  # mm
+    
+    # Dimension line
+    dimension_line_offset: float = 10.0  # mm from measured points
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert style to dictionary."""
+        return {
+            "text_height": self.text_height,
+            "text_color": self.text_color,
+            "text_font": self.text_font,
+            "text_precision": self.text_precision,
+            "text_prefix": self.text_prefix,
+            "text_suffix": self.text_suffix,
+            "arrow_size": self.arrow_size,
+            "arrow_type": self.arrow_type,
+            "arrow_color": self.arrow_color,
+            "line_weight": self.line_weight,
+            "line_color": self.line_color,
+            "extension_line_offset": self.extension_line_offset,
+            "extension_line_extension": self.extension_line_extension,
+            "dimension_line_offset": self.dimension_line_offset,
+        }
+
+
+class BaseDimension:
+    """Base class for all dimension types."""
+    
+    def __init__(
+        self,
+        style: Optional[DimensionStyle] = None,
+        layer: str = "Annotations",
+        id: Optional[str] = None
+    ):
+        self.id = id or str(uuid4())
+        self.style = style or DimensionStyle()
+        self.layer = layer
+        self.visible = True
+        self.locked = False
+        
+    def format_value(self, value: float) -> str:
+        """Format a numeric value according to style precision."""
+        formatted = f"{value:.{self.style.text_precision}f}"
+        # Remove trailing zeros if precision allows
+        if '.' in formatted and self.style.text_precision > 0:
+            formatted = formatted.rstrip('0').rstrip('.')
+        return f"{self.style.text_prefix}{formatted}{self.style.text_suffix}"
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert dimension to dictionary."""
+        return {
+            "id": self.id,
+            "type": self.__class__.__name__,
+            "style": self.style.to_dict(),
+            "layer": self.layer,
+            "visible": self.visible,
+            "locked": self.locked,
+        }
+
+
+class AlignedDimension(BaseDimension):
+    """
+    Aligned dimension measuring distance between two points.
+    
+    The dimension line is parallel to the measured line, offset by
+    a perpendicular distance.
+    
+    Usage:
+        dim = AlignedDimension(
+            start_point=Point2D(0, 0),
+            end_point=Point2D(100, 50),
+            offset_distance=15.0
+        )
+    """
+    
+    def __init__(
+        self,
+        start_point: Point2D,
+        end_point: Point2D,
+        offset_distance: float = 10.0,
+        style: Optional[DimensionStyle] = None,
+        layer: str = "Annotations",
+        id: Optional[str] = None
+    ):
+        super().__init__(style, layer, id)
+        self.start_point = start_point
+        self.end_point = end_point
+        self.offset_distance = offset_distance
+        self._calculate_geometry()
+    
+    def _calculate_geometry(self):
+        """Calculate dimension line position and text placement."""
+        # Calculate direction vector
+        dx = self.end_point.x - self.start_point.x
+        dy = self.end_point.y - self.start_point.y
+        length = math.sqrt(dx**2 + dy**2)
+        
+        if length == 0:
+            # Degenerate case - same start and end point
+            self.dimension_line_start = self.start_point
+            self.dimension_line_end = self.end_point
+            self.text_position = self.start_point
+            self.text_rotation = 0.0
+            self.measured_value = 0.0
+            return
+        
+        # Normalize direction
+        ux, uy = dx / length, dy / length
+        
+        # Perpendicular vector (rotated 90 degrees CCW)
+        px, py = -uy, ux
+        
+        # Calculate dimension line endpoints (offset from measured line)
+        offset_x = px * self.offset_distance
+        offset_y = py * self.offset_distance
+        
+        self.dimension_line_start = Point2D(
+            self.start_point.x + offset_x,
+            self.start_point.y + offset_y
+        )
+        self.dimension_line_end = Point2D(
+            self.end_point.x + offset_x,
+            self.end_point.y + offset_y
+        )
+        
+        # Text position (center of dimension line)
+        self.text_position = Point2D(
+            (self.dimension_line_start.x + self.dimension_line_end.x) / 2,
+            (self.dimension_line_start.y + self.dimension_line_end.y) / 2
+        )
+        
+        # Text rotation (parallel to dimension line)
+        self.text_rotation = math.degrees(math.atan2(dy, dx))
+        
+        # Measured value
+        self.measured_value = length
+    
+    def get_extension_lines(self) -> List[Tuple[Point2D, Point2D]]:
+        """Get extension line start and end points."""
+        # Calculate direction vector
+        dx = self.end_point.x - self.start_point.x
+        dy = self.end_point.y - self.start_point.y
+        length = math.sqrt(dx**2 + dy**2)
+        
+        if length == 0:
+            return []
+        
+        # Normalize direction
+        ux, uy = dx / length, dy / length
+        
+        # Perpendicular offset
+        px, py = -uy, ux
+        offset_x = px * self.offset_distance
+        offset_y = py * self.offset_distance
+        
+        # Extension line from measured point to dimension line
+        ext_offset = self.style.extension_line_offset
+        ext_x = px * ext_offset
+        ext_y = py * ext_offset
+        
+        line1_start = Point2D(
+            self.start_point.x + ext_x,
+            self.start_point.y + ext_y
+        )
+        line1_end = Point2D(
+            self.dimension_line_start.x + self.style.extension_line_extension * px,
+            self.dimension_line_start.y + self.style.extension_line_extension * py
+        )
+        
+        line2_start = Point2D(
+            self.end_point.x + ext_x,
+            self.end_point.y + ext_y
+        )
+        line2_end = Point2D(
+            self.dimension_line_end.x + self.style.extension_line_extension * px,
+            self.dimension_line_end.y + self.style.extension_line_extension * py
+        )
+        
+        return [(line1_start, line1_end), (line2_start, line2_end)]
+    
+    def get_dimension_line(self) -> Tuple[Point2D, Point2D]:
+        """Get dimension line start and end points."""
+        return (self.dimension_line_start, self.dimension_line_end)
+    
+    def get_text(self) -> str:
+        """Get formatted dimension text."""
+        return self.format_value(self.measured_value)
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary."""
+        data = super().to_dict()
+        data.update({
+            "start_point": self.start_point.to_tuple(),
+            "end_point": self.end_point.to_tuple(),
+            "offset_distance": self.offset_distance,
+            "measured_value": self.measured_value,
+            "dimension_line_start": self.dimension_line_start.to_tuple(),
+            "dimension_line_end": self.dimension_line_end.to_tuple(),
+            "text_position": self.text_position.to_tuple(),
+            "text_rotation": self.text_rotation,
+        })
+        return data
+
+
+class HorizontalDimension(BaseDimension):
+    """
+    Horizontal dimension measuring X-axis distance.
+    
+    Creates a horizontal dimension line with vertical extension lines.
+    
+    Usage:
+        dim = HorizontalDimension(
+            start_point=Point2D(0, 0),
+            end_point=Point2D(100, 50),
+            y_position=60.0
+        )
+    """
+    
+    def __init__(
+        self,
+        start_point: Point2D,
+        end_point: Point2D,
+        y_position: Optional[float] = None,
+        style: Optional[DimensionStyle] = None,
+        layer: str = "Annotations",
+        id: Optional[str] = None
+    ):
+        super().__init__(style, layer, id)
+        self.start_point = start_point
+        self.end_point = end_point
+        # Default y_position is above both points
+        if y_position is None:
+            y_position = max(start_point.y, end_point.y) + self.style.dimension_line_offset
+        self.y_position = y_position
+        self._calculate_geometry()
+    
+    def _calculate_geometry(self):
+        """Calculate dimension line and text position."""
+        # Dimension line is horizontal
+        left_x = min(self.start_point.x, self.end_point.x)
+        right_x = max(self.start_point.x, self.end_point.x)
+        
+        self.dimension_line_start = Point2D(left_x, self.y_position)
+        self.dimension_line_end = Point2D(right_x, self.y_position)
+        
+        # Text position (center of dimension line, above it)
+        self.text_position = Point2D(
+            (left_x + right_x) / 2,
+            self.y_position + self.style.text_height
+        )
+        self.text_rotation = 0.0  # Horizontal text
+        
+        # Measured value
+        self.measured_value = abs(self.end_point.x - self.start_point.x)
+    
+    def get_extension_lines(self) -> List[Tuple[Point2D, Point2D]]:
+        """Get vertical extension lines."""
+        lines = []
+        
+        # Start point extension line
+        y_dir = 1 if self.y_position > self.start_point.y else -1
+        ext_start_y = self.start_point.y + y_dir * self.style.extension_line_offset
+        lines.append((
+            Point2D(self.start_point.x, ext_start_y),
+            Point2D(self.start_point.x, self.y_position + y_dir * self.style.extension_line_extension)
+        ))
+        
+        # End point extension line
+        y_dir = 1 if self.y_position > self.end_point.y else -1
+        ext_start_y = self.end_point.y + y_dir * self.style.extension_line_offset
+        lines.append((
+            Point2D(self.end_point.x, ext_start_y),
+            Point2D(self.end_point.x, self.y_position + y_dir * self.style.extension_line_extension)
+        ))
+        
+        return lines
+    
+    def get_dimension_line(self) -> Tuple[Point2D, Point2D]:
+        """Get dimension line endpoints."""
+        return (self.dimension_line_start, self.dimension_line_end)
+    
+    def get_text(self) -> str:
+        """Get formatted dimension text."""
+        return self.format_value(self.measured_value)
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary."""
+        data = super().to_dict()
+        data.update({
+            "start_point": self.start_point.to_tuple(),
+            "end_point": self.end_point.to_tuple(),
+            "y_position": self.y_position,
+            "measured_value": self.measured_value,
+            "dimension_line_start": self.dimension_line_start.to_tuple(),
+            "dimension_line_end": self.dimension_line_end.to_tuple(),
+            "text_position": self.text_position.to_tuple(),
+            "text_rotation": self.text_rotation,
+        })
+        return data
+
+
+class VerticalDimension(BaseDimension):
+    """
+    Vertical dimension measuring Y-axis distance.
+    
+    Creates a vertical dimension line with horizontal extension lines.
+    
+    Usage:
+        dim = VerticalDimension(
+            start_point=Point2D(0, 0),
+            end_point=Point2D(100, 50),
+            x_position=-10.0
+        )
+    """
+    
+    def __init__(
+        self,
+        start_point: Point2D,
+        end_point: Point2D,
+        x_position: Optional[float] = None,
+        style: Optional[DimensionStyle] = None,
+        layer: str = "Annotations",
+        id: Optional[str] = None
+    ):
+        super().__init__(style, layer, id)
+        self.start_point = start_point
+        self.end_point = end_point
+        # Default x_position is left of both points
+        if x_position is None:
+            x_position = min(start_point.x, end_point.x) - self.style.dimension_line_offset
+        self.x_position = x_position
+        self._calculate_geometry()
+    
+    def _calculate_geometry(self):
+        """Calculate dimension line and text position."""
+        # Dimension line is vertical
+        bottom_y = min(self.start_point.y, self.end_point.y)
+        top_y = max(self.start_point.y, self.end_point.y)
+        
+        self.dimension_line_start = Point2D(self.x_position, bottom_y)
+        self.dimension_line_end = Point2D(self.x_position, top_y)
+        
+        # Text position (center of dimension line, rotated 90 degrees)
+        self.text_position = Point2D(
+            self.x_position - self.style.text_height,
+            (bottom_y + top_y) / 2
+        )
+        self.text_rotation = 90.0  # Vertical text
+        
+        # Measured value
+        self.measured_value = abs(self.end_point.y - self.start_point.y)
+    
+    def get_extension_lines(self) -> List[Tuple[Point2D, Point2D]]:
+        """Get horizontal extension lines."""
+        lines = []
+        
+        # Start point extension line
+        x_dir = 1 if self.x_position > self.start_point.x else -1
+        ext_start_x = self.start_point.x + x_dir * self.style.extension_line_offset
+        lines.append((
+            Point2D(ext_start_x, self.start_point.y),
+            Point2D(self.x_position + x_dir * self.style.extension_line_extension, self.start_point.y)
+        ))
+        
+        # End point extension line
+        x_dir = 1 if self.x_position > self.end_point.x else -1
+        ext_start_x = self.end_point.x + x_dir * self.style.extension_line_offset
+        lines.append((
+            Point2D(ext_start_x, self.end_point.y),
+            Point2D(self.x_position + x_dir * self.style.extension_line_extension, self.end_point.y)
+        ))
+        
+        return lines
+    
+    def get_dimension_line(self) -> Tuple[Point2D, Point2D]:
+        """Get dimension line endpoints."""
+        return (self.dimension_line_start, self.dimension_line_end)
+    
+    def get_text(self) -> str:
+        """Get formatted dimension text."""
+        return self.format_value(self.measured_value)
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary."""
+        data = super().to_dict()
+        data.update({
+            "start_point": self.start_point.to_tuple(),
+            "end_point": self.end_point.to_tuple(),
+            "x_position": self.x_position,
+            "measured_value": self.measured_value,
+            "dimension_line_start": self.dimension_line_start.to_tuple(),
+            "dimension_line_end": self.dimension_line_end.to_tuple(),
+            "text_position": self.text_position.to_tuple(),
+            "text_rotation": self.text_rotation,
+        })
+        return data
+
+
+class RadiusDimension(BaseDimension):
+    """
+    Radius dimension for circles and arcs.
+    
+    Displays a leader line from the center to the arc with radius value.
+    
+    Usage:
+        dim = RadiusDimension(
+            center=Point2D(50, 50),
+            radius=25.0,
+            angle=45.0  # degrees
+        )
+    """
+    
+    def __init__(
+        self,
+        center: Point2D,
+        radius: float,
+        angle: float = 45.0,
+        style: Optional[DimensionStyle] = None,
+        layer: str = "Annotations",
+        id: Optional[str] = None
+    ):
+        super().__init__(style, layer, id)
+        self.center = center
+        self.radius = radius
+        self.angle = math.radians(angle)
+        self._calculate_geometry()
+    
+    def _calculate_geometry(self):
+        """Calculate leader line and text position."""
+        # Point on the arc
+        self.arc_point = Point2D(
+            self.center.x + self.radius * math.cos(self.angle),
+            self.center.y + self.radius * math.sin(self.angle)
+        )
+        
+        # Leader line extends slightly beyond arc
+        leader_extension = self.style.arrow_size * 2
+        self.leader_end = Point2D(
+            self.center.x + (self.radius + leader_extension) * math.cos(self.angle),
+            self.center.y + (self.radius + leader_extension) * math.sin(self.angle)
+        )
+        
+        # Text position (at end of leader)
+        text_offset = self.style.text_height * 1.5
+        self.text_position = Point2D(
+            self.leader_end.x + text_offset * math.cos(self.angle),
+            self.leader_end.y + text_offset * math.sin(self.angle)
+        )
+        
+        # Text rotation (horizontal by default for radius)
+        self.text_rotation = 0.0
+    
+    def get_leader_line(self) -> Tuple[Point2D, Point2D]:
+        """Get leader line from center to arc."""
+        return (self.center, self.leader_end)
+    
+    def get_text(self) -> str:
+        """Get formatted radius text with R prefix."""
+        return f"R{self.format_value(self.radius)}"
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary."""
+        data = super().to_dict()
+        data.update({
+            "center": self.center.to_tuple(),
+            "radius": self.radius,
+            "angle": math.degrees(self.angle),
+            "arc_point": self.arc_point.to_tuple(),
+            "leader_end": self.leader_end.to_tuple(),
+            "text_position": self.text_position.to_tuple(),
+            "text_rotation": self.text_rotation,
+        })
+        return data
+
+
+class AngleDimension(BaseDimension):
+    """
+    Angle dimension between two lines.
+    
+    Measures the angle between two lines that share a common vertex.
+    
+    Usage:
+        dim = AngleDimension(
+            vertex=Point2D(0, 0),
+            start_point=Point2D(100, 0),
+            end_point=Point2D(50, 86.6),
+            radius=30.0
+        )
+    """
+    
+    def __init__(
+        self,
+        vertex: Point2D,
+        start_point: Point2D,
+        end_point: Point2D,
+        radius: float = 20.0,
+        style: Optional[DimensionStyle] = None,
+        layer: str = "Annotations",
+        id: Optional[str] = None
+    ):
+        super().__init__(style, layer, id)
+        self.vertex = vertex
+        self.start_point = start_point
+        self.end_point = end_point
+        self.radius = radius
+        self._calculate_geometry()
+    
+    def _calculate_geometry(self):
+        """Calculate arc and text position."""
+        # Calculate angles from vertex
+        dx1 = self.start_point.x - self.vertex.x
+        dy1 = self.start_point.y - self.vertex.y
+        self.start_angle = math.atan2(dy1, dx1)
+        
+        dx2 = self.end_point.x - self.vertex.x
+        dy2 = self.end_point.y - self.vertex.y
+        self.end_angle = math.atan2(dy2, dx2)
+        
+        # Calculate the angle value (always positive, less than 180)
+        angle_diff = self.end_angle - self.start_angle
+        while angle_diff < 0:
+            angle_diff += 2 * math.pi
+        while angle_diff > 2 * math.pi:
+            angle_diff -= 2 * math.pi
+        
+        # Use the smaller angle
+        if angle_diff > math.pi:
+            angle_diff = 2 * math.pi - angle_diff
+        
+        self.measured_angle = math.degrees(angle_diff)
+        self.mid_angle = self.start_angle + angle_diff / 2
+        
+        # Arc center is at vertex
+        self.arc_center = self.vertex
+        
+        # Text position (at mid-angle on the arc)
+        self.text_position = Point2D(
+            self.vertex.x + self.radius * math.cos(self.mid_angle),
+            self.vertex.y + self.radius * math.sin(self.mid_angle)
+        )
+        
+        # Text rotation (horizontal)
+        self.text_rotation = 0.0
+    
+    def get_arc_points(self, segments: int = 20) -> List[Point2D]:
+        """Get points along the arc for drawing."""
+        points = []
+        angle_diff = self.end_angle - self.start_angle
+        
+        # Normalize to smallest arc
+        while angle_diff < 0:
+            angle_diff += 2 * math.pi
+        while angle_diff > 2 * math.pi:
+            angle_diff -= 2 * math.pi
+        if angle_diff > math.pi:
+            angle_diff = 2 * math.pi - angle_diff
+        
+        for i in range(segments + 1):
+            t = i / segments
+            angle = self.start_angle + angle_diff * t
+            points.append(Point2D(
+                self.vertex.x + self.radius * math.cos(angle),
+                self.vertex.y + self.radius * math.sin(angle)
+            ))
+        
+        return points
+    
+    def get_leader_lines(self) -> List[Tuple[Point2D, Point2D]]:
+        """Get leader lines from arc to measured points."""
+        arc_start = Point2D(
+            self.vertex.x + self.radius * math.cos(self.start_angle),
+            self.vertex.y + self.radius * math.sin(self.start_angle)
+        )
+        arc_end = Point2D(
+            self.vertex.x + self.radius * math.cos(self.end_angle),
+            self.vertex.y + self.radius * math.sin(self.end_angle)
+        )
+        
+        return [
+            (arc_start, self.start_point),
+            (arc_end, self.end_point)
+        ]
+    
+    def get_text(self) -> str:
+        """Get formatted angle text with degree symbol."""
+        return f"{self.format_value(self.measured_angle)}°"
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary."""
+        data = super().to_dict()
+        data.update({
+            "vertex": self.vertex.to_tuple(),
+            "start_point": self.start_point.to_tuple(),
+            "end_point": self.end_point.to_tuple(),
+            "radius": self.radius,
+            "measured_angle": self.measured_angle,
+            "start_angle": math.degrees(self.start_angle),
+            "end_angle": math.degrees(self.end_angle),
+            "text_position": self.text_position.to_tuple(),
+            "text_rotation": self.text_rotation,
+        })
+        return data
+
+
+# Type alias for all dimension types
+Dimension = Union[
+    AlignedDimension,
+    HorizontalDimension,
+    VerticalDimension,
+    RadiusDimension,
+    AngleDimension
+]

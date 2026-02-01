@@ -1,11 +1,4 @@
-# Wrote src/components/BIMWorkbench/DraftingCanvas.tsx
-/**
- * DraftingCanvas Component
- * 
- * Main SVG drafting canvas integrating navigation, grid, selection,
- * and coordinate display. Provides professional 2D drawing surface.
- */
-import React, {
+  import React, {
   useRef,
   useState,
   useCallback,
@@ -266,7 +259,3 @@ export const DraftingCanvas = forwardRef<DraftingCanvasRef, DraftingCanvasProps>
     );
   }
 );
-DraftingCanvas.displayName = 'DraftingCanvas';
-export default DraftingCanvas;
-Thinking: Good, the DraftingCanvas component is created. Now I need to create the CSS file for it.
-Now let me create the CSS file for the drafting canvas:
