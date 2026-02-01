@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+  <!-- Horizontal Dimension Icon -->
+  <!-- Two points with horizontal dimension line -->
+  
+  <!-- Background -->
+  <rect width="48" height="48" fill="none"/>
+  
+  <!-- First point (circle) -->
+  <circle cx="8" cy="24" r="3" fill="#333" stroke="none"/>
+  
+  <!-- Second point (circle) -->
+  <circle cx="40" cy="24" r="3" fill="#333" stroke="none"/>
+  
+  <!-- Extension lines (vertical) -->
+  <line x1="8" y1="24" x2="8" y2="16" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+  <line x1="8" y1="16" x2="8" y2="12" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+  
+  <line x1="40" y1="24" x2="40" y2="16" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+  <line x1="40" y1="16" x2="40" y2="12" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Dimension line (horizontal) -->
+  <line x1="8" y1="20" x2="40" y2="20" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Left arrow -->
+  <polygon points="8,20 12,20 8,17" fill="#333"/>
+  
+  <!-- Right arrow -->
+  <polygon points="40,20 36,20 40,17" fill="#333"/>
+  
+  <!-- Dimension text -->
+  <text x="24" y="16" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" font-weight="bold" fill="#333">150</text>
+</svg>

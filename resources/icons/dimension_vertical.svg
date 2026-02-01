@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+  <!-- Vertical Dimension Icon -->
+  <!-- Two points with vertical dimension line -->
+  
+  <!-- Background -->
+  <rect width="48" height="48" fill="none"/>
+  
+  <!-- First point (circle) -->
+  <circle cx="24" cy="40" r="3" fill="#333" stroke="none"/>
+  
+  <!-- Second point (circle) -->
+  <circle cx="24" cy="8" r="3" fill="#333" stroke="none"/>
+  
+  <!-- Extension lines (horizontal) -->
+  <line x1="24" y1="40" x2="16" y2="40" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+  <line x1="16" y1="40" x2="12" y2="40" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+  
+  <line x1="24" y1="8" x2="16" y2="8" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+  <line x1="16" y1="8" x2="12" y2="8" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Dimension line (vertical) -->
+  <line x1="20" y1="40" x2="20" y2="8" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Top arrow (pointing down) -->
+  <polygon points="20,8 20,12 17,8" fill="#333"/>
+  
+  <!-- Bottom arrow (pointing up) -->
+  <polygon points="20,40 20,36 17,40" fill="#333"/>
+  
+  <!-- Dimension text (vertical orientation) -->
+  <text x="16" y="24" text-anchor="middle" font-family="Arial, sans-serif" font-size="8" font-weight="bold" fill="#333" transform="rotate(-90, 16, 24)">200</text>
+</svg>

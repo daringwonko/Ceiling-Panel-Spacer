@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+  <!-- Leader Line Icon -->
+  <!-- Polyline with arrow at end -->
+  
+  <!-- Background -->
+  <rect width="48" height="48" fill="none"/>
+  
+  <!-- Leader line (L-shaped) -->
+  <polyline points="12,12 12,28 32,28" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Arrow head at end -->
+  <polygon points="32,28 28,25 28,31" fill="#333"/>
+  
+  <!-- Text label at start -->
+  <rect x="6" y="6" width="14" height="10" fill="#fff" stroke="#333" stroke-width="1"/>
+  <text x="13" y="14" text-anchor="middle" font-family="Arial, sans-serif" font-size="6" font-weight="bold" fill="#333">ABC</text>
+</svg>

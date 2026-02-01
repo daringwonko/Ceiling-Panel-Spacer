@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+  <!-- Text Label Icon -->
+  <!-- Text with bounding box -->
+  
+  <!-- Background -->
+  <rect width="48" height="48" fill="none"/>
+  
+  <!-- Text bounding box (dashed) -->
+  <rect x="8" y="12" width="32" height="24" fill="none" stroke="#666" stroke-width="1" stroke-dasharray="3,2"/>
+  
+  <!-- Letter T -->
+  <text x="24" y="29" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#333">T</text>
+  
+  <!-- Text lines hint -->
+  <line x1="8" y1="38" x2="40" y2="38" stroke="#999" stroke-width="1"/>
+  <line x1="8" y1="42" x2="40" y2="42" stroke="#999" stroke-width="1"/>
+</svg>

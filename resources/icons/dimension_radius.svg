@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+  <!-- Radius Dimension Icon -->
+  <!-- Circle with radius arrow and R text -->
+  
+  <!-- Background -->
+  <rect width="48" height="48" fill="none"/>
+  
+  <!-- Circle outline -->
+  <circle cx="24" cy="24" r="12" fill="none" stroke="#333" stroke-width="2"/>
+  
+  <!-- Center point -->
+  <circle cx="24" cy="24" r="2" fill="#333" stroke="none"/>
+  
+  <!-- Radius line from center to edge -->
+  <line x1="24" y1="24" x2="36" y2="24" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Arrow at edge pointing toward center -->
+  <polygon points="36,24 33,22 33,26" fill="#333"/>
+  
+  <!-- R label -->
+  <text x="18" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#333">R</text>
+  <text x="28" y="30" text-anchor="start" font-family="Arial, sans-serif" font-size="8" font-weight="bold" fill="#333">12</text>
+</svg>
