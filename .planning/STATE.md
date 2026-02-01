@@ -1,9 +1,9 @@
- Phase: 06 of 06 (BIM Workbench Implementation)
-Plan: 18 of 21 (Export System - Tasks 1-3 Complete)
-Status: Wave 5 In Progress - Export System Implementation Underway
-Last activity: 2026-02-01 - Completed 06-18 Tasks 1-3 (Export Utilities, Dialog UI, Batch Export)
+Phase: 06 of 06 (BIM Workbench Implementation)
+Plan: 19 of 21 (Project Export & Schedules - Complete)
+Status: Wave 5 Progress - Export System Implementation Underway
+Last activity: 2026-02-01 - Completed 06-19 (Project Export & Schedules - All 4 tasks)
 
-Progress: █████████████████████████████████████████████████░░░░░░░░░░░░  81%
+Progress: ██████████████████████████████████████████████████░░░░░░░░░░░░  86%
 
 Phase 6 (BIM Workbench) Progress:
 - 06-CONTEXT: BIM Workbench specification ✓ Complete
@@ -24,8 +24,9 @@ Phase 6 (BIM Workbench) Progress:
 - 06-15: Section Plane System ✓ Complete
 - 06-16: 2D View Generation ✓ Complete (All 6 tasks)
 - 06-17: Elevation Views ✓ Complete (via 06-16 Task 4)
-- 06-18: Export System ✓ Complete (Tasks 1-3: Export Utilities, Dialog UI, Batch Export)
-- 06-19 through 06-21: 3 plans ⏳ Ready to Execute
+- 06-18: Export System ✓ Complete (All 3 tasks)
+- 06-19: Project Export & Schedules ✓ Complete (All 4 tasks)
+- 06-20 through 06-21: 2 plans ⏳ Ready to Execute
 
 WAVE STRUCTURE:
 - Wave 1: Core Infrastructure (4 plans) ✓ Complete
@@ -55,11 +56,12 @@ WAVE STRUCTURE:
     - Task 5: ViewComponent ✓
     - Task 6: View Templates ✓
 - Wave 5: Export & IFC (3 plans) 🔄 In Progress
-  - 06-18: Export System ✓ Complete (Tasks 1-3)
+  - 06-18: Export System ✓ Complete
+  - 06-19: Project Export & Schedules ✓ Complete
 - Wave 6: Polish & Integration (2 plans) ⏳ Ready to Execute
 
-PLATFORM STATUS: WAVE 5 IN PROGRESS 🚧
-Export System Implementation Underway
+PLATFORM STATUS: WAVE 5 NEARING COMPLETION 🚧
+Export System and Schedules Implementation Complete
 
 ✅ Phase 6 Context Complete
 ✅ 21 Plans Created (All Waves)
@@ -67,94 +69,28 @@ Export System Implementation Underway
 ✅ Wave 2 Complete (4/4 plans)
 ✅ Wave 3 Complete (5/5 plans)
 ✅ Wave 4 Complete (5/5 plans)
-🔄 Wave 5 In Progress (1/3 plans)
+🔄 Wave 5 In Progress (2/3 plans)
 ⏳ Wave 6 Ready to Execute
 
-WAVE 1 COMPLETION SUMMARY:
-- BIM Layout Foundation: Complete with responsive layout, panels, toolbars
-- BIM Store: Complete with state management, layers, materials, tools
-- BIM Components: Complete with icons, panels, property editor
-- BIM API Layer: Complete with client, hooks, store integration, backend stubs
+WAVE 5 COMPLETION SUMMARY:
 
-WAVE 2 COMPLETION SUMMARY:
-- 2D Drafting Canvas: Complete with SVG rendering and event handling
-- Basic 2D Drafting Tools: Complete with Line, Rectangle, Circle, Arc tools
-- Advanced 2D Drafting Tools: Complete with 6 advanced geometric tools
-- Snapping System and Editing Tools: Complete with precision CAD capabilities
-  - SnapSystem: 7 snap types with priority-based selection
-  - MoveTool: Object translation with mouse and keyboard input
-  - RotateTool: Rotation around center point with angle input
-  - ScaleTool: Uniform/non-uniform scaling from base point
-  - TrimTool: Cut objects at intersections with cutting edges
-  - OffsetTool: Create parallel copies at specified distance
-  - FilletTool: Rounded corners between two lines
-  - SnapControls: UI for snap settings and toggles
-  - EditToolbar: Toolbar with all editing tools and shortcuts
-  - 67 comprehensive tests (100% pass rate)
+- Export System (06-18): Complete with full export capabilities
+  - ExportDialog.tsx: Modal with format, scope, scale options
+  - ExportOptions.tsx: Configuration panel with preview
+  - Support for DXF, SVG, IFC, PNG formats
+  - Real-time preview generation
+  - Keyboard shortcuts (Escape, Ctrl+Enter)
+  - Batch export functionality
+  - 2D and 3D export options
 
-WAVE 3 COMPLETION SUMMARY:
-- 3D Object Base System: Complete with Three.js integration
-  - BIM3DObject: Base class extending Object3D with IFC metadata
-  - BIM3DCanvas: React component with @react-three/fiber
-  - WorkingPlaneSystem: Top/front/side/custom plane management
-  - BIMObjectFactory: Creates wall, door, window, floor, ceiling, column, beam
-  - SelectionVisualizer: Highlight, bounding box, transform controls
-  - 1,777 lines of TypeScript code
-  - Full type definitions for 3D BIM operations
-
-- Project Hierarchy (06-12): Complete with full tree management
-  - Site: Geographic coordinates, terrain, building container
-  - Building: Level container with auto-calculated bounding box
-  - Level: Object container at elevation with visibility toggle
-  - HierarchyManager: Tree traversal, drag-drop, context menus
-  - HierarchyTree: React component with expand/collapse, selection
-  - Full BIM Store integration with hierarchy state
-  - Demo component with sample project structure
-
-- Material & Layer Management (06-13): Complete with PBR materials
-  - Material System: 20+ predefined PBR materials (concrete, wood, metal, glass, etc.)
-  - Three.js Integration: MeshStandardMaterial with caching for performance
-  - MaterialLibrary: CRUD operations, localStorage persistence, JSON import/export
-  - MaterialPanel: Grid view with search, filter, preview, editor
-  - MaterialPreview: 3D sphere with auto-rotation and proper lighting
-  - Layer System: Hierarchical layers with visibility/lock controls
-  - LayerManager: CRUD, parent-child relationships, active layer management
-  - LayerPanel: Tree view with expand/collapse, inline editing, context menu
-  - Default Layers: 0, Structure, Architecture, MEP, Furniture, Annotations
-  - useMaterials/useLayers hooks for React integration
-
-WAVE 4 COMPLETION SUMMARY:
-
-- Annotation System (06-14): Complete with smart annotations
-  - Annotation classes for dimensioning, text, symbols
-  - AnnotationCanvas overlay for 2D annotations
-  - SmartAnnotationTool with interactive creation
-  - BIM Store integration for annotation state management
-  - React components: AnnotationPanel, AnnotationCanvas, SmartDimensionTool
-  - Support for linear, angular, radial, ordinate dimensions
-  - Auto associative dimensioning to geometric elements
-  - Type-safe annotations with TypeScript interfaces
-
-- Section Plane System (06-15): Complete with 3D clipping
-  - SectionType enum: PLAN, ELEVATION, SECTION types
-  - SectionPlaneClass with position, normal, size properties
-  - Visual representation: rectangle mesh, hatching pattern, direction arrows
-  - SectionClipper for 3D geometry clipping at planes
-  - CSG-based cutting operations with cut surface generation
-  - Geometry caching for performance optimization
-  - Batch clipping operations for multiple objects
-
-- 2D View Generation (06-16): Complete with full view system
-  - OrthographicProjection: 3D-to-2D transformation engine (516 lines)
-  - PlanViewGenerator: Top-down views with cut geometry and hatching (526 lines)
-  - SectionViewGenerator: Vertical sections with plane cutting (601 lines)
-  - ElevationViewGenerator: Cardinal direction elevations (N/S/E/W) (596 lines)
-  - ViewComponent: Interactive canvas rendering with pan/zoom (3,085 lines)
-  - View Templates: Paper sizes, title blocks, north arrows
-  - Hatch patterns: concrete, steel, wood, diagonal, crosshatch
-  - Paper sizes: ISO A0-A4, US ARCH A-E, US Letter/Legal/Tabloid
-  - Export formats: SVG, DXF (placeholder), PNG (placeholder)
-  - 6,800+ lines across 8 commits
+- Project Export & Schedules (06-19): Complete with quantity management
+  - Project export/import to JSON with validation
+  - Door, window, material schedules with filtering/sorting
+  - Quantity takeoff (areas, volumes, material quantities)
+  - CSV/Excel export functionality
+  - Backend API endpoints for scheduling
+  - Client-side export utilities
+  - TypeScript types for all schedule structures
 
 DECISIONS MADE:
 - Absolute imports to avoid package conflicts
@@ -182,14 +118,17 @@ DECISIONS MADE:
 - Material-to-hatching mapping for architectural conventions
 - SVG as primary export format for vector output
 - ViewState with transform/inverse_transform for pan/zoom
+- Schedule column architecture with accessor functions
+- Filter operators: equals, contains, gt, lt, gte, lte
+- Client-side CSV export vs API-based Excel export
 
-AGENT DEPLOYMENT: WAVE 5 READY
+AGENT DEPLOYMENT: WAVE 5 NEARING COMPLETION
 Following AGENTS-PIPELINE.md v3.0 pattern
-Next: Execute Plans 06-17 through 06-21 (Wave 5: Export & IFC)
+Next: Execute Plans 06-20 through 06-21 (Wave 6: Polish & Integration)
 
 SESSION CONTINUITY:
-Last session: 2026-02-01T02:52:46Z - Completed Plan 06-18 Tasks 1-3
-Stopped at: Completed 06-18 (Export System - 3/3 tasks)
+Last session: 2026-02-01T03:15:00Z - Completed Plan 06-19 (Project Export & Schedules)
+Stopped at: Completed 06-19 (Project Export & Schedules - 4/4 tasks)
 Resume file: None - plan complete
-Completed: 06-14, 06-15, 06-16, 06-18 (Wave 4-5)
-Pending: 06-17, 06-19, 06-20, 06-21 (Wave 5-6)
+Completed: 06-14, 06-15, 06-16, 06-18, 06-19 (Wave 4-5)
+Pending: 06-20, 06-21 (Wave 6: Polish & Integration)
