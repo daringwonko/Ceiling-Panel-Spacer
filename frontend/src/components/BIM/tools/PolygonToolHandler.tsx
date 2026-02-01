@@ -1,16 +1,11 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useBIMStore, BIMObject } from '../../../stores/useBIMStore'
+import { bimClient } from '../../../api/bimClient'
 
-interface Point {
+type Point = {
   x: number
   y: number
-}
-
-interface PolygonCreationResponse {
-  id: string
-  vertices: number[][]
-  success: boolean
 }
 
 type DrawingState = 'idle' | 'placing_vertices' | 'complete'
@@ -163,21 +158,15 @@ export default function PolygonToolHandler() {
     if (drawingState === 'idle' || vertices.length === 0) {
       setVertices([snapped])
       setDrawingState('placing_vertices')
-    } else if (drawingState === 'placing_vertices') {
-      if (isNearFirstPoint(snapped) && vertices.length >= 3) {
-        setIsLoading(true)
-        setError(null)
+      } else if (drawingState === 'placing_vertices') {
+        if (isNearFirstPoint(snapped) && vertices.length >= 3) {
+          setIsLoading(true)
+          setError(null)
 
-        try {
-          const response = await fetch('/api/bim/tools/polygon', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
+          try {
+            const data = await bimClient.createPolygon({
               vertices: vertices.map(v => [v.x, v.y, 0]),
-            }),
-          })
-
-          const data: PolygonCreationResponse = await response.json()
+            })
 
           if (data.success) {
             const centroid = vertices.reduce((acc, v) => ({ x: acc.x + v.x / vertices.length, y: acc.y + v.y / vertices.length }), { x: 0, y: 0 })
@@ -227,15 +216,9 @@ export default function PolygonToolHandler() {
       setError(null)
 
       try {
-        const response = await fetch('/api/bim/tools/polygon', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            vertices: vertices.map(v => [v.x, v.y, 0]),
-          }),
+        const data = await bimClient.createPolygon({
+          vertices: vertices.map(v => [v.x, v.y, 0]),
         })
-
-        const data: PolygonCreationResponse = await response.json()
 
         if (data.success) {
           const centroid = vertices.reduce((acc, v) => ({ x: acc.x + v.x / vertices.length, y: acc.y + v.y / vertices.length }), { x: 0, y: 0 })

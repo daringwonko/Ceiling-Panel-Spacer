@@ -1,3 +1,4 @@
+import { bimClient } from '../../../api/bimClient'
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useBIMStore, BIMObject } from '../../../stores/useBIMStore'
@@ -6,15 +7,6 @@ import { v4 as uuidv4 } from 'uuid'
 interface Point {
   x: number
   y: number
-}
-
-interface DoorCreationResponse {
-  id: string
-  position: [number, number, number]
-  width: number
-  height: number
-  direction: string
-  success: boolean
 }
 
 type DrawingState = 'idle' | 'placing' | 'complete'
@@ -217,18 +209,12 @@ export default function DoorToolHandler() {
       setError(null)
 
       try {
-        const response = await fetch('/api/bim/tools/door', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            position: [snapped.x, snapped.y, 0],
-            width: doorWidth,
-            height: doorHeight,
-            direction: doorDirection,
-          }),
+        const data = await bimClient.createDoor({
+          position: [snapped.x, snapped.y, 0],
+          width: doorWidth,
+          height: doorHeight,
+          direction: doorDirection,
         })
-
-        const data: DoorCreationResponse = await response.json()
 
         if (data.success) {
           const newDoor: BIMObject = {

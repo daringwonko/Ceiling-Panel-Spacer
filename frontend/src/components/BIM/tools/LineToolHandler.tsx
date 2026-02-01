@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useBIMStore, BIMObject } from '../../../stores/useBIMStore'
+import { bimClient } from '../../../api/bimClient'
 import { v4 as uuidv4 } from 'uuid'
 
 interface Point {
@@ -150,16 +151,10 @@ export default function LineToolHandler() {
       setError(null)
 
       try {
-        const response = await fetch('/api/bim/tools/line', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            start: [startPoint!.x, startPoint!.y, 0],
-            end: [snapped.x, snapped.y, 0],
-          }),
+        const data: LineCreationResponse = await bimClient.createLine({
+          start: [startPoint!.x, startPoint!.y, 0],
+          end: [snapped.x, snapped.y, 0],
         })
-
-        const data: LineCreationResponse = await response.json()
 
         if (data.success) {
           const newLine: BIMObject = {

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useBIMStore, BIMObject } from '../../../stores/useBIMStore'
 import { v4 as uuidv4 } from 'uuid'
+import { bimClient } from '../../../api/bimClient'
 
 interface Point {
   x: number
@@ -179,15 +180,9 @@ export default function PolylineToolHandler() {
     setError(null)
 
     try {
-      const response = await fetch('/api/bim/tools/polyline', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          points: points.map(p => [p.x, p.y, 0]),
-        }),
+      const data: PolylineCreationResponse = await bimClient.createPolyline({
+        points: points.map(p => [p.x, p.y, 0]),
       })
-
-      const data: PolylineCreationResponse = await response.json()
 
       if (data.success) {
         const newPolyline: BIMObject = {
@@ -233,15 +228,9 @@ export default function PolylineToolHandler() {
       setError(null)
 
       try {
-        const response = await fetch('/api/bim/tools/polyline', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            points: points.map(p => [p.x, p.y, 0]),
-          }),
-        })
-
-        const data: PolylineCreationResponse = await response.json()
+      const data: PolylineCreationResponse = await bimClient.createPolyline({
+        points: points.map(p => [p.x, p.y, 0]),
+      })
 
         if (data.success) {
           const newPolyline: BIMObject = {

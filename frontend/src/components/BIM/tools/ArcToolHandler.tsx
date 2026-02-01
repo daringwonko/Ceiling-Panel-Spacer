@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useBIMStore, BIMObject } from '../../../stores/useBIMStore'
-import { v4 as uuidv4 } from 'uuid'
+import { bimClient } from '../../../api/bimClient'
 
 interface Point {
   x: number
@@ -177,18 +177,12 @@ export default function ArcToolHandler() {
         const startAngle = Math.atan2(startPoint!.y - centerPoint!.y, startPoint!.x - centerPoint!.x)
         const endAngle = Math.atan2(snapped.y - centerPoint!.y, snapped.x - centerPoint!.x)
 
-        const response = await fetch('/api/bim/tools/arc', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            center,
-            radius,
-            startAngle,
-            endAngle,
-          }),
+        const data: ArcCreationResponse = await bimClient.createArc({
+          center,
+          radius,
+          startAngle,
+          endAngle,
         })
-
-        const data: ArcCreationResponse = await response.json()
 
         if (data.success) {
           const newArc: BIMObject = {

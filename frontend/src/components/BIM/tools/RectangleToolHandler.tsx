@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useBIMStore, BIMObject } from '../../../stores/useBIMStore'
 import { v4 as uuidv4 } from 'uuid'
+import { bimClient } from '../../../api/bimClient'
 
 interface Point {
   x: number
@@ -163,16 +164,10 @@ export default function RectangleToolHandler() {
       setError(null)
 
       try {
-        const response = await fetch('/api/bim/tools/rectangle', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            corner: [snapped.x, snapped.y, 0],
-            opposite_corner: [corner!.x, corner!.y, 0],
-          }),
+        const data: RectangleCreationResponse = await bimClient.createRectangle({
+          corner: [snapped.x, snapped.y, 0],
+          opposite_corner: [corner!.x, corner!.y, 0],
         })
-
-        const data: RectangleCreationResponse = await response.json()
 
         if (data.success) {
           const width = Math.abs(data.opposite_corner[0] - data.corner[0])

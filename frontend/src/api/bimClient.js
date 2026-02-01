@@ -280,6 +280,30 @@ export const bimClient = {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
   },
+
+  // ============================================================================
+  // TOOL ENDPOINTS
+  // ============================================================================
+
+  createLine: (data) => bimApiClient.post('/tools/line', data),
+
+  createCircle: (data) => bimApiClient.post('/tools/circle', data),
+
+  createArc: (data) => bimApiClient.post('/tools/arc', data),
+
+  createRectangle: (data) => bimApiClient.post('/tools/rectangle', data),
+
+  createDoor: (data) => bimApiClient.post('/tools/door', data),
+
+  createWindow: (data) => bimApiClient.post('/tools/window', data),
+
+  createEllipse: (data) => bimApiClient.post('/tools/ellipse', data),
+
+  createPolygon: (data) => bimApiClient.post('/tools/polygon', data),
+
+  createPolyline: (data) => bimApiClient.post('/tools/polyline', data),
+
+  createStairs: (data) => bimApiClient.post('/tools/stairs', data),
 }
 
 export default bimClient

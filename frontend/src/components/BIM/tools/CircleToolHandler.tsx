@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useBIMStore, BIMObject } from '../../../stores/useBIMStore'
 import { v4 as uuidv4 } from 'uuid'
+import { bimClient } from '../../../api/bimClient'
 
 interface Point {
   x: number
@@ -170,16 +171,10 @@ export default function CircleToolHandler() {
           Math.pow(snapped.x - centerPoint!.x, 2) + Math.pow(snapped.y - centerPoint!.y, 2)
         )
 
-        const response = await fetch('/api/bim/tools/circle', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            center: [centerPoint!.x, centerPoint!.y, 0],
-            radius: radius,
-          }),
+        const data: CircleCreationResponse = await bimClient.createCircle({
+          center: [centerPoint!.x, centerPoint!.y, 0],
+          radius: radius,
         })
-
-        const data: CircleCreationResponse = await response.json()
 
         if (data.success) {
           const newCircle: BIMObject = {

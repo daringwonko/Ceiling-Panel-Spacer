@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useBIMStore, BIMObject } from '../../../stores/useBIMStore'
+import { bimClient } from '../../../api/bimClient'
 
 interface Point {
   x: number
@@ -186,17 +187,11 @@ export default function WindowToolHandler() {
     setError(null)
 
     try {
-      const response = await fetch('/api/bim/tools/window', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          position: [hoverPoint.x, hoverPoint.y, 0],
-          width: windowWidth,
-          height: windowHeight,
-        }),
+      const data: WindowCreationResponse = await bimClient.createWindow({
+        position: [hoverPoint.x, hoverPoint.y, 0],
+        width: windowWidth,
+        height: windowHeight,
       })
-
-      const data: WindowCreationResponse = await response.json()
 
       if (data.success) {
         const newWindow = {

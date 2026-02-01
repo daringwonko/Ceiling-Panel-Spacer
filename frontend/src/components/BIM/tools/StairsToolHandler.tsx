@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useBIMStore, BIMObject } from '../../../stores/useBIMStore'
+import { bimClient } from '../../../api/bimClient'
 import { v4 as uuidv4 } from 'uuid'
 
 interface Point {
@@ -203,18 +204,12 @@ export default function StairsToolHandler() {
       setError(null)
 
       try {
-        const response = await fetch('/api/bim/tools/stairs', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            start: [startPoint!.x, startPoint!.y, 0],
-            end: [snapped.x, snapped.y, 0],
-            width: width,
-            num_steps: numSteps,
-          }),
+        const data: StairsCreationResponse = await bimClient.createStairs({
+          start: [startPoint!.x, startPoint!.y, 0],
+          end: [snapped.x, snapped.y, 0],
+          width: width,
+          num_steps: numSteps,
         })
-
-        const data: StairsCreationResponse = await response.json()
 
         if (data.success) {
           const newStairs: BIMObject = {

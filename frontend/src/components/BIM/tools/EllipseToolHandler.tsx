@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useBIMStore, BIMObject } from '../../../stores/useBIMStore'
+import { bimClient } from '../../../api/bimClient'
 
 interface Point {
   x: number
@@ -200,18 +201,12 @@ export default function EllipseToolHandler() {
         const radiusX = Math.abs(snapped.x - centerPoint!.x)
         const radiusY = Math.abs(snapped.y - centerPoint!.y)
 
-        const response = await fetch('/api/bim/tools/ellipse', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            center: [centerPoint!.x, centerPoint!.y, 0],
-            rx: radiusX,
-            ry: radiusY,
-            rotation: 0,
-          }),
+        const data: EllipseCreationResponse = await bimClient.createEllipse({
+          center: [centerPoint!.x, centerPoint!.y, 0],
+          rx: radiusX,
+          ry: radiusY,
+          rotation: 0,
         })
-
-        const data: EllipseCreationResponse = await response.json()
 
         if (data.success) {
           const newEllipse: BIMObject = {
