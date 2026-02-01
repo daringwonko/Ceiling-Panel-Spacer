@@ -11,14 +11,17 @@ from .wall import Wall, create_wall
 from .beam import Beam, create_beam
 from .column import Column, create_column
 from .slab import Slab, create_slab
+from .roof import Roof, makeRoof
 
 __all__ = [
     "Wall",
     "Beam",
     "Column",
     "Slab",
+    "Roof",
     "create_wall",
     "create_beam",
     "create_column",
     "create_slab",
+    "makeRoof",
 ]

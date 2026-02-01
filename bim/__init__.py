@@ -4,8 +4,8 @@ Provides structural object classes, creation tools, and property panels
 for BIM workflows in the Ceiling Panel Spacer application.
 """
 
-from .objects import Wall, Beam, Column, Slab
-from .objects import create_wall, create_beam, create_column, create_slab
+from .objects import Wall, Beam, Column, Slab, Roof
+from .objects import create_wall, create_beam, create_column, create_slab, makeRoof
 from .gui.structural_tools import WallTool, BeamTool, ColumnTool, SlabTool
 from .property.structural_props import (
     WallPropertyPanel,
@@ -24,11 +24,13 @@ __all__ = [
     "Beam",
     "Column",
     "Slab",
+    "Roof",
     # Creation functions
     "create_wall",
     "create_beam",
     "create_column",
     "create_slab",
+    "makeRoof",
     # Tools
     "WallTool",
     "BeamTool",
