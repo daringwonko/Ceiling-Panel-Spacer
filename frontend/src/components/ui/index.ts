@@ -11,6 +11,13 @@ export type { MaterialCardProps } from "./MaterialCard"
 export { MaterialDialog } from "./MaterialDialog"
 export type { MaterialDialogProps } from "./MaterialDialog"
 
+// Control Interfaces (Upgraded ceiling tool controls)
+export { default as CeilingControlPanel } from "./CeilingControlPanel"
+export type { CeilingControlPanelProps } from "./CeilingControlPanel"
+
+// Theme Integration (Global Material Design integration)
+export { default as ThemeWrapper, useThemeContext, useResponsive, ResponsiveWrapper } from "./ThemeWrapper"
+
 // Original Radix UI + Tailwind Components (kept for backward compatibility)
 
 export { Button, buttonVariants } from "./Button"
