@@ -1,0 +1,1 @@
+/bin/bash: line 1: claude: command not found

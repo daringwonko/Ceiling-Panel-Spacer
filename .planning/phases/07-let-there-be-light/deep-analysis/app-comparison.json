@@ -1,0 +1,45 @@
+{
+  "timestamp": "2026-02-01T02:16:16.403226",
+  "app_tsx": {
+    "path": "/home/tomas/Ceiling Panel Spacer/frontend/src/App.tsx",
+    "lines": 58,
+    "features": [
+      "CeilingWorkbench 3D interface",
+      "Panel management",
+      "Material selection"
+    ],
+    "components": [],
+    "stores": [],
+    "ip_assets": [],
+    "imports": [
+      "import React, { Suspense } from 'react'",
+      "import { ThemeProvider, createTheme, CssBaseline } from '@mui/material'",
+      "import CeilingWorkbench from './workbench/CeilingWorkbench'"
+    ]
+  },
+  "app_jsx": {
+    "path": "/home/tomas/Ceiling Panel Spacer/frontend/src/App.jsx",
+    "lines": 31,
+    "features": [
+      "BIMLayout shell",
+      "React Router routing",
+      "React Query integration",
+      "TestComponents testing",
+      "StructuralObjectsDemo BIM objects"
+    ],
+    "components": [
+      "QueryClient",
+      "StructuralObjectsDemo"
+    ],
+    "stores": [],
+    "ip_assets": [],
+    "imports": [
+      "import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'",
+      "import { QueryClient, QueryClientProvider } from '@tanstack/react-query'",
+      "import BIMLayout from './components/Layout/BIMLayout'",
+      "import TestComponents from './components/bim/TestComponents'",
+      "import { StructuralObjectsDemo } from './bim'"
+    ]
+  },
+  "comparison": {}
+}

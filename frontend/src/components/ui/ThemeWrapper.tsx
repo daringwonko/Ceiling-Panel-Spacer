@@ -1,6 +1,6 @@
 import React, { useState, useMemo, createContext, useContext } from 'react'
 import { ThemeProvider as MuiThemeProvider, CssBaseline } from '@mui/material'
-import { bimTheme, bimDarkTheme } from '../themes/bimTheme'
+import { bimTheme, bimDarkTheme } from '../themes/index'
 
 // Theme context for managing theme state
 interface ThemeContextType {

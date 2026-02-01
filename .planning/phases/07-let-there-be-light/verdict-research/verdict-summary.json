@@ -1,0 +1,201 @@
+{
+  "timestamp": "2026-02-01T02:00:03.112561",
+  "connected": [
+    {
+      "candidate": "ai",
+      "exists": true,
+      "lines": 0,
+      "mtime": "2026-01-31 16:03",
+      "referenced_by": [
+        "/home/tomas/Ceiling Panel Spacer/tests/test_phase1_complete.py",
+        "/home/tomas/Ceiling Panel Spacer/tests/test_phase3_sprint7.py",
+        "/home/tomas/Ceiling Panel Spacer/tests/test_phase2_sprint6.py"
+      ],
+      "verdict": "CONNECTED",
+      "claim": "Empty directory - verify no connections"
+    },
+    {
+      "candidate": "analytics",
+      "exists": true,
+      "lines": 1392,
+      "mtime": "2026-01-11 01:33",
+      "referenced_by": [
+        "/home/tomas/Ceiling Panel Spacer/frontend/src/services/__tests__/federatedLearning.test.ts",
+        "/home/tomas/Ceiling Panel Spacer/frontend/src/components/Analytics/AnalyticsDashboard.tsx",
+        "/home/tomas/Ceiling Panel Spacer/frontend/src/hooks/usePerformanceMonitoring.ts",
+        "/home/tomas/Ceiling Panel Spacer/frontend/src/services/errorMonitoring.ts",
+        "/home/tomas/Ceiling Panel Spacer/tests/test_integration.py",
+        "/home/tomas/Ceiling Panel Spacer/orchestration/autonomous_adaptation.py",
+        "/home/tomas/Ceiling Panel Spacer/web/gui_server.py",
+        "/home/tomas/Ceiling Panel Spacer/archive/ceiling_panel_calc(1).py"
+      ],
+      "verdict": "CONNECTED",
+      "claim": "1 file - verify no connections"
+    },
+    {
+      "candidate": "blockchain",
+      "exists": true,
+      "lines": 1208,
+      "mtime": "2026-01-11 01:33",
+      "referenced_by": [
+        "/home/tomas/Ceiling Panel Spacer/tests/test_integration.py",
+        "/home/tomas/Ceiling Panel Spacer/tests/test_phase2_sprint6.py",
+        "/home/tomas/Ceiling Panel Spacer/archive/current_state_analysis.py"
+      ],
+      "verdict": "CONNECTED",
+      "claim": "1 file - verify no connections"
+    },
+    {
+      "candidate": "billing",
+      "exists": true,
+      "lines": 386,
+      "mtime": "2026-01-11 01:33",
+      "referenced_by": [
+        "/home/tomas/Ceiling Panel Spacer/archive/full_architecture.py",
+        "/home/tomas/Ceiling Panel Spacer/frontend/src/components/Help/TutorialOverlay.tsx",
+        "/home/tomas/Ceiling Panel Spacer/.planning/BIM_PIPELINE_ORCHESTRATOR.py"
+      ],
+      "verdict": "CONNECTED",
+      "claim": "1 file - verify no connections"
+    },
+    {
+      "candidate": "auth",
+      "exists": true,
+      "lines": 241,
+      "mtime": "2026-01-11 01:33",
+      "referenced_by": [
+        "/home/tomas/Ceiling Panel Spacer/api/routes/projects.py",
+        "/home/tomas/Ceiling Panel Spacer/web/gui_server.py",
+        "/home/tomas/Ceiling Panel Spacer/analytics/predictive_analytics.py",
+        "/home/tomas/Ceiling Panel Spacer/archive/ceiling_panel_calc(1).py",
+        "/home/tomas/Ceiling Panel Spacer/archive/current_state_analysis.py",
+        "/home/tomas/Ceiling Panel Spacer/archive/phase1_mvp.py",
+        "/home/tomas/Ceiling Panel Spacer/core/ceiling_panel_calc.py",
+        "/home/tomas/Ceiling Panel Spacer/frontend/src/features/bim/services/MaterialLibrary.ts",
+        "/home/tomas/Ceiling Panel Spacer/frontend/src/features/bim/services/LayerManager.ts",
+        "/home/tomas/Ceiling Panel Spacer/frontend/src/features/bim/components/MaterialPreview.tsx"
+      ],
+      "verdict": "CONNECTED",
+      "claim": "1 file - verify no connections"
+    },
+    {
+      "candidate": "web",
+      "exists": true,
+      "lines": 731,
+      "mtime": "2026-01-11 01:33",
+      "referenced_by": [
+        "/home/tomas/Ceiling Panel Spacer/src/bim/ifc/ifcPropertyExtractor.ts",
+        "/home/tomas/Ceiling Panel Spacer/orchestration/collaboration_engine.py",
+        "/home/tomas/Ceiling Panel Spacer/frontend/src/components/Exports.jsx",
+        "/home/tomas/Ceiling Panel Spacer/frontend/dist/assets/index-B_0YZWwq.js",
+        "/home/tomas/Ceiling Panel Spacer/main_platform_entry.py"
+      ],
+      "verdict": "CONNECTED",
+      "claim": "Verify connections"
+    },
+    {
+      "candidate": "scripts",
+      "exists": true,
+      "lines": 124,
+      "mtime": "2026-01-31 13:27",
+      "referenced_by": [
+        "/home/tomas/Ceiling Panel Spacer/iot/iot_security.py",
+        "/home/tomas/Ceiling Panel Spacer/iot/iot_sensor_network.py"
+      ],
+      "verdict": "CONNECTED",
+      "claim": "Verify connections"
+    },
+    {
+      "candidate": "Spacer",
+      "exists": true,
+      "lines": 0,
+      "mtime": "2026-01-31 21:03",
+      "referenced_by": [
+        "/home/tomas/Ceiling Panel Spacer/frontend/src/components/Help/TutorialOverlay.tsx",
+        "/home/tomas/Ceiling Panel Spacer/frontend/src/components/Polish/WelcomeScreen.tsx",
+        "/home/tomas/Ceiling Panel Spacer/frontend/src/components/Polish/RecentProjects.tsx",
+        "/home/tomas/Ceiling Panel Spacer/frontend/src/themes/bimTheme.tsx",
+        "/home/tomas/Ceiling Panel Spacer/frontend/src/utils/i18n.ts",
+        "/home/tomas/Ceiling Panel Spacer/frontend/src/core/tool.py",
+        "/home/tomas/Ceiling Panel Spacer/frontend/src/tools/__init__.py",
+        "/home/tomas/Ceiling Panel Spacer/frontend/src/workbench/edit_toolbar.py",
+        "/home/tomas/Ceiling Panel Spacer/frontend/src/features/bim/services/LayerManager.ts",
+        "/home/tomas/Ceiling Panel Spacer/frontend/src/features/bim/index.ts"
+      ],
+      "verdict": "CONNECTED",
+      "claim": "FULL DUPLICATE - verify connections"
+    },
+    {
+      "candidate": "archive",
+      "exists": true,
+      "lines": 4351,
+      "mtime": "2026-01-31 13:27",
+      "referenced_by": [
+        "/home/tomas/Ceiling Panel Spacer/tests/test_phase2_sprint4.py",
+        "/home/tomas/Ceiling Panel Spacer/tests/test_phase2_sprint5.py",
+        "/home/tomas/Ceiling Panel Spacer/tests/test_phase1_complete.py",
+        "/home/tomas/Ceiling Panel Spacer/tests/test_phase1_mvp.py",
+        "/home/tomas/Ceiling Panel Spacer/optimization/reinforcement_optimizer.py"
+      ],
+      "verdict": "CONNECTED",
+      "claim": "Old files with (1) - verify connections"
+    }
+  ],
+  "orphaned": [
+    {
+      "candidate": "vision",
+      "exists": true,
+      "lines": 462,
+      "mtime": "2026-01-11 01:33",
+      "referenced_by": [],
+      "verdict": "ORPHAN",
+      "claim": "1 file - verify no connections"
+    },
+    {
+      "candidate": "resources",
+      "exists": true,
+      "lines": 0,
+      "mtime": "2026-01-31 21:03",
+      "referenced_by": [],
+      "verdict": "ORPHAN",
+      "claim": "Verify connections"
+    },
+    {
+      "candidate": "k8s",
+      "exists": true,
+      "lines": 0,
+      "mtime": "2026-01-11 01:33",
+      "referenced_by": [],
+      "verdict": "ORPHAN",
+      "claim": "Verify connections"
+    },
+    {
+      "candidate": "03-platform-integration",
+      "exists": true,
+      "lines": 0,
+      "mtime": "2026-01-31 16:39",
+      "referenced_by": [],
+      "verdict": "ORPHAN",
+      "claim": "Phase docs at root"
+    },
+    {
+      "candidate": "frontend/src/main.jsx",
+      "exists": true,
+      "lines": 0,
+      "mtime": "2026-01-31 16:07",
+      "referenced_by": [],
+      "verdict": "ORPHAN",
+      "claim": "React entry - verify if used"
+    },
+    {
+      "candidate": "frontend/src/App.jsx",
+      "exists": true,
+      "lines": 0,
+      "mtime": "2026-02-01 01:05",
+      "referenced_by": [],
+      "verdict": "ORPHAN",
+      "claim": "App component - verify if used"
+    }
+  ],
+  "unknown": []
+}

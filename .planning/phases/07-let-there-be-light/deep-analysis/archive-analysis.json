@@ -1,0 +1,200 @@
+{
+  "timestamp": "2026-02-01T02:16:14.249915",
+  "files": [
+    {
+      "name": "__init__.py",
+      "lines": 7,
+      "status": "CONNECTED",
+      "referenced_by": [
+        "/home/tomas/Ceiling Panel Spacer/analytics/code_analyzer.py",
+        "/home/tomas/Ceiling Panel Spacer/.planning/phases/07-let-there-be-light/verdict-research/verifier.py"
+      ]
+    },
+    {
+      "name": "ceiling_panel_calc(1).py",
+      "lines": 1272,
+      "status": "CONNECTED",
+      "referenced_by": [
+        "/home/tomas/Ceiling Panel Spacer/.planning/phases/07-let-there-be-light/verdict-research/verifier.py",
+        "/home/tomas/Ceiling Panel Spacer/core/config_manager.py",
+        "/home/tomas/Ceiling Panel Spacer/Savage_Cabinetry_Platform/kitchen_orchestrator.py",
+        "/home/tomas/Ceiling Panel Spacer/api/routes/calculations.py",
+        "/home/tomas/Ceiling Panel Spacer/api/routes/exports.py"
+      ]
+    },
+    {
+      "name": "climate_scenario_modeling.py",
+      "lines": 223,
+      "status": "ORPHANED",
+      "referenced_by": []
+    },
+    {
+      "name": "current_state_analysis.py",
+      "lines": 509,
+      "status": "ORPHANED",
+      "referenced_by": []
+    },
+    {
+      "name": "emotional_design_optimization.py",
+      "lines": 145,
+      "status": "ORPHANED",
+      "referenced_by": []
+    },
+    {
+      "name": "examples(1).py",
+      "lines": 330,
+      "status": "CONNECTED",
+      "referenced_by": [
+        "/home/tomas/Ceiling Panel Spacer/.planning/phases/07-let-there-be-light/verdict-research/verifier.py",
+        "/home/tomas/Ceiling Panel Spacer/examples/examples.py",
+        "/home/tomas/Ceiling Panel Spacer/examples/__init__.py",
+        "/home/tomas/Ceiling Panel Spacer/frontend/src/components/BIMWorkbench/SelectionVisualizer.ts",
+        "/home/tomas/Ceiling Panel Spacer/frontend/node_modules/@types/three/src/audio/Audio.d.ts"
+      ]
+    },
+    {
+      "name": "full_architecture.py",
+      "lines": 549,
+      "status": "CONNECTED",
+      "referenced_by": [
+        "/home/tomas/Ceiling Panel Spacer/tests/test_phase2_sprint4.py",
+        "/home/tomas/Ceiling Panel Spacer/tests/test_phase2_sprint5.py"
+      ]
+    },
+    {
+      "name": "gan_style_generator.py",
+      "lines": 24,
+      "status": "ORPHANED",
+      "referenced_by": []
+    },
+    {
+      "name": "phase1_mvp.py",
+      "lines": 644,
+      "status": "CONNECTED",
+      "referenced_by": [
+        "/home/tomas/Ceiling Panel Spacer/tests/test_phase1_complete.py",
+        "/home/tomas/Ceiling Panel Spacer/tests/test_phase1_mvp.py"
+      ]
+    },
+    {
+      "name": "rl_optimizer.py",
+      "lines": 31,
+      "status": "ORPHANED",
+      "referenced_by": []
+    },
+    {
+      "name": "three_d_engine.py",
+      "lines": 617,
+      "status": "CONNECTED",
+      "referenced_by": [
+        "/home/tomas/Ceiling Panel Spacer/tests/test_phase1_complete.py"
+      ]
+    },
+    {
+      "name": "todo.md",
+      "lines": 16,
+      "status": "ORPHANED",
+      "referenced_by": []
+    }
+  ],
+  "connected": [
+    {
+      "name": "__init__.py",
+      "lines": 7,
+      "status": "CONNECTED",
+      "referenced_by": [
+        "/home/tomas/Ceiling Panel Spacer/analytics/code_analyzer.py",
+        "/home/tomas/Ceiling Panel Spacer/.planning/phases/07-let-there-be-light/verdict-research/verifier.py"
+      ]
+    },
+    {
+      "name": "ceiling_panel_calc(1).py",
+      "lines": 1272,
+      "status": "CONNECTED",
+      "referenced_by": [
+        "/home/tomas/Ceiling Panel Spacer/.planning/phases/07-let-there-be-light/verdict-research/verifier.py",
+        "/home/tomas/Ceiling Panel Spacer/core/config_manager.py",
+        "/home/tomas/Ceiling Panel Spacer/Savage_Cabinetry_Platform/kitchen_orchestrator.py",
+        "/home/tomas/Ceiling Panel Spacer/api/routes/calculations.py",
+        "/home/tomas/Ceiling Panel Spacer/api/routes/exports.py"
+      ]
+    },
+    {
+      "name": "examples(1).py",
+      "lines": 330,
+      "status": "CONNECTED",
+      "referenced_by": [
+        "/home/tomas/Ceiling Panel Spacer/.planning/phases/07-let-there-be-light/verdict-research/verifier.py",
+        "/home/tomas/Ceiling Panel Spacer/examples/examples.py",
+        "/home/tomas/Ceiling Panel Spacer/examples/__init__.py",
+        "/home/tomas/Ceiling Panel Spacer/frontend/src/components/BIMWorkbench/SelectionVisualizer.ts",
+        "/home/tomas/Ceiling Panel Spacer/frontend/node_modules/@types/three/src/audio/Audio.d.ts"
+      ]
+    },
+    {
+      "name": "full_architecture.py",
+      "lines": 549,
+      "status": "CONNECTED",
+      "referenced_by": [
+        "/home/tomas/Ceiling Panel Spacer/tests/test_phase2_sprint4.py",
+        "/home/tomas/Ceiling Panel Spacer/tests/test_phase2_sprint5.py"
+      ]
+    },
+    {
+      "name": "phase1_mvp.py",
+      "lines": 644,
+      "status": "CONNECTED",
+      "referenced_by": [
+        "/home/tomas/Ceiling Panel Spacer/tests/test_phase1_complete.py",
+        "/home/tomas/Ceiling Panel Spacer/tests/test_phase1_mvp.py"
+      ]
+    },
+    {
+      "name": "three_d_engine.py",
+      "lines": 617,
+      "status": "CONNECTED",
+      "referenced_by": [
+        "/home/tomas/Ceiling Panel Spacer/tests/test_phase1_complete.py"
+      ]
+    }
+  ],
+  "orphaned": [
+    {
+      "name": "climate_scenario_modeling.py",
+      "lines": 223,
+      "status": "ORPHANED",
+      "referenced_by": []
+    },
+    {
+      "name": "current_state_analysis.py",
+      "lines": 509,
+      "status": "ORPHANED",
+      "referenced_by": []
+    },
+    {
+      "name": "emotional_design_optimization.py",
+      "lines": 145,
+      "status": "ORPHANED",
+      "referenced_by": []
+    },
+    {
+      "name": "gan_style_generator.py",
+      "lines": 24,
+      "status": "ORPHANED",
+      "referenced_by": []
+    },
+    {
+      "name": "rl_optimizer.py",
+      "lines": 31,
+      "status": "ORPHANED",
+      "referenced_by": []
+    },
+    {
+      "name": "todo.md",
+      "lines": 16,
+      "status": "ORPHANED",
+      "referenced_by": []
+    }
+  ],
+  "summary": {}
+}

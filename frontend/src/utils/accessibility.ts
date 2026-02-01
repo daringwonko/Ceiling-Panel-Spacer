@@ -4,44 +4,49 @@
  */
 
 // Skip to main content link
-export const SkipToContent: React.FC<{ targetId?: string }> = ({ targetId = 'main-content' }) => (
-  <a
-    href={`#${targetId}`}
-    className="skip-to-content"
-    onClick={(e) => {
-      e.preventDefault();
-      const target = document.getElementById(targetId);
-      if (target) {
-        target.tabIndex = -1;
-        target.focus();
-        target.removeAttribute('tabindex');
-      }
-    }}
-  >
-    Skip to main content
-    <style>{`
-      .skip-to-content {
-        position: absolute;
-        top: -40px;
-        left: 0;
-        background: #2196f3;
-        color: white;
-        padding: 8px 16px;
-        z-index: 10000;
-        text-decoration: none;
-        font-weight: 600;
-        border-radius: 0 0 4px 0;
-        transition: top 0.2s;
-      }
+export const SkipToContent: React.FC<{ targetId?: string }> = ({ targetId = 'main-content' }) => {
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const target = document.getElementById(targetId);
+    if (target) {
+      target.tabIndex = -1;
+      target.focus();
+      target.removeAttribute('tabindex');
+    }
+  };
 
-      .skip-to-content:focus {
-        top: 0;
-        outline: 3px solid #ff9800;
-        outline-offset: -3px;
-      }
-    `}</style>
-  </a>
-);
+  return (
+    <>
+      <style>{`
+        .skip-to-content {
+          position: absolute;
+          top: -40px;
+          left: 0;
+          background: #2196f3;
+          color: white;
+          padding: 8px 16px;
+          z-index: 10000;
+          text-decoration: none;
+          font-weight: 600;
+          border-radius: 0 0 4px 0;
+          transition: top 0.2s;
+        }
+        .skip-to-content:focus {
+          top: 0;
+          outline: 3px solid #ff9800;
+          outline-offset: -3px;
+        }
+      `}</style>
+      <a
+        href={'#' + targetId}
+        className="skip-to-content"
+        onClick={handleClick}
+      >
+        Skip to main content
+      </a>
+    </>
+  );
+};
 
 // Live region for screen reader announcements
 export class Announcer {
