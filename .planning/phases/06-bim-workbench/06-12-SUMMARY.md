@@ -347,11 +347,11 @@ Test coverage:
 
 ## Next Steps
 
-1. **Drag-Drop Reorganization**: Add drag-drop support for moving objects between levels
-2. **Tree View**: Implement hierarchical tree view in sidebar
-3. **3D Level Visualization**: Show level planes in 3D view
-4. **Level Templates**: Pre-defined level configurations
-5. **Elevation Snapshots**: Save/load different elevation configurations
+1. **Search/Filter**: Add search functionality to HierarchyTree
+2. **Undo/Redo**: Implement command pattern for hierarchy operations
+3. **Copy/Paste**: Add copy/paste operations for nodes
+4. **3D Visualization**: Show selected hierarchy nodes in 3D view
+5. **Templates**: Create pre-defined site/building/level templates
 
 ## Compliance
 
