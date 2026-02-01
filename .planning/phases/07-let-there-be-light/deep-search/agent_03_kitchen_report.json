@@ -1,0 +1,132 @@
+{
+  "search_summary": {
+    "timestamp": "2026-02-01T00:00:00Z",
+    "search_directory": "/home/tomas/Ceiling Panel Spacer",
+    "search_patterns": ["kitchen", "cabinet", "cabinetry"],
+    "files_found_by_name": 3,
+    "files_found_by_content": 0,
+    "files_found_by_store_component": 0
+  },
+  "files": [
+    {
+      "path": "/home/tomas/Ceiling Panel Spacer/Savage_Cabinetry_Platform/kitchen_orchestrator.py",
+      "type": "python",
+      "lines": 395,
+      "functionality": {
+        "category": "Orchestrator / Core Engine",
+        "description": "Central kitchen design orchestrator for coordinating ceiling panel calculations, material handling, and design workflows",
+        "main_class": "KitchenDesignOrchestrator",
+        "key_methods": [
+          "validate_design_parameters(params) -> List[str]",
+          "calculate_ceiling_panels(params: DesignParameters) -> DesignResult",
+          "generate_panel_layout(params, result, format_type) -> str",
+          "export_design(params, result, formats, output_dir) -> Dict[str, str]",
+          "get_cost_estimate(params: DesignParameters) -> Dict"
+        ],
+        "data_classes": [
+          {
+            "name": "DesignParameters",
+            "fields": ["ceiling_width_mm", "ceiling_length_mm", "material_type", "gap_edge_mm", "gap_spacing_mm", "max_panel_width_mm", "max_panel_length_mm"]
+          },
+          {
+            "name": "DesignResult",
+            "fields": ["panels_count", "panel_dimensions", "total_area_sqm", "estimated_cost", "material_info", "warnings"]
+          }
+        ],
+        "custom_exceptions": ["KitchenDesignException"],
+        "features": [
+          "Panel calculation with configurable gaps and constraints",
+          "Material definitions and cost calculations",
+          "Multi-format export (JSON, text, DXF, SVG placeholders)",
+          "Design validation with error reporting",
+          "Cost estimation with waste allowance"
+        ]
+      },
+      "state_stores": null,
+      "components": null,
+      "backend_functions": [
+        {
+          "name": "_load_materials",
+          "returns": "Dict",
+          "description": "Load material definitions from configuration"
+        },
+        {
+          "name": "_generate_json_layout",
+          "returns": "str",
+          "description": "Generate JSON formatted layout output"
+        },
+        {
+          "name": "_generate_text_layout",
+          "returns": "str",
+          "description": "Generate human-readable text report"
+        },
+        {
+          "name": "_generate_dxf_layout",
+          "returns": "str",
+          "description": "Generate DXF file placeholder"
+        },
+        {
+          "name": "_generate_svg_layout",
+          "returns": "str",
+          "description": "Generate SVG file placeholder"
+        },
+        {
+          "name": "create_default_orchestrator",
+          "returns": "KitchenDesignOrchestrator",
+          "description": "Factory function for creating default orchestrator instance"
+        }
+      ],
+      "integrations": [
+        "ceiling.py (planned import)",
+        "Panel.py (planned import)",
+        "Existing ceiling_panel_calc.py (placeholder references)"
+      ]
+    },
+    {
+      "path": "/home/tomas/Ceiling Panel Spacer/.planning/phases/03-platform-integration/03-01-kitchen-orchestrator-PLAN.md",
+      "type": "markdown",
+      "lines": 121,
+      "functionality": {
+        "category": "Planning Document",
+        "description": "Execution plan for creating the kitchen design orchestrator platform",
+        "phase": "03-platform-integration",
+        "plan_number": "01",
+        "tasks": [
+          "Create Package Structure (__init__.py)",
+          "Implement Kitchen Design Orchestrator",
+          "Add Workflow Methods",
+          "Create Platform README"
+        ],
+        "success_criteria": [
+          "KitchenDesignOrchestrator can be imported and instantiated",
+          "Core workflow methods are available",
+          "Integration with existing ceiling/Panel modules works",
+          "Platform directory structure is established"
+        ]
+      },
+      "state_stores": null,
+      "components": null,
+      "backend_functions": null,
+      "integrations": [
+        "ceiling.py",
+        "Panel.py"
+      ]
+    }
+  ],
+  "findings": {
+    "total_kitchen_cabinet_files": 2,
+    "unique_functionality_types": ["Orchestrator / Core Engine", "Planning Document"],
+    "frontend_stores_found": 0,
+    "frontend_components_found": 0,
+    "backend_functions_found": 7,
+    "custom_exceptions_found": 1,
+    "data_classes_found": 2,
+    "integrations_planned": 3
+  },
+  "recommendations": [
+    "Add frontend components (useKitchen, CabinetStore, KitchenDesign, CabinetDesign)",
+    "Implement actual integration with existing ceiling.py and Panel.py modules",
+    "Complete DXF/SVG layout generation methods instead of using placeholders",
+    "Create React/Vue frontend components for kitchen design visualization"
+  ]
+}

@@ -1,0 +1,138 @@
+{
+  "search_summary": {
+    "command_1_files_found": 0,
+    "command_2_matches_found": 0,
+    "note": "No files with 'material' in filename; searching broader patterns"
+  },
+  "material_definitions": {
+    "dataclass_material": {
+      "file": "core/ceiling_panel_calc.py",
+      "line_range": "40-48",
+      "lines": 9,
+      "fields": [
+        {"name": "name", "type": "str"},
+        {"name": "category", "type": "str"},
+        {"name": "color", "type": "str"},
+        {"name": "reflectivity", "type": "float"},
+        {"name": "cost_per_sqm", "type": "float"},
+        {"name": "notes", "type": "str", "default": ""}
+      ],
+      "description": "Material/finish specification dataclass"
+    }
+  },
+  "material_library_implementations": {
+    "material_library_class": {
+      "file": "core/ceiling_panel_calc.py",
+      "line_range": "526-602",
+      "lines": 77,
+      "class_name": "MaterialLibrary",
+      "methods": [
+        {"name": "get_material", "type": "classmethod", "description": "Get material by key"},
+        {"name": "list_materials", "type": "classmethod", "description": "Print all materials"}
+      ],
+      "predefined_materials": {
+        "led_panel_white": {
+          "name": "LED Panel",
+          "category": "lighting",
+          "color": "White",
+          "reflectivity": 0.85,
+          "cost_per_sqm": 450.00,
+          "notes": "Integrated LED lighting, 4000K"
+        },
+        "led_panel_black": {
+          "name": "LED Panel",
+          "category": "lighting",
+          "color": "Black",
+          "reflectivity": 0.15,
+          "cost_per_sqm": 450.00,
+          "notes": "Integrated LED lighting, 4000K"
+        },
+        "acoustic_white": {
+          "name": "Acoustic Panel",
+          "category": "acoustic",
+          "color": "White",
+          "reflectivity": 0.70,
+          "cost_per_sqm": 35.00,
+          "notes": "Sound absorbing, Class A"
+        },
+        "acoustic_grey": {
+          "name": "Acoustic Panel",
+          "category": "acoustic",
+          "color": "Grey",
+          "reflectivity": 0.50,
+          "cost_per_sqm": 35.00,
+          "notes": "Sound absorbing, Class A"
+        },
+        "drywall_white": {
+          "name": "Drywall",
+          "category": "drywall",
+          "color": "White",
+          "reflectivity": 0.75,
+          "cost_per_sqm": 15.00,
+          "notes": "Standard gypsum board"
+        },
+        "aluminum_brushed": {
+          "name": "Aluminum",
+          "category": "metal",
+          "color": "Brushed Silver",
+          "reflectivity": 0.60,
+          "cost_per_sqm": 120.00,
+          "notes": "Anodized aluminum, brushed finish"
+        },
+        "aluminum_polished": {
+          "name": "Aluminum",
+          "category": "metal",
+          "color": "Polished Silver",
+          "reflectivity": 0.90,
+          "cost_per_sqm": 140.00,
+          "notes": "Anodized aluminum, mirror polish"
+        }
+      },
+      "total_predefined_materials": 7
+    }
+  },
+  "api_material_routes": {
+    "file": "api/routes/materials.py",
+    "line_range": "1-253",
+    "lines": 253,
+    "size_bytes": 6188,
+    "blueprint": "materials",
+    "base_url": "/api/v1",
+    "endpoints": [
+      {
+        "route": "/materials",
+        "methods": ["GET"],
+        "description": "List all available materials with optional filters"
+      },
+      {
+        "route": "/materials/<material_id>",
+        "methods": ["GET"],
+        "description": "Get a specific material by ID"
+      },
+      {
+        "route": "/materials/categories",
+        "methods": ["GET"],
+        "description": "List all material categories"
+      },
+      {
+        "route": "/materials/cost-estimate",
+        "methods": ["POST"],
+        "description": "Estimate material cost for a given area"
+      }
+    ]
+  },
+  "file_inventory": [
+    {
+      "file": "core/ceiling_panel_calc.py",
+      "lines": 827,
+      "description": "Core calculator with Material dataclass and MaterialLibrary"
+    },
+    {
+      "file": "api/routes/materials.py",
+      "lines": 253,
+      "description": "Materials API endpoints (Flask blueprint)"
+    }
+  ],
+  "categories": ["lighting", "acoustic", "drywall", "metal"],
+  "total_unique_materials": 7
+}

@@ -75,8 +75,11 @@ function App() {
               <Route path="/ceiling" element={<CeilingWorkbench />} />
 
               {/* BIM Workbench */}
-              <Route path="/bim" element={<BIMLayout />} />
+              <Route path="/bim/*" element={<BIMLayout />} />
               <Route path="/bim/structural-demo" element={<StructuralObjectsDemo />} />
+
+              {/* Kitchen Design */}
+              <Route path="/kitchen" element={<div style={{padding: '40px', color: '#888'}}>Kitchen Design - Coming Soon</div>} />
 
               {/* Legacy redirect */}
               <Route path="*" element={<Navigate to="/" replace />} />

@@ -1,0 +1,24 @@
+{
+  "agent": "UI Components Specialist",
+  "findings": [
+    {"file": "/home/tomas/Ceiling Panel Spacer/frontend/src/components/ui/Badge.tsx", "status": "MISSING - CAUSING ERROR"},
+    {"file": "/home/tomas/Ceiling Panel Spacer/frontend/src/components/ui/Button.tsx", "lines": 30, "status": "EXISTS"},
+    {"file": "/home/tomas/Ceiling Panel Spacer/frontend/src/components/ui/Card.tsx", "lines": 20, "status": "EXISTS"},
+    {"file": "/home/tomas/Ceiling Panel Spacer/frontend/src/components/ui/Dialog.tsx", "lines": 50, "status": "EXISTS"},
+    {"file": "/home/tomas/Ceiling Panel Spacer/frontend/src/components/ui/Tabs.tsx", "lines": 40, "status": "EXISTS"},
+    {"file": "/home/tomas/Ceiling Panel Spacer/frontend/src/components/ui/Tooltip.tsx", "lines": 30, "status": "EXISTS"},
+    {"file": "/home/tomas/Ceiling Panel Spacer/frontend/src/components/ui/Input.tsx", "lines": 25, "status": "EXISTS"},
+    {"file": "/home/tomas/Ceiling Panel Spacer/frontend/src/components/ui/Select.tsx", "lines": 35, "status": "EXISTS"},
+    {"file": "/home/tomas/Ceiling Panel Spacer/frontend/src/components/ui/Toolbar.tsx", "lines": 19, "status": "EXISTS"},
+    {"file": "/home/tomas/Ceiling Panel Spacer/frontend/src/components/ui/index.ts", "lines": 15, "status": "EXISTS"},
+    {"file": "/home/tomas/Ceiling Panel Spacer/frontend/src/components/ui/MaterialButton.tsx", "lines": 25, "status": "EXISTS"},
+    {"file": "/home/tomas/Ceiling Panel Spacer/frontend/src/components/ui/MaterialCard.tsx", "lines": 20, "status": "EXISTS"},
+    {"file": "/home/tomas/Ceiling Panel Spacer/frontend/src/components/ui/MaterialDialog.tsx", "lines": 45, "status": "EXISTS"},
+    {"file": "/home/tomas/Ceiling Panel Spacer/frontend/src/components/ui/MeasurementDialog.tsx", "lines": 60, "status": "EXISTS"},
+    {"file": "/home/tomas/Ceiling Panel Spacer/frontend/src/components/ui/ThreeDControls.tsx", "lines": 40, "status": "EXISTS"}
+  ],
+  "total_files": 15,
+  "total_lines": 474,
+  "critical_missing": ["Badge.tsx"],
+  "recommendation": "CREATE frontend/src/components/ui/Badge.tsx"
+}

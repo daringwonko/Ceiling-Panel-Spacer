@@ -1,0 +1,259 @@
+{
+  "report_generated": "2026-02-01",
+  "search_paths": [
+    "/home/tomas/Ceiling Panel Spacer/bim_workbench/tools",
+    "/home/tomas/Ceiling Panel Spacer/bim_wb_tools",
+    "/home/tomas/Ceiling Panel Spacer/bim_workbench/drafting"
+  ],
+  "tool_classes": [
+    {
+      "name": "LineTool",
+      "file": "bim_workbench/tools/line_tool.py",
+      "lines": 213,
+      "status": "FULLY IMPLEMENTED",
+      "description": "Line drawing tool with two-point input and ortho mode support",
+      "features": ["Mouse press handling", "Mouse move preview", "Ortho mode (Shift)", "Key press handling", "Helper function for direct creation"]
+    },
+    {
+      "name": "RectangleTool",
+      "file": "bim_workbench/tools/rectangle_tool.py",
+      "lines": 224,
+      "status": "FULLY IMPLEMENTED",
+      "description": "Rectangle drawing tool with two-point input and square mode support",
+      "features": ["Mouse press handling", "Mouse move preview", "Square mode (Shift)", "Key press handling", "Helper function for direct creation"]
+    },
+    {
+      "name": "CircleTool",
+      "file": "bim_workbench/tools/circle_tool.py",
+      "lines": 247,
+      "status": "FULLY IMPLEMENTED",
+      "description": "Circle drawing tool with center-radius input and numeric input support",
+      "features": ["Mouse press handling", "Mouse move preview", "Numeric radius input", "Key press handling", "Helper function for direct creation"]
+    },
+    {
+      "name": "ArcTool",
+      "file": "bim_workbench/tools/arc_tool.py",
+      "lines": 310,
+      "status": "FULLY IMPLEMENTED",
+      "description": "Arc drawing tool with three-point input (center, start, end)",
+      "features": ["3-click workflow", "Direction control (Ctrl)", "Angle calculation", "Arc length calculation", "Helper function for direct creation"]
+    },
+    {
+      "name": "DoorTool",
+      "file": "bim_workbench/tools/door_tool.py",
+      "lines": 306,
+      "status": "FULLY IMPLEMENTED",
+      "description": "Door placement tool with wall face selection and configurable parameters",
+      "features": ["Wall selection", "Parameter configuration", "Task panel integration", "Wall cutting", "Swing direction support"]
+    },
+    {
+      "name": "WindowTool",
+      "file": "bim_workbench/tools/window_tool.py",
+      "lines": 333,
+      "status": "FULLY IMPLEMENTED",
+      "description": "Window placement tool with wall face selection and configurable parameters",
+      "features": ["Wall selection", "Parameter configuration", "Task panel integration", "Wall cutting", "Multiple window types"]
+    },
+    {
+      "name": "StairsTool",
+      "file": "bim_workbench/tools/stairs_tool.py",
+      "lines": 341,
+      "status": "FULLY IMPLEMENTED",
+      "description": "Stairs creation tool with path drawing and real-time 3D preview",
+      "features": ["Path drawing", "Multiple path types", "Real-time preview", "Parameter configuration", "Calculations display"]
+    },
+    {
+      "name": "ToolManager",
+      "file": "bim_workbench/tools/tool_manager.py",
+      "lines": 111,
+      "status": "FULLY IMPLEMENTED",
+      "description": "Manager for tool registration, activation, and event routing",
+      "features": ["Singleton pattern", "Tool registration", "Event routing", "Active tool management"]
+    },
+    {
+      "name": "BaseDimension",
+      "file": "bim_wb_tools/dimension.py",
+      "lines": 1079,
+      "status": "PLACEHOLDER",
+      "description": "Base class for all dimension types",
+      "features": ["Property setup", "Reference tracking", "Parametric updates"],
+      "notes": "Coin3D geometry methods contain 'pass' statements"
+    },
+    {
+      "name": "AlignedDimension",
+      "file": "bim_wb_tools/dimension.py",
+      "lines": 1079,
+      "status": "PLACEHOLDER",
+      "description": "Aligned dimension measuring distance between two points",
+      "features": ["Angle calculation", "Dimension formatting"],
+      "notes": "_create_arrows and _create_dimension_geometry contain 'pass'"
+    },
+    {
+      "name": "HorizontalDimension",
+      "file": "bim_wb_tools/dimension.py",
+      "lines": 1079,
+      "status": "PLACEHOLDER",
+      "description": "Horizontal dimension forcing horizontal measurement",
+      "features": ["Horizontal constraint"]
+    },
+    {
+      "name": "VerticalDimension",
+      "file": "bim_wb_tools/dimension.py",
+      "lines": 1079,
+      "status": "PLACEHOLDER",
+      "description": "Vertical dimension forcing vertical measurement",
+      "features": ["Vertical constraint"]
+    },
+    {
+      "name": "RadiusDimension",
+      "file": "bim_wb_tools/dimension.py",
+      "lines": 1079,
+      "status": "PLACEHOLDER",
+      "description": "Radius dimension for circles and arcs",
+      "features": ["Radius formatting"],
+      "notes": "_create_dimension_geometry contains 'pass'"
+    },
+    {
+      "name": "AngleDimension",
+      "file": "bim_wb_tools/dimension.py",
+      "lines": 1079,
+      "status": "PLACEHOLDER",
+      "description": "Angular dimension measuring angle between three points",
+      "features": ["Angle calculation", "Interior/exterior toggle"],
+      "notes": "_create_dimension_geometry contains 'pass'"
+    },
+    {
+      "name": "DimensionUpdateManager",
+      "file": "bim_wb_tools/dimension.py",
+      "lines": 1079,
+      "status": "PLACEHOLDER",
+      "description": "Singleton for managing parametric dimension updates",
+      "features": ["Singleton pattern", "Observer registration"],
+      "notes": "Implementation complete but relies on placeholders"
+    },
+    {
+      "name": "*Command",
+      "file": "bim_wb_tools/dimension.py",
+      "lines": 1079,
+      "status": "PLACEHOLDER",
+      "description": "FreeCAD command classes for dimension creation",
+      "features": ["Console messages only", "No actual execution implementation"]
+    },
+    {
+      "name": "TextLabel",
+      "file": "bim_wb_tools/annotation.py",
+      "lines": 723,
+      "status": "PLACEHOLDER",
+      "description": "Text label annotation object",
+      "features": ["Property setup", "Reference tracking"],
+      "notes": "_create_text_geometry contains 'pass'"
+    },
+    {
+      "name": "LeaderLine",
+      "file": "bim_wb_tools/annotation.py",
+      "lines": 723,
+      "status": "PLACEHOLDER",
+      "description": "Leader line annotation with arrow",
+      "features": ["Property setup", "Reference tracking"],
+      "notes": "_create_leader_geometry contains 'pass'"
+    },
+    {
+      "name": "AnnotationUpdateManager",
+      "file": "bim_wb_tools/annotation.py",
+      "lines": 723,
+      "status": "PLACEHOLDER",
+      "description": "Singleton for managing parametric annotation updates",
+      "features": ["Singleton pattern"]
+    },
+    {
+      "name": "*Command",
+      "file": "bim_wb_tools/annotation.py",
+      "lines": 723,
+      "status": "PLACEHOLDER",
+      "description": "FreeCAD command classes for annotation creation",
+      "features": ["Console messages only", "No actual execution implementation"]
+    },
+    {
+      "name": "PolylineTool",
+      "file": "bim_workbench/drafting/polyline_tool.py",
+      "lines": 231,
+      "status": "FULLY IMPLEMENTED",
+      "description": "Tool for creating connected line segments",
+      "features": ["Vertex management", "Rubber-band preview", "Open/closed toggle", "Double-click finish"]
+    },
+    {
+      "name": "PolygonTool",
+      "file": "bim_workbench/drafting/polygon_tool.py",
+      "lines": 292,
+      "status": "FULLY IMPLEMENTED",
+      "description": "Tool for creating regular polygons",
+      "features": ["Center-radius workflow", "Configurable sides (3-9)", "Inscribed/circumscribed modes"]
+    },
+    {
+      "name": "EllipseTool",
+      "file": "bim_workbench/drafting/ellipse_tool.py",
+      "lines": 380,
+      "status": "FULLY IMPLEMENTED",
+      "description": "Tool for creating ellipses via axis definition",
+      "features": ["3-click workflow", "Major/minor axis definition", "Rotation control", "45-degree constraint"]
+    },
+    {
+      "name": "BSplineTool",
+      "file": "bim_workbench/drafting/bspline_tool.py",
+      "lines": 410,
+      "status": "FULLY IMPLEMENTED",
+      "description": "Tool for creating B-spline curves",
+      "features": ["Cox-de Boor algorithm", "Degree 2/3 support", "Control polygon display", "Knot vector generation"]
+    },
+    {
+      "name": "BezierTool",
+      "file": "bim_workbench/drafting/bezier_tool.py",
+      "lines": 412,
+      "status": "FULLY IMPLEMENTED",
+      "description": "Tool for creating Bézier curves",
+      "features": ["4-click workflow", "Cubic/quadratic support", "Control handles", "Bernstein polynomial formula"]
+    },
+    {
+      "name": "PointTool",
+      "file": "bim_workbench/drafting/point_tool.py",
+      "lines": 259,
+      "status": "FULLY IMPLEMENTED",
+      "description": "Tool for placing point markers",
+      "features": ["Single-click placement", "Multiple marker styles", "Size adjustment", "Tool remains active"]
+    }
+  ],
+  "summary": {
+    "total_tool_classes": 27,
+    "fully_implemented": 15,
+    "placeholder": 12,
+    "total_lines_of_code": 5871
+  },
+  "architectural_notes": {
+    "tool_architectures": [
+      {
+        "type": "BIM Workbench Interactive Tools",
+        "location": "bim_workbench/tools/",
+        "base_class": "Tool",
+        "purpose": "Interactive canvas drawing tools with mouse/keyboard handling"
+      },
+      {
+        "type": "FreeCAD Command Classes",
+        "location": "bim_wb_tools/",
+        "base_class": "FreeCAD FeaturePython",
+        "purpose": "FreeCAD workbench commands for dimensioning and annotation"
+      },
+      {
+        "type": "Drafting Tools",
+        "location": "bim_workbench/drafting/",
+        "base_class": "BaseDraftTool",
+        "purpose": "Additional drafting tools with entity-based creation"
+      }
+    ],
+    "placeholder_patterns": [
+      "Coin3D scene graph geometry methods contain 'pass' statements",
+      "ViewProvider _create_*_geometry methods not implemented",
+      "Command classes only print console messages without execution"
+    ],
+    "implementation_quality": "High for canvas tools, partial for FreeCAD integration"
+  }
+}

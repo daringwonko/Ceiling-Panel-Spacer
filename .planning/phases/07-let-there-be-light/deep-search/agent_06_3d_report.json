@@ -1,0 +1,95 @@
+{
+  "search_timestamp": "2026-02-01T00:00:00Z",
+  "search_command_1": "find /home/tomas/Ceiling Panel Spacer -type f \\( -name \"*canvas*\" -o -name \"*three*\" -o -name \"*3d*\" -o -name \"*scene*\" \\) \\( -name \"*.tsx\" -o -name \"*.ts\" -o -name \"*.py\" \\) ! -path \"*/node_modules/*\" 2>/dev/null | head -30",
+  "search_command_2": "grep -r \"Canvas|@react-three|WebGLRenderer\" /home/tomas/Ceiling Panel Spacer/frontend --include=\"*.tsx\" --include=\"*.ts\" 2>/dev/null | head -20",
+  "files_found": {
+    "backend_python": [
+      "/home/tomas/Ceiling Panel Spacer/core/engines/three_d_engine.py",
+      "/home/tomas/Ceiling Panel Spacer/output/renderer_3d.py"
+    ],
+    "frontend_typescript": [
+      "/home/tomas/Ceiling Panel Spacer/frontend/src/components/BIMWorkbench/types/3d.ts",
+      "/home/tomas/Ceiling Panel Spacer/frontend/src/utils/threeOptimization.ts",
+      "/home/tomas/Ceiling Panel Spacer/frontend/src/features/bim/utils/threeMaterialGenerator.ts",
+      "/home/tomas/Ceiling Panel Spacer/frontend/src/test/mocks/three-mock.ts"
+    ],
+    "frontend_components_using_three": [
+      "/home/tomas/Ceiling Panel Spacer/frontend/src/components/ThreeDCanvas.tsx",
+      "/home/tomas/Ceiling Panel Spacer/frontend/src/components/ThreeDEditor.tsx",
+      "/home/tomas/Ceiling Panel Spacer/frontend/src/components/BIMWorkbench/BIM3DCanvas.tsx",
+      "/home/tomas/Ceiling Panel Spacer/frontend/src/components/Visualization/Visualization.jsx",
+      "/home/tomas/Ceiling Panel Spacer/frontend/src/components/Arch3DEditor.jsx"
+    ]
+  },
+  "three_js_usage_patterns": {
+    "react_three_fiber_imports": [
+      "import { Canvas } from '@react-three/fiber';",
+      "import { useFrame, useThree } from '@react-three/fiber';"
+    ],
+    "react_three_drei_imports": [
+      "import { OrbitControls } from '@react-three/drei';",
+      "import { Grid, PerspectiveCamera, Environment } from '@react-three/drei';"
+    ],
+    "three_core_imports": [
+      "import * as THREE from 'three';"
+    ],
+    "patterns_identified": [
+      "Canvas wrapper with camera config",
+      "OrbitControls for navigation",
+      "useThree() for accessing GL/scene/camera",
+      "useFrame() for animation loops",
+      "BIM3DObject class extending THREE.Object3D"
+    ]
+  },
+  "potential_context_lost_issues": {
+    "files_with_risk": [
+      {
+        "file": "/home/tomas/Ceiling Panel Spacer/frontend/src/components/ThreeDCanvas.tsx",
+        "issues": [
+          "No WebGL context loss handling",
+          "No dispose cleanup for geometries/materials",
+          "No canvas recreate logic on context lost",
+          "Missing gl event listeners (webglcontextlost, webglcontextrestored)"
+        ],
+        "fix_suggestions": [
+          "Add gl={{ onContextLost: handleContextLost, onContextRestored: handleContextRestored }}",
+          "Implement proper dispose in useEffect cleanup"
+        ]
+      },
+      {
+        "file": "/home/tomas/Ceiling Panel Spacer/frontend/src/components/BIMWorkbench/BIM3DCanvas.tsx",
+        "issues": [
+          "Canvas uses preserveDrawingBuffer: true",
+          "No explicit context loss event handling",
+          "BIM3DObject materials not properly disposed on cleanup"
+        ],
+        "fix_suggestions": [
+          "Add context lost/restored handlers to Canvas props",
+          "Implement BIM3DObject.dispose() method"
+        ]
+      }
+    ],
+    "missing_patterns": [
+      "No 'webglcontextlost' event listeners anywhere",
+      "No 'webglcontextrestored' event listeners anywhere",
+      "No renderer.dispose() calls",
+      "No geometry.dispose() calls"
+    ]
+  },
+  "files_for_context_lost_fix": {
+    "primary_files": [
+      "/home/tomas/Ceiling Panel Spacer/frontend/src/components/ThreeDCanvas.tsx",
+      "/home/tomas/Ceiling Panel Spacer/frontend/src/components/BIMWorkbench/BIM3DCanvas.tsx"
+    ],
+    "supporting_files": [
+      "/home/tomas/Ceiling Panel Spacer/frontend/src/components/BIMWorkbench/BIM3DObject.ts",
+      "/home/tomas/Ceiling Panel Spacer/frontend/src/components/BIMWorkbench/types/3d.ts"
+    ]
+  },
+  "recommendations": [
+    "Add context loss handlers to all Canvas components with gl prop",
+    "Implement proper disposal pattern using useEffect cleanup",
+    "Create a ThreeContextManager hook to centralize WebGL context handling",
+    "Add @react-three/fiber's ErrorBoundary to catch context lost errors"
+  ]
+}

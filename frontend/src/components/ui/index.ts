@@ -78,3 +78,6 @@ export {
 } from "./Card"
 
 export { Toolbar } from "./Toolbar"
+
+export { Badge, badgeVariants } from "./Badge"
+export type { BadgeProps } from "./Badge"

@@ -1,0 +1,177 @@
+{
+  "export_import_search_results": {
+    "timestamp": "2026-02-01",
+    "search_commands": [
+      "find /home/tomas/Ceiling Panel Spacer -type f \\( -name \"*export*\" -o -name \"*import*\" -o -name \"*dxf*\" -o -name \"*ifc*\" -o -name \"*svg*\" \\) \\( -name \"*.py\" -o -name \"*.tsx\" \\) ! -path \"*/node_modules/*\" ! -path \"*/.git/*\"",
+      "find /home/tomas/Ceiling Panel Spacer/output -type f"
+    ],
+    "export_import_implementations": [
+      {
+        "file": "/home/tomas/Ceiling Panel Spacer/api/routes/exports.py",
+        "line_count": 496,
+        "description": "Flask API endpoints for export operations",
+        "endpoints": [
+          "/api/v1/exports/svg",
+          "/api/v1/exports/dxf",
+          "/api/v1/exports/3d",
+          "/api/v1/exports/download/<export_id>",
+          "/api/v1/exports/<export_id>"
+        ],
+        "classes_imported": [
+          "SVGGenerator",
+          "DXFGenerator",
+          "ProjectExporter",
+          "CeilingPanel3DGenerator",
+          "MeshExporter"
+        ]
+      },
+      {
+        "file": "/home/tomas/Ceiling Panel Spacer/core/svg_config.py",
+        "line_count": 56,
+        "description": "SVG configuration for output generation",
+        "classes": [
+          "SVGConfig"
+        ],
+        "targets": [
+          "screen",
+          "print",
+          "high_res",
+          "custom"
+        ]
+      },
+      {
+        "file": "/home/tomas/Ceiling Panel Spacer/output/renderer_3d.py",
+        "line_count": 584,
+        "description": "3D rendering and mesh export capabilities",
+        "classes": [
+          "CeilingPanel3DGenerator",
+          "MeshExporter",
+          "Mesh",
+          "Vertex",
+          "Face",
+          "Material"
+        ]
+      },
+      {
+        "file": "/home/tomas/Ceiling Panel Spacer/core/ceiling_panel_calc.py",
+        "line_count": 827,
+        "description": "Core calculator with export classes",
+        "export_classes": [
+          {
+            "name": "DXFGenerator",
+            "line": 234,
+            "description": "Generates DXF files for CAD software"
+          },
+          {
+            "name": "SVGGenerator",
+            "line": 388,
+            "description": "Generates scalable vector graphics"
+          },
+          {
+            "name": "ProjectExporter",
+            "line": 604,
+            "description": "Exports complete project data"
+          }
+        ]
+      }
+    ],
+    "file_formats_supported": {
+      "2d_vector": {
+        "svg": {
+          "description": "Scalable Vector Graphics",
+          "mimetype": "image/svg+xml",
+          "features": [
+            "scalable",
+            "web-ready",
+            "print-friendly"
+          ]
+        }
+      },
+      "cad": {
+        "dxf": {
+          "description": "AutoCAD Drawing Exchange Format",
+          "mimetype": "application/dxf",
+          "features": [
+            "CAD compatibility",
+            "layer support",
+            "dimensions"
+          ]
+        }
+      },
+      "3d_mesh": {
+        "obj": {
+          "description": "Wavefront OBJ format",
+          "features": [
+            "vertices",
+            "faces",
+            "normals",
+            "MTL material support"
+          ]
+        },
+        "stl": {
+          "description": "Stereolithography format",
+          "features": [
+            "binary and ASCII",
+            "facets",
+            "3D printing compatible"
+          ]
+        },
+        "gltf": {
+          "description": "GL Transmission Format",
+          "features": [
+            "webgl ready",
+            "JSON+bin",
+            "scene graph"
+          ]
+        }
+      },
+      "data": {
+        "json": {
+          "description": "Project metadata and calculations",
+          "features": [
+            "machine readable",
+            "complete data",
+            "importable"
+          ]
+        },
+        "txt": {
+          "description": "Human-readable report",
+          "features": [
+            "formatted text",
+            "measurements",
+            "cutting list"
+          ]
+        }
+      }
+    },
+    "output_examples": [
+      {
+        "file": "/home/tomas/Ceiling Panel Spacer/output/examples/example_layout.dxf",
+        "size_bytes": 19035,
+        "format": "dxf"
+      },
+      {
+        "file": "/home/tomas/Ceiling Panel Spacer/output/examples/example_layout.svg",
+        "size_bytes": 2178,
+        "format": "svg"
+      },
+      {
+        "file": "/home/tomas/Ceiling Panel Spacer/output/examples/example_project.json",
+        "size_bytes": 720,
+        "format": "json"
+      },
+      {
+        "file": "/home/tomas/Ceiling Panel Spacer/output/examples/example_report.txt",
+        "size_bytes": 1455,
+        "format": "txt"
+      }
+    ],
+    "summary": {
+      "total_export_related_files": 4,
+      "total_lines_of_code": 1963,
+      "supported_export_formats": 6,
+      "api_endpoints": 5,
+      "export_classes": 7
+    }
+  }
+}

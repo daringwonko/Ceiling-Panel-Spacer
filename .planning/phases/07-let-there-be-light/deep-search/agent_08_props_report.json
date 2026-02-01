@@ -1,0 +1,163 @@
+{
+  "search_query": "Property panel implementations (WallProperties, BeamProperties, ColumnProperties, PropertyPanel)",
+  "search_date": "2026-02-01",
+  "total_property_panels": 8,
+  "total_lines_of_code": 3578,
+  "property_panels": [
+    {
+      "name": "WallPropertiesPanel",
+      "path": "frontend/src/bim/property-panels/WallProperties.tsx",
+      "line_count": 401,
+      "editing_functionality": [
+        "Wall dimensions (length, height, thickness)",
+        "Position (X, Y, Z coordinates)",
+        "Rotation angle",
+        "Material selection",
+        "Layer assignment",
+        "Start/End point editing",
+        "Height adjustment",
+        "Phase/level attributes"
+      ],
+      "exports": ["WallPropertiesPanel"]
+    },
+    {
+      "name": "BeamPropertiesPanel",
+      "path": "frontend/src/bim/property-panels/BeamProperties.tsx",
+      "line_count": 448,
+      "editing_functionality": [
+        "Beam dimensions (length, width, height)",
+        "Position (X, Y, Z coordinates)",
+        "Rotation angle",
+        "Material selection",
+        "Layer assignment",
+        "Start/End point editing",
+        "Profile selection (rectangular, I-beam, etc.)",
+        "Phase/level attributes"
+      ],
+      "exports": ["BeamPropertiesPanel"]
+    },
+    {
+      "name": "ColumnPropertiesPanel",
+      "path": "frontend/src/bim/property-panels/ColumnProperties.tsx",
+      "line_count": 413,
+      "editing_functionality": [
+        "Column dimensions (width, depth, height)",
+        "Position (X, Y, Z coordinates)",
+        "Rotation angle",
+        "Material selection",
+        "Layer assignment",
+        "Profile shape (rectangular, circular)",
+        "Height adjustment",
+        "Base level/top level attributes"
+      ],
+      "exports": ["ColumnPropertiesPanel"]
+    },
+    {
+      "name": "SlabPropertiesPanel",
+      "path": "frontend/src/bim/property-panels/SlabProperties.tsx",
+      "line_count": 379,
+      "editing_functionality": [
+        "Slab dimensions (length, width, thickness)",
+        "Position (X, Y, Z coordinates)",
+        "Rotation angle",
+        "Material selection",
+        "Layer assignment",
+        "Boundary points editing",
+        "Thickness adjustment",
+        "Slope/grade settings"
+      ],
+      "exports": ["SlabPropertiesPanel"]
+    },
+    {
+      "name": "StructuralPropertyPanel",
+      "path": "frontend/src/bim/property-panels/StructuralPropertyPanel.tsx",
+      "line_count": 180,
+      "editing_functionality": [
+        "Switcher component for WallPropertiesPanel",
+        "Switcher component for BeamPropertiesPanel",
+        "Switcher component for ColumnPropertiesPanel",
+        "Switcher component for SlabPropertiesPanel",
+        "Dynamic panel rendering based on selected object type"
+      ],
+      "exports": ["StructuralPropertyPanel"]
+    },
+    {
+      "name": "ObjectPropertiesPanel",
+      "path": "frontend/src/features/bim/components/ObjectPropertiesPanel.tsx",
+      "line_count": 588,
+      "editing_functionality": [
+        "Generic object properties display",
+        "Transform controls (position, rotation, scale)",
+        "Material properties editing",
+        "Layer assignment",
+        "Visibility controls",
+        "Name/label editing",
+        "Dimensions display",
+        "Selection highlighting",
+        "Multi-object selection support"
+      ],
+      "exports": ["ObjectPropertiesPanel"]
+    },
+    {
+      "name": "LevelProperties",
+      "path": "frontend/src/components/LevelPanel/LevelProperties.tsx",
+      "line_count": 367,
+      "editing_functionality": [
+        "Level name editing",
+        "Elevation input (in meters)",
+        "Height input",
+        "Level number assignment",
+        "Usage type selection (living, office, retail, utility, industrial, other)",
+        "Display color picker",
+        "Visibility toggle",
+        "Statistics display (object count, total area, bounds)",
+        "Validation for elevation conflicts and height constraints",
+        "Auto-name generation from level number"
+      ],
+      "exports": ["LevelProperties"]
+    },
+    {
+      "name": "SectionPanel",
+      "path": "src/bim/ui/section_panel.tsx",
+      "line_count": 802,
+      "editing_functionality": [
+        "Section plane creation",
+        "Section type selection (Plan, Elevation, Section)",
+        "Section name editing",
+        "Activation/deactivation controls",
+        "Section direction flipping",
+        "Section deletion",
+        "Filter and sort sections",
+        "Properties display for selected section",
+        "Keyboard shortcuts (Enter, Esc, F, S/P/E)",
+        "Width/Height/Position/Normal property display"
+      ],
+      "exports": ["SectionPanel"]
+    }
+  ],
+  "state_management": {
+    "store": "frontend/src/stores/useBIMStore.ts",
+    "actions": [
+      "togglePropertiesPanel",
+      "setPropertiesPanelObject"
+    ]
+  },
+  "lazy_loading": {
+    "component": "LazyPropertiesPanel",
+    "path": "frontend/src/utils/lazyLoad.ts"
+  },
+  "material_properties": {
+    "file": "design/structural_engine.py",
+    "class": "MaterialProperties",
+    "properties": [
+      "material type (concrete_25, concrete_35, steel_s275, steel_s355, wood_spruce)"
+    ]
+  },
+  "notes": [
+    "Property panels follow React functional component pattern with hooks",
+    "LevelProperties includes comprehensive form validation",
+    "SectionPanel includes embedded CSS styles",
+    "ObjectPropertiesPanel includes transform controls integration",
+    "All structural property panels support onUpdate and onValidate callbacks"
+  ]
+}

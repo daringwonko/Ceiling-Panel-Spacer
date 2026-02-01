@@ -1,0 +1,339 @@
+{
+  "search_summary": {
+    "total_files_found": 6,
+    "search_patterns_used": [
+      "Find files by name (*wall*, *beam*, *column*, *slab*, *roof*)",
+      "Grep for class definitions (Wall, Beam, Column, Slab, Roof)"
+    ],
+    "search_date": "2026-02-01"
+  },
+  "bim_objects": [
+    {
+      "file_path": "/home/tomas/Ceiling Panel Spacer/bim/objects/wall.py",
+      "line_count": 235,
+      "implements": "Parametric wall object for BIM Workbench",
+      "description": "Provides parametric wall creation with thickness, height, and material properties. Walls are extruded vertically from a base line defined on a working plane.",
+      "classes": [
+        {
+          "name": "Wall",
+          "type": "dataclass",
+          "key_properties": [
+            "start: Tuple[float, float, float]",
+            "end: Tuple[float, float, float]",
+            "height: float",
+            "thickness: float",
+            "material: str",
+            "level: str",
+            "id: str"
+          ],
+          "key_methods": [
+            "validate()",
+            "length (property)",
+            "area (property)",
+            "volume (property)",
+            "get_face_polygons()",
+            "to_dict()",
+            "update_geometry(**kwargs)"
+          ]
+        }
+      ],
+      "functions": [
+        {
+          "name": "create_wall",
+          "signature": "create_wall(start, end, height=2800.0, thickness=200.0, material='Concrete', level='Level 0', wall_id=None) -> Wall",
+          "description": "Factory function to create a new wall object"
+        }
+      ]
+    },
+    {
+      "file_path": "/home/tomas/Ceiling Panel Spacer/bim/objects/beam.py",
+      "line_count": 314,
+      "implements": "Parametric beam object with rectangular profile",
+      "description": "Provides parametric beam creation with rectangular profile along a vector. Beams can be positioned at any elevation with configurable profile dimensions.",
+      "classes": [
+        {
+          "name": "Beam",
+          "type": "dataclass",
+          "key_properties": [
+            "start: Tuple[float, float, float]",
+            "end: Tuple[float, float, float]",
+            "profile_width: float",
+            "profile_height: float",
+            "material: str",
+            "elevation: float",
+            "id: str"
+          ],
+          "key_methods": [
+            "validate()",
+            "length (property)",
+            "volume (property)",
+            "weight (property)",
+            "axis_vector (property)",
+            "is_horizontal (property)",
+            "get_profile_outline()",
+            "get_bounding_box()",
+            "to_dict()",
+            "update_geometry(**kwargs)"
+          ]
+        }
+      ],
+      "functions": [
+        {
+          "name": "create_beam",
+          "signature": "create_beam(start, end, profile_width=200.0, profile_height=400.0, material='Concrete', elevation=None, beam_id=None) -> Beam",
+          "description": "Factory function to create a new beam object"
+        }
+      ]
+    },
+    {
+      "file_path": "/home/tomas/Ceiling Panel Spacer/bim/objects/column.py",
+      "line_count": 307,
+      "implements": "Parametric column object with rectangle or circle profile",
+      "description": "Provides parametric column creation with rectangular or circular profiles. Columns are extruded vertically from a base elevation to a specified height.",
+      "classes": [
+        {
+          "name": "Column",
+          "type": "dataclass",
+          "key_properties": [
+            "position: Tuple[float, float]",
+            "base_elevation: float",
+            "height: float",
+            "profile_type: Literal['rectangle', 'circle']",
+            "width: float",
+            "depth: float",
+            "material: str",
+            "level: str",
+            "id: str"
+          ],
+          "key_methods": [
+            "validate()",
+            "top_elevation (property)",
+            "cross_sectional_area (property)",
+            "surface_area (property)",
+            "volume (property)",
+            "weight (property)",
+            "center_point (property)",
+            "get_base_outline()",
+            "get_3d_outline()",
+            "get_bounding_box()",
+            "to_dict()",
+            "update_geometry(**kwargs)"
+          ]
+        }
+      ],
+      "functions": [
+        {
+          "name": "create_column",
+          "signature": "create_column(position, height=3000.0, profile_type='rectangle', width=300.0, depth=None, base_elevation=0.0, material='Concrete', level='Level 0', column_id=None) -> Column",
+          "description": "Factory function to create a new column object"
+        }
+      ]
+    },
+    {
+      "file_path": "/home/tomas/Ceiling Panel Spacer/bim/objects/slab.py",
+      "line_count": 367,
+      "implements": "Parametric slab object with polygonal boundary",
+      "description": "Provides parametric slab creation with polygonal boundaries. Slabs are extruded vertically to a specified thickness from a top elevation.",
+      "classes": [
+        {
+          "name": "Slab",
+          "type": "dataclass",
+          "key_properties": [
+            "boundary: List[Tuple[float, float]]",
+            "thickness: float",
+            "elevation: float",
+            "material: str",
+            "extrude_direction: Literal['down', 'up']",
+            "level: str",
+            "id: str"
+          ],
+          "key_methods": [
+            "validate()",
+            "_has_self_intersection()",
+            "area (property)",
+            "volume (property)",
+            "perimeter (property)",
+            "top_elevation (property)",
+            "bottom_elevation (property)",
+            "centroid (property)",
+            "get_top_face()",
+            "get_bottom_face()",
+            "get_side_faces()",
+            "get_bounding_box()",
+            "is_point_inside(point)",
+            "to_dict()",
+            "update_geometry(**kwargs)"
+          ]
+        }
+      ],
+      "functions": [
+        {
+          "name": "create_slab",
+          "signature": "create_slab(boundary, thickness=200.0, elevation=3000.0, material='Concrete', extrude_direction='down', level='Level 1', slab_id=None) -> Slab",
+          "description": "Factory function to create a new slab object"
+        }
+      ]
+    },
+    {
+      "file_path": "/home/tomas/Ceiling Panel Spacer/bim/objects/roof.py",
+      "line_count": 506,
+      "implements": "Parametric roof object generated from closed wire profile",
+      "description": "Provides parametric roof generation from closed wire profiles. Supports multiple roof types including gable, hip, shed, and flat.",
+      "enums": [
+        {
+          "name": "RoofType",
+          "values": ["GABLE", "HIP", "SHED", "FLAT"]
+        }
+      ],
+      "classes": [
+        {
+          "name": "Roof",
+          "type": "class",
+          "key_properties": [
+            "id: str",
+            "name: str",
+            "type: str",
+            "position: Tuple[float, float, float]",
+            "slope_angle: float",
+            "overhang: float",
+            "roof_type: RoofType",
+            "thickness: float",
+            "base_wire: List[Tuple[float, float]]"
+          ],
+          "key_methods": [
+            "_validate_range()",
+            "slope_angle (property/setter)",
+            "overhang (property/setter)",
+            "roof_type (property/setter)",
+            "thickness (property/setter)",
+            "base_wire (property/setter)",
+            "is_valid_wire()",
+            "generate_from_wire()",
+            "get_geometry()",
+            "get_preview_geometry()",
+            "_generate_gable_roof()",
+            "_generate_hip_roof()",
+            "_generate_shed_roof()",
+            "_generate_flat_roof()",
+            "_calculate_bounding_box()",
+            "_calculate_centroid()",
+            "_calculate_ridge_height()",
+            "_apply_overhang()",
+            "to_dict()",
+            "from_dict(cls, data)"
+          ]
+        }
+      ],
+      "functions": [
+        {
+          "name": "makeRoof",
+          "signature": "makeRoof(base_wire, slope_angle=30.0, roof_type=RoofType.GABLE, name='Roof') -> Roof",
+          "description": "Factory function to create a new Roof object"
+        }
+      ]
+    },
+    {
+      "file_path": "/home/tomas/Ceiling Panel Spacer/bim_workbench/objects/roof.py",
+      "line_count": 588,
+      "implements": "Parametric roof object for BIM Workbench (duplicate/alternative implementation)",
+      "description": "Similar to bim/objects/roof.py but with slightly different structure. Provides parametric roof generation from closed wire profiles.",
+      "enums": [
+        {
+          "name": "RoofType",
+          "values": ["GABLE", "HIP", "SHED", "FLAT"]
+        }
+      ],
+      "classes": [
+        {
+          "name": "Roof",
+          "type": "class",
+          "key_properties": [
+            "id: str",
+            "name: str",
+            "type: str",
+            "position: Tuple[float, float, float]",
+            "_slope_angle",
+            "_overhang",
+            "_roof_type",
+            "_thickness",
+            "_base_wire"
+          ],
+          "key_methods": [
+            "_validate_range()",
+            "slope_angle (property/setter)",
+            "overhang (property/setter)",
+            "roof_type (property/setter)",
+            "thickness (property/setter)",
+            "base_wire (property/setter)",
+            "is_valid_wire()",
+            "generate_from_wire()",
+            "get_geometry()",
+            "get_preview_geometry()",
+            "_generate_gable_roof()",
+            "_generate_hip_roof()",
+            "_generate_shed_roof()",
+            "_generate_flat_roof()",
+            "_calculate_bounding_box()",
+            "_calculate_centroid()",
+            "_calculate_ridge_height()",
+            "_apply_overhang()",
+            "to_dict()",
+            "from_dict(cls, data)"
+          ]
+        }
+      ],
+      "functions": [
+        {
+          "name": "makeRoof",
+          "signature": "makeRoof(base_wire, slope_angle=30.0, roof_type=RoofType.GABLE, name='Roof') -> Roof",
+          "description": "Factory function to create a new Roof object"
+        }
+      ]
+    }
+  ],
+  "related_classes_found": [
+    {
+      "file_path": "/home/tomas/Ceiling Panel Spacer/design/structural_engine.py",
+      "classes": ["BeamDesign", "ColumnDesign"],
+      "description": "Structural design classes for beams and columns"
+    },
+    {
+      "file_path": "/home/tomas/Ceiling Panel Spacer/bim/gui/structural_tools.py",
+      "classes": ["WallTool", "BeamTool", "ColumnTool", "SlabTool"],
+      "description": "GUI tool classes for creating structural elements"
+    },
+    {
+      "file_path": "/home/tomas/Ceiling Panel Spacer/bim/property/structural_props.py",
+      "classes": ["WallPropertyPanel", "BeamPropertyPanel", "ColumnPropertyPanel", "SlabPropertyPanel"],
+      "description": "Property panel classes for editing structural element properties"
+    }
+  ],
+  "all_class_definitions": [
+    "Wall (bim/objects/wall.py:13)",
+    "Beam (bim/objects/beam.py:13)",
+    "Column (bim/objects/column.py:13)",
+    "Slab (bim/objects/slab.py:13)",
+    "RoofType (bim/objects/roof.py:10)",
+    "Roof (bim/objects/roof.py:16)",
+    "RoofType (bim_workbench/objects/roof.py:14)",
+    "Roof (bim_workbench/objects/roof.py:23)",
+    "BeamDesign (design/structural_engine.py)",
+    "ColumnDesign (design/structural_engine.py)",
+    "WallTool (bim/gui/structural_tools.py)",
+    "BeamTool (bim/gui/structural_tools.py)",
+    "ColumnTool (bim/gui/structural_tools.py)",
+    "SlabTool (bim/gui/structural_tools.py)",
+    "WallPropertyPanel (bim/property/structural_props.py)",
+    "BeamPropertyPanel (bim/property/structural_props.py)",
+    "ColumnPropertyPanel (bim/property/structural_props.py)",
+    "SlabPropertyPanel (bim/property/structural_props.py)"
+  ],
+  "factory_functions": [
+    "create_wall (bim/objects/wall.py:191)",
+    "create_beam (bim/objects/beam.py:267)",
+    "create_column (bim/objects/column.py:244)",
+    "create_slab (bim/objects/slab.py:315)",
+    "makeRoof (bim/objects/roof.py:480)",
+    "makeRoof (bim_workbench/objects/roof.py:562)"
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "three": "^0.149.0",
+    "three": "^0.160.0",
     "web-ifc-three": "^0.0.126",
     "zustand": "^5.0.10"
   },

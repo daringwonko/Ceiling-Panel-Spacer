@@ -230,20 +230,80 @@ export const BIM3DCanvas: React.FC<BIM3DCanvasProps> = ({
   onObjectHover,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const contextLostRef = useRef<boolean>(false);
+  const disposedObjectsRef = useRef<Set<string>>(new Set());
+
+  const onContextLost = useCallback((e: Event) => {
+    e.preventDefault();
+    console.warn('WebGL context lost');
+    contextLostRef.current = true;
+  }, []);
+
+  const onContextRestored = useCallback(() => {
+    console.info('WebGL context restored');
+    contextLostRef.current = false;
+    disposedObjectsRef.current.clear();
+  }, []);
+
+  const disposeObject = useCallback((obj: BIM3DObject) => {
+    if (disposedObjectsRef.current.has(obj.id)) return;
+    disposedObjectsRef.current.add(obj.id);
+    obj.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        if (child.geometry) child.geometry.dispose();
+        if (child.material) {
+          if (Array.isArray(child.material)) {
+            child.material.forEach(m => m.dispose());
+          } else {
+            child.material.dispose();
+          }
+        }
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const handleContextLost = (e: Event) => {
+      e.preventDefault();
+      console.warn('WebGL context lost');
+      contextLostRef.current = true;
+    };
+
+    const handleContextRestored = () => {
+      console.info('WebGL context restored');
+      contextLostRef.current = false;
+      disposedObjectsRef.current.clear();
+    };
+
+    canvas.addEventListener('webglcontextlost', handleContextLost);
+    canvas.addEventListener('webglcontextrestored', handleContextRestored);
+
+    return () => {
+      canvas.removeEventListener('webglcontextlost', handleContextLost);
+      canvas.removeEventListener('webglcontextrestored', handleContextRestored);
+      objects.forEach(disposeObject);
+      disposedObjectsRef.current.clear();
+    };
+  }, [objects, disposeObject]);
 
   return (
-    <div style={{ 
-      width: '100%', 
-      height: '100%', 
+    <div style={{
+      width: '100%',
+      height: '100%',
       backgroundColor,
       position: 'relative'
     }}>
       <Canvas
         ref={canvasRef}
-        gl={{ 
-          antialias: true, 
+        gl={{
+          antialias: true,
           alpha: false,
           preserveDrawingBuffer: true,
+          onContextLost,
+          onContextRestored,
         }}
         shadows
         style={{
