@@ -10,11 +10,20 @@ import sys
 from pathlib import Path
 from typing import Optional, List
 
-from .kitchen_orchestrator import (
-    KitchenDesignOrchestrator,
-    DesignParameters,
-    KitchenDesignException
-)
+try:
+    # Try relative import first (when used as module)
+    from .kitchen_orchestrator import (
+        KitchenDesignOrchestrator,
+        DesignParameters,
+        KitchenDesignException,
+    )
+except ImportError:
+    # Fall back to absolute import (when running directly)
+    from kitchen_orchestrator import (
+        KitchenDesignOrchestrator,
+        DesignParameters,
+        KitchenDesignException,
+    )
 
 
 class CLIInterface:
@@ -78,48 +87,105 @@ class CLIInterface:
         """Create argument parser with all commands."""
         parser = argparse.ArgumentParser(
             prog="savage-cli",
-            description="Savage Cabinetry Platform - Professional Kitchen Design CLI"
+            description="Savage Cabinetry Platform - Professional Kitchen Design CLI",
         )
 
         subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
         # Calculate command
-        calc_parser = subparsers.add_parser("calculate", help="Calculate ceiling panel layout")
-        calc_parser.add_argument("--width", "-w", type=int, required=True,
-                               help="Ceiling width in millimeters")
-        calc_parser.add_argument("--length", "-l", type=int, required=True,
-                               help="Ceiling length in millimeters")
-        calc_parser.add_argument("--material", "-m", default="standard_tiles",
-                               choices=["standard_tiles", "acoustic_panels"],
-                               help="Material type (default: standard_tiles)")
-        calc_parser.add_argument("--edge-gap", type=int, default=200,
-                               help="Edge gap in millimeters (default: 200)")
-        calc_parser.add_argument("--spacing-gap", type=int, default=50,
-                               help="Spacing gap in millimeters (default: 50)")
-        calc_parser.add_argument("--format", "-f", choices=["text", "json"],
-                               default="text", help="Output format (default: text)")
+        calc_parser = subparsers.add_parser(
+            "calculate", help="Calculate ceiling panel layout"
+        )
+        calc_parser.add_argument(
+            "--width",
+            "-w",
+            type=int,
+            required=True,
+            help="Ceiling width in millimeters",
+        )
+        calc_parser.add_argument(
+            "--length",
+            "-l",
+            type=int,
+            required=True,
+            help="Ceiling length in millimeters",
+        )
+        calc_parser.add_argument(
+            "--material",
+            "-m",
+            default="standard_tiles",
+            choices=["standard_tiles", "acoustic_panels"],
+            help="Material type (default: standard_tiles)",
+        )
+        calc_parser.add_argument(
+            "--edge-gap",
+            type=int,
+            default=200,
+            help="Edge gap in millimeters (default: 200)",
+        )
+        calc_parser.add_argument(
+            "--spacing-gap",
+            type=int,
+            default=50,
+            help="Spacing gap in millimeters (default: 50)",
+        )
+        calc_parser.add_argument(
+            "--format",
+            "-f",
+            choices=["text", "json"],
+            default="text",
+            help="Output format (default: text)",
+        )
 
         # Estimate command
         est_parser = subparsers.add_parser("estimate", help="Quick cost estimate")
-        est_parser.add_argument("--width", "-w", type=int, required=True,
-                              help="Ceiling width in millimeters")
-        est_parser.add_argument("--length", "-l", type=int, required=True,
-                              help="Ceiling length in millimeters")
-        est_parser.add_argument("--material", "-m", default="standard_tiles",
-                              choices=["standard_tiles", "acoustic_panels"],
-                              help="Material type (default: standard_tiles)")
-        est_parser.add_argument("--edge-gap", type=int, default=200,
-                              help="Edge gap in millimeters (default: 200)")
+        est_parser.add_argument(
+            "--width",
+            "-w",
+            type=int,
+            required=True,
+            help="Ceiling width in millimeters",
+        )
+        est_parser.add_argument(
+            "--length",
+            "-l",
+            type=int,
+            required=True,
+            help="Ceiling length in millimeters",
+        )
+        est_parser.add_argument(
+            "--material",
+            "-m",
+            default="standard_tiles",
+            choices=["standard_tiles", "acoustic_panels"],
+            help="Material type (default: standard_tiles)",
+        )
+        est_parser.add_argument(
+            "--edge-gap",
+            type=int,
+            default=200,
+            help="Edge gap in millimeters (default: 200)",
+        )
 
         # Export command
         exp_parser = subparsers.add_parser("export", help="Export design files")
-        exp_parser.add_argument("formats", nargs="+",
-                              choices=["json", "text", "dxf", "svg"],
-                              help="Export formats (can specify multiple)")
-        exp_parser.add_argument("--output-dir", "-o", default=".",
-                              help="Output directory (default: current directory)")
-        exp_parser.add_argument("--use-cache", action="store_true",
-                              help="Use results from last calculate command")
+        exp_parser.add_argument(
+            "formats",
+            nargs="+",
+            choices=["json", "text", "dxf", "svg"],
+            help="Export formats (can specify multiple)",
+        )
+        exp_parser.add_argument(
+            "--output-dir",
+            "-o",
+            default=".",
+            help="Output directory (default: current directory)",
+        )
+        exp_parser.add_argument(
+            "--use-cache",
+            action="store_true",
+            help="Use results from last calculate command",
+        )
 
         # Status command
         status_parser = subparsers.add_parser("status", help="Show platform status")
@@ -133,17 +199,14 @@ class CLIInterface:
             ceiling_length_mm=args.length,
             material_type=args.material,
             gap_edge_mm=args.edge_gap,
-            gap_spacing_mm=args.spacing_gap
+            gap_spacing_mm=args.spacing_gap,
         )
 
         try:
             result = self.orchestrator.calculate_ceiling_panels(params)
 
             # Cache results for export command
-            self.results_cache = {
-                "params": params,
-                "result": result
-            }
+            self.results_cache = {"params": params, "result": result}
 
             if args.format == "json":
                 output = self.orchestrator.generate_panel_layout(params, result, "json")
@@ -169,7 +232,7 @@ class CLIInterface:
             ceiling_width_mm=args.width,
             ceiling_length_mm=args.length,
             material_type=args.material,
-            gap_edge_mm=args.edge_gap
+            gap_edge_mm=args.edge_gap,
         )
 
         try:
@@ -183,9 +246,13 @@ class CLIInterface:
 
             print("\n💰 COST ESTIMATE")
             print("=" * 30)
-            print(f"Ceiling: {args.width}mm × {args.length}mm ({estimate['area_sqm']} sqm)")
+            print(
+                f"Ceiling: {args.width}mm × {args.length}mm ({estimate['area_sqm']} sqm)"
+            )
             print(f"Material: {estimate['material']}")
-            print(".2f"            print(".2f"            print(".2f"            print("\n📝 This is a rough estimate including 15% waste allowance.")
+            print(f"Total Material Cost: ${estimate['total_estimated_cost']:.2f}")
+            print(f"Waste Allowance (15%): ${estimate['waste_allowance']:.2f}")
+            print(f"\n📝 This is a rough estimate including 15% waste allowance.")
 
         except KitchenDesignException as e:
             print(f"❌ Design Error: {e}", file=sys.stderr)
@@ -196,7 +263,10 @@ class CLIInterface:
     def _cmd_export(self, args: argparse.Namespace) -> int:
         """Handle export command."""
         if not self.results_cache:
-            print("❌ No calculation results to export. Run 'calculate' command first, or use --use-cache if you have results.", file=sys.stderr)
+            print(
+                "❌ No calculation results to export. Run 'calculate' command first, or use --use-cache if you have results.",
+                file=sys.stderr,
+            )
             return 1
 
         params = self.results_cache["params"]
@@ -205,10 +275,12 @@ class CLIInterface:
         try:
             Path(args.output_dir).mkdir(exist_ok=True)
 
-            exported = self.orchestrator.export_design(params, result, args.formats, args.output_dir)
+            exported = self.orchestrator.export_design(
+                params, result, args.formats, args.output_dir
+            )
 
-            print("
-📁 EXPORT COMPLETE"            print("=" * 30)
+            print("\n📁 EXPORT COMPLETE")
+            print("=" * 30)
             for fmt, path in exported.items():
                 if fmt in ["dxf", "svg", "json"]:
                     print(f"📄 {fmt.upper()}: {path}")
