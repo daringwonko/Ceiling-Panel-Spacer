@@ -326,20 +326,24 @@ const isVisible = hierarchyManager.isVisible(level.id)
 
 ## Testing
 
-Run the test suite:
-```bash
-cd frontend
-npx tsx src/test/levelSystem.test.ts
-```
-
 Test coverage:
 - ✓ Site creation with geographic properties
 - ✓ Building creation with site association
 - ✓ Level creation with elevation and height
 - ✓ Object assignment to levels
 - ✓ Hierarchy traversal (Site → Building → Level)
-- ✓ Level visibility toggling
+- ✓ Tree management operations
+- ✓ Drag-drop validation
+- ✓ Selection management
+- ✓ Expand/collapse functionality
+- ✓ Visibility toggling
+- ✓ Event notifications
+- ✓ JSON serialization/deserialization
 - ✓ Project export/import with hierarchy
+
+## Commits
+
+- `4b7e8314` feat(06-12): implement Site → Building → Level → Object hierarchy
 
 ## Next Steps
 
