@@ -302,9 +302,105 @@ export const DEFAULT_ROOF: Omit<Roof, 'id' | 'position'> = {
   material: 'tile',
 };
 
+/**
+ * Section plane types for generating 2D cuts from 3D models
+ */
+export enum SectionType {
+  PLAN = 'PLAN',       // Horizontal cut, looking down
+  ELEVATION = 'ELEVATION', // Vertical cut, looking at wall
+  SECTION = 'SECTION', // Custom angled cut
+}
+
+/**
+ * Section plane for cutting through 3D model
+ */
+export interface SectionPlane {
+  id: string;
+  name: string;
+  type: SectionType;
+  position: Point3D;    // Center position in 3D space
+  normal: Vector3D;     // Direction the section faces (positive side)
+  width: number;        // Width of section plane in mm
+  height: number;       // Height of section plane in mm
+  isActive: boolean;    // Whether this section is currently active
+}
+
+/**
+ * 3D point for section plane
+ */
+export interface Point3D {
+  x: number;
+  y: number;
+  z: number;
+}
+
+/**
+ * 3D vector for direction/normal
+ */
+export interface Vector3D {
+  x: number;
+  y: number;
+  z: number;
+}
+
+/**
+ * Plane equation coefficients (ax + by + cz = d)
+ */
+export interface PlaneEquation {
+  a: number;
+  b: number;
+  c: number;
+  d: number;
+}
+
+/**
+ * Rectangle bounds for section plane visualization
+ */
+export interface SectionBounds {
+  corners: Point3D[];
+  minX: number;
+  maxX: number;
+  minY: number;
+  maxY: number;
+  minZ: number;
+  maxZ: number;
+}
+
+/**
+ * Clipping result from cutting geometry
+ */
+export interface ClippingResult {
+  clipped: boolean;
+  geometry: ThreeGeometry | null;
+  cutSurface: ThreeGeometry | null;
+}
+
+/**
+ * Three.js geometry type (for clipping operations)
+ */
+export interface ThreeGeometry {
+  type: 'mesh' | 'bufferGeometry';
+  vertices?: number[];
+  faces?: number[];
+  attributes?: Record<string, unknown>;
+}
+
+/**
+ * Default values for section planes
+ */
+export const DEFAULT_SECTION_PLANE: Omit<SectionPlane, 'id' | 'name'> = {
+  type: SectionType.SECTION,
+  position: { x: 0, y: 0, z: 0 },
+  normal: { x: 1, y: 0, z: 0 },
+  width: 2000,
+  height: 3000,
+  isActive: false,
+};
+
 export default {
   DEFAULT_DOOR,
   DEFAULT_WINDOW,
   DEFAULT_STAIRS,
   DEFAULT_ROOF,
+  DEFAULT_SECTION_PLANE,
 };
